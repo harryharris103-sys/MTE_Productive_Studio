@@ -1,193 +1,651 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>MTE Productive Studio</title>
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg">
 <meta name="theme-color" content="#1A1A1A">
 <style>
 :root{--g:#C9932E;--d:#1A1A1A;--p:#242424;--l:#3a3a3a;--m:#9a9a9a;--t:#f2f2f2;font-family:Helvetica,Arial,sans-serif}
 *{box-sizing:border-box}html,body{height:100%;margin:0;background:var(--d);color:var(--t);font-size:13px}
-body{display:grid;grid-template-rows:auto 1fr;grid-template-columns:76px 1fr 260px;grid-template-areas:"top top top" "tools stage side"}
-header{grid-area:top;display:flex;gap:8px;align-items:center;padding:8px 12px;border-bottom:2px solid var(--g);flex-wrap:wrap}
-header b{font-size:15px;letter-spacing:.06em;margin-right:8px}header b i{color:var(--g);font-style:normal}
-button,select,input{font:inherit;color:var(--t);background:var(--p);border:1px solid var(--l);border-radius:4px;padding:6px 9px}
+body{height:100dvh;display:grid;grid-template-rows:auto 1fr;grid-template-columns:76px 1fr 280px;grid-template-areas:"top top top" "tools stage side";overflow:hidden}
+header{grid-area:top;border-bottom:2px solid var(--g);padding:6px 10px;padding-top:max(6px,env(safe-area-inset-top))}
+#hmain,#hmore{display:flex;gap:6px;align-items:center;flex-wrap:wrap}#hmore{margin-top:6px}
+.lg{width:28px;height:28px;border-radius:6px}.brand{font-size:14px;letter-spacing:.05em}.brand i{color:var(--g);font-style:normal}
+.ver{font-size:10px;color:var(--d);background:var(--g);border-radius:9px;padding:1px 6px;font-weight:700}
+.sp{flex:1}
+button,select,input,textarea{font:inherit;color:var(--t);background:var(--p);border:1px solid var(--l);border-radius:4px;padding:6px 9px}
 button{cursor:pointer}button:hover{border-color:var(--g)}button.pri{background:var(--g);color:var(--d);border-color:var(--g);font-weight:700}
-input[type=color]{padding:0;width:34px;height:28px}input[type=number]{width:70px}
-button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--g);outline-offset:1px}
-#tools{grid-area:tools;display:flex;flex-direction:column;gap:6px;padding:8px;border-right:1px solid var(--l);overflow:auto}
+button.on{border-color:var(--g);background:#3a2f17}
+input[type=color]{padding:0;width:34px;height:28px}input[type=number]{width:68px}input[type=range]{padding:0}
+label{display:inline-flex;gap:4px;align-items:center}.chk input{width:auto}
+:focus-visible{outline:2px solid var(--g);outline-offset:1px}
+#wsTabs{display:flex;gap:4px;margin-left:8px}
+#tools{grid-area:tools;display:flex;flex-direction:column;gap:5px;padding:8px;border-right:1px solid var(--l);overflow:auto}
 #tools button{width:100%;padding:8px 2px;font-size:12px}
-#stage{grid-area:stage;overflow:auto;display:grid;place-items:center;background:#101010;padding:20px;position:relative}
+#stage{grid-area:stage;overflow:auto;display:grid;place-items:center;background:#101010;padding:20px;position:relative;touch-action:pan-x pan-y}
 #stage.drag{outline:3px dashed var(--g);outline-offset:-10px}
 .cw{box-shadow:0 0 0 1px var(--l),0 10px 40px #000;background:repeating-conic-gradient(#2c2c2c 0 25%,#222 0 50%) 0 0/16px 16px}
 #side{grid-area:side;border-left:1px solid var(--l);overflow:auto;padding:10px;display:flex;flex-direction:column;gap:12px}
 h3{margin:0 0 6px;font-size:12px;color:var(--g)}.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
 .sw{width:22px;height:22px;padding:0;border-radius:50%}
+.ib{padding:5px 7px;line-height:0}.ib svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6}
 .ly{display:flex;gap:4px;align-items:center;padding:3px;border:1px solid transparent;border-radius:4px}
-.ly.on{border-color:var(--g);background:var(--p)}.ly span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
-.ly button{padding:1px 6px}
-#toast{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:var(--g);color:var(--d);padding:8px 14px;border-radius:6px;font-weight:700;display:none;z-index:9}
-@media(max-width:800px){body{grid-template-columns:1fr;grid-template-rows:auto auto 55vh auto;grid-template-areas:"top" "tools" "stage" "side"}#tools{flex-direction:row;flex-wrap:wrap;border-right:0}#tools button{width:auto;padding:8px 12px}}
-</style></head><body>
+.ly.on{border-color:var(--g);background:var(--p)}.ly span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}.ly button{padding:1px 6px}
+#toast{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:var(--g);color:var(--d);padding:8px 14px;border-radius:6px;font-weight:700;display:none;z-index:99;max-width:92vw}
+#fab,#soBar{display:none}
+#soBar{position:fixed;top:0;left:0;right:0;z-index:50;background:var(--g);color:var(--d);padding:6px 10px;gap:8px;align-items:center;font-weight:700}
+.wsp{grid-column:1/-1;grid-row:2/-1;display:none;flex-direction:column;overflow:auto;padding:10px;gap:8px}
+body:not([data-ws=design]) :is(#tools,#stage,#side,#hmore,#fab){display:none!important}
+body[data-ws=office] #ws-office{display:flex}
+dialog{background:var(--d);color:var(--t);border:2px solid var(--g);border-radius:10px;padding:14px;max-width:min(720px,96vw);width:96vw;max-height:92dvh;overflow:auto}
+dialog::backdrop{background:#000a}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
+.grid button{text-align:left;padding:8px}.grid small{display:block;color:var(--m)}
+table.sh{border-collapse:collapse}.sh td,.sh th{border:1px solid var(--l);padding:0}.sh th{background:var(--p);padding:2px 6px;color:var(--m);font-weight:400}
+.sh input{border:0;border-radius:0;width:96px;background:transparent}
+textarea.pp{width:100%;min-height:34px;resize:vertical}
+small.m{color:var(--m)}
+@media(max-width:800px){
+ body{grid-template-columns:1fr;grid-template-rows:auto 1fr auto;grid-template-areas:"top" "stage" "tools"}
+ header{padding:4px 6px;padding-top:max(4px,env(safe-area-inset-top))}
+ .brand{display:none}#hmain button{padding:6px 8px}
+ #hmore{display:none}#hmore.show{display:flex}
+ #tools{flex-direction:row;border-right:0;border-top:1px solid var(--l);overflow-x:auto;overflow-y:hidden;padding:5px 6px calc(5px + env(safe-area-inset-bottom));flex-wrap:nowrap;gap:4px}
+ #tools button{width:auto;flex:0 0 auto;min-width:54px;min-height:40px;padding:6px 8px}
+ #stage{padding:6px}
+ #side{position:fixed;left:0;right:0;bottom:calc(52px + env(safe-area-inset-bottom));max-height:55dvh;z-index:20;background:var(--d);border:1px solid var(--g);border-radius:12px 12px 0 0;transform:translateY(120%);transition:transform .2s}
+ #side.open{transform:none}
+ #fab{display:block;position:fixed;right:10px;bottom:calc(62px + env(safe-area-inset-bottom));z-index:21;border-radius:20px;background:var(--g);color:var(--d);font-weight:700;border-color:var(--g)}
+ button,select,input{min-height:34px}
+}
+</style></head><body data-ws="design">
 <header>
- <b>MEGA TAG <i>/</i> PRODUCTIVE STUDIO</b>
- <button id="open">Open file</button><input id="file" type="file" multiple hidden accept=".svg,.psd,.pdf,.ai,.png,.jpg,.jpeg,.webp,.gif,.mte,.json">
- <button id="undo" title="Ctrl+Z">Undo</button><button id="redo" title="Ctrl+Y">Redo</button>
- <select id="preset" aria-label="Canvas size"><option value="1080,1080">Square 1080</option><option value="1080,1920">Story 1080×1920</option><option value="1920,1080">Video 1920×1080</option><option value="794,1123">A4 (96 dpi)</option><option value="1200,630">Link preview</option></select>
- <label>Bg <input id="bg" type="color" value="#ffffff"></label>
- <span style="flex:1"></span>
- <label>Scale <select id="sc"><option>1</option><option>2</option><option>3</option><option>4</option></select></label>
- <select id="fmt" aria-label="Export format"><option value="png-t">PNG (transparent)</option><option value="png">PNG</option><option value="jpg">JPG</option><option value="jpeg">JPEG</option><option value="webp">WEBP</option><option value="svg">SVG</option><option value="pdf">PDF</option><option value="mte">MTE project</option></select>
- <button class="pri" id="export">Export</button>
+ <div id="hmain">
+  <img src="icon.svg" alt="" class="lg"><b class="brand">MTE <i>Productive</i> Studio</b><span class="ver" id="ver"></span>
+  <nav id="wsTabs" aria-label="Workspaces"><button data-ws="design" class="on">Design</button></nav>
+  <span class="sp"></span>
+  <button id="bNew" class="pri">+ New</button><button id="open">Open</button><button class="pri" id="bSave" title="Save project (Ctrl+S)">Save</button><button id="bSaveAs" title="Save as (Ctrl+Shift+S)">Save as</button><span id="dirty" title="Unsaved changes" style="color:var(--g)"></span>
+  <button id="undo" title="Ctrl+Z" aria-label="Undo">&#8630;</button><button id="redo" title="Ctrl+Y" aria-label="Redo">&#8631;</button>
+  <button class="pri" id="export">Export</button><button id="bMore" aria-label="More options">&#9776;</button>
+  <input id="file" type="file" multiple hidden accept=".svg,.psd,.pdf,.ai,.png,.jpg,.jpeg,.webp,.gif,.mte,.json,.docx,.pptx,.xlsx,.xls,.ods,.csv,.odt,.odp">
+ </div>
+ <div id="hmore">
+  <input id="pname" placeholder="Project name" style="width:140px" aria-label="Project name">
+  <button id="bSize" title="Canvas size"><span id="info"></span></button>
+  <label>Colour <select id="cmode"><option value="rgb">RGB</option><option value="cmyk">CMYK</option></select></label>
+  <label>Scale <select id="sc"><option>1</option><option>2</option><option>3</option><option value="3.125">300 dpi</option><option>4</option></select></label>
+  <select id="fmt" aria-label="Export format"><option value="png-t">PNG (transparent)</option><option value="png">PNG</option><option value="jpg">JPG</option><option value="jpeg">JPEG</option><option value="webp">WEBP</option><option value="svg">SVG (editable)</option><option value="pdf-l">PDF (layered)</option><option value="pdf">PDF (flat)</option><option value="psd">PSD (layers, live text)</option><option value="ai">AI (PDF-compatible, layered)</option><option value="mte">MTE project</option></select>
+  <label class="chk"><input type="checkbox" id="xlive" checked>Live text</label><label class="chk"><input type="checkbox" id="xproj" checked>Embed project</label>
+ </div>
 </header>
+<div id="soBar"><span>Editing smart object</span><button id="soDone" class="pri" style="background:var(--d);color:var(--g)">Update &amp; return</button><button id="soCancel">Cancel</button></div>
 <nav id="tools" aria-label="Tools">
- <button data-t="text">Text</button><button data-t="rect">Rectangle</button><button data-t="ell">Ellipse</button><button data-t="tri">Triangle</button><button data-t="line">Line</button><button data-t="img">Image</button>
+ <button data-t="text">Text</button><button data-t="rect">Rect</button><button data-t="ell">Ellipse</button><button data-t="tri">Triangle</button><button data-t="line">Line</button><button data-t="img">Image</button>
  <button data-t="logo">MTE logo</button><button data-t="word">Wordmark</button>
- <button data-t="group">Group</button><button data-t="ungroup">Ungroup</button><button data-t="dup">Duplicate</button>
- <button data-t="letter">Letterhead</button><button data-t="post">Social post</button>
- <button data-t="zin">Zoom +</button><button data-t="zout">Zoom −</button>
+ <button data-t="group">Group</button><button data-t="ungroup">Ungroup</button><button data-t="dup">Duplicate</button><button data-t="del">Delete</button>
+ <button data-t="post">Social post</button><button data-t="zin">Zoom +</button><button data-t="zout">Zoom &minus;</button><button data-t="fit">Fit</button>
 </nav>
 <main id="stage"><div class="cw"><canvas id="c"></canvas></div></main>
+<button id="fab">Panel</button>
 <aside id="side">
- <section><h3>Properties</h3>
-  <div class="row"><label>Fill <input id="fill" type="color" value="#C9932E"></label><label>Stroke <input id="stroke" type="color" value="#1A1A1A"></label><label>Width <input id="sw" type="number" min="0" value="0"></label></div>
+ <section><h3>Fill &amp; stroke</h3>
+  <div class="row"><select id="ftarget" aria-label="Target"><option value="sel">Target: selection</option><option value="bg">Target: canvas background</option></select><select id="ftype"><option value="solid">Solid</option><option value="linear">Linear gradient</option><option value="radial">Radial gradient</option></select></div>
+  <div class="row"><label>A <input id="fill" type="color" value="#C9932E"></label><label id="lblB">B <input id="fill2" type="color" value="#1A1A1A"></label><label id="lblAng">Angle <input id="fang" type="number" value="90" min="0" max="360"></label></div>
+  <div class="row" id="cmykrow" hidden><label>C<input id="cc" type="number" min="0" max="100" value="0"></label><label>M<input id="cm" type="number" min="0" max="100" value="0"></label><label>Y<input id="cy" type="number" min="0" max="100" value="0"></label><label>K<input id="ck" type="number" min="0" max="100" value="0"></label></div>
+  <div class="row"><label>Stroke <input id="stroke" type="color" value="#1A1A1A"></label><label>Width <input id="sw" type="number" min="0" value="0"></label></div>
   <div class="row"><label>Opacity <input id="op" type="range" min="0" max="1" step=".05" value="1"></label></div>
-  <div class="row"><select id="ff"><option>Arial</option><option>Helvetica</option><option>Georgia</option><option>Times New Roman</option><option>Verdana</option><option>Courier New</option><option>Impact</option></select><input id="fs" type="number" min="6" value="48"><button id="bold"><b>B</b></button></div>
   <div class="row" id="pal"></div>
  </section>
+ <section><h3>Text</h3>
+  <div class="row"><select id="ff"><option>Arial</option><option>Helvetica</option><option>Georgia</option><option>Times New Roman</option><option>Verdana</option><option>Trebuchet MS</option><option>Tahoma</option><option>Courier New</option><option>Impact</option></select><input id="fs" type="number" min="6" value="48"></div>
+  <div class="row"><button id="bold"><b>B</b></button><button id="ital"><i>I</i></button><button id="und"><u>U</u></button><span id="taRow"></span></div>
+  <div class="row"><label>Spacing <input id="tsp" type="number" value="0" step="10"></label><label>Line <input id="tlh" type="number" value="1.16" step=".05"></label></div>
+ </section>
+ <section><h3>Align</h3>
+  <div class="row"><select id="alto"><option value="auto">Auto (selection if 2+)</option><option value="canvas">To canvas</option><option value="sel">To selection</option></select></div>
+  <div class="row" id="alRow"></div>
+ </section>
+ <section><h3>Effects</h3>
+  <div class="row"><select id="blend" aria-label="Blend mode"></select></div>
+  <div class="row"><button id="bwhite" title="Multiply: white disappears">Blend on white</button><button id="bblack" title="Screen: black disappears">Blend on black</button></div>
+  <div class="row"><select id="bif"><option value="off">Blend-If: off</option><option value="white">Knock out white</option><option value="black">Knock out black</option></select><label>Level <input id="bifT" type="range" min="0" max="255" value="235"></label><label>Soft <input id="bifS" type="range" min="1" max="100" value="30"></label></div>
+  <div class="row"><button id="clipMake">Clip to layer below</button><button id="clipRel">Release clip</button></div>
+  <div class="row"><button id="pEdit">Edit points</button><button id="toPath">To path</button><button id="svgCode">SVG code</button><button id="smartEdit" hidden>Edit smart object</button></div>
+ </section>
  <section><h3>Layers</h3><div id="layers"></div></section>
- <section><small style="color:var(--m)">Opens SVG, PSD, PDF, AI (PDF-based), PNG/JPG/WEBP and .mte projects. Drag files onto the canvas.</small></section>
+ <section><small class="m">Opens SVG, PSD, PDF, AI, images, .mte and Office files (DOCX, PPTX, XLSX). Drop files onto the canvas. Arrow keys nudge (Shift = 10px).</small></section>
 </aside>
+<section class="wsp" id="ws-office" aria-label="Office"></section>
 <div id="toast" role="status"></div>
+
+<dialog id="dNew"><h3 id="dNewT">New project</h3>
+ <div class="chips" id="dCats"></div><div class="grid" id="dPre"></div>
+ <h3 style="margin-top:12px">Custom size</h3>
+ <div class="row"><label>Width <input id="nw" type="number" step="any" min="1" value="1080"></label><label>Height <input id="nh" type="number" step="any" min="1" value="1080"></label>
+ <select id="nu" aria-label="Units"><option>px</option><option>in</option><option>mm</option><option>cm</option></select>
+ <label>DPI <select id="nd"><option>72</option><option selected>96</option><option>150</option><option>300</option></select></label></div>
+ <div class="row"><label>Colour <select id="ncm"><option value="rgb">RGB</option><option value="cmyk">CMYK</option></select></label><label>Background <input id="nbg" type="color" value="#ffffff"></label><label class="chk" id="nTabL"><input type="checkbox" id="nTab" checked>Open in new tab</label></div>
+ <small class="m" id="nPx"></small>
+ <div class="row" style="margin-top:10px"><button class="pri" id="nGo">Create</button><button id="nCancel">Cancel</button></div>
+</dialog>
+<dialog id="dSvg"><h3>SVG code</h3><textarea id="svgTa" class="pp" style="min-height:44dvh;font-family:monospace;font-size:12px" spellcheck="false"></textarea>
+ <div class="row" style="margin-top:8px"><button class="pri" id="svgApply">Apply</button><button id="svgDl">Download .svg</button><button id="svgClose">Close</button></div></dialog>
+<dialog id="dPdf"><h3>Import PDF / AI</h3>
+ <div class="row"><label>Mode <select id="pdfMode"><option value="layers">Layers (one editable layer per PDF layer)</option><option value="vector">Vector (editable paths, best effort)</option><option value="flat">Flat page</option></select></label><label>Page <input id="pdfPg" type="number" min="1" value="1"></label></div>
+ <small class="m" id="pdfInfo"></small>
+ <div class="row" style="margin-top:10px"><button class="pri" id="pdfGo">Import</button><button id="pdfCancel">Cancel</button></div></dialog>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/ag-psd@28.2.0/dist/bundle.js"></script>
 <script>
-const $=s=>document.querySelector(s),GOLD='#C9932E',INK='#1A1A1A';
+/* ===== MTE Productive Studio — keep VERSION in sync with sw.js (V) ===== */
+const VERSION='0.0.2';let dirty=false,fh=null;
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],GOLD='#C9932E',INK='#1A1A1A';
+const PROPS=['name','smartId','maskName','cmyk'];
+const LIBS={pdf:['https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js','pdfjsLib'],psd:['https://cdn.jsdelivr.net/npm/ag-psd@28.2.0/dist/bundle.js','agPsd'],zip:['https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js','JSZip'],xlsx:['https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js','XLSX']};
+const lib=k=>window[LIBS[k][1]]?Promise.resolve():new Promise((ok,no)=>{const s=document.createElement('script');s.src=LIBS[k][0];s.onload=ok;s.onerror=()=>no(new Error(k+' library failed to load. Connect once to cache it.'));document.head.append(s)});
+let tm;const toast=(m,keep)=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(tm);if(!keep)tm=setTimeout(()=>t.style.display='none',4200)};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+/* units and colour helpers */
+const toPx=(v,u,d)=>u==='in'?v*d:u==='cm'?v/2.54*d:u==='mm'?v/25.4*d:v;
+const fromPx=(p,u,d)=>u==='in'?p/d:u==='cm'?p/d*2.54:u==='mm'?p/d*25.4:p;
+const r2=n=>Math.round(n*100)/100;
+const rgb2hex=(r,g,b)=>'#'+[r,g,b].map(v=>clamp(Math.round(v),0,255).toString(16).padStart(2,'0')).join('');
+const hex2rgb=h=>{h=(h||'#000').replace('#','');if(h.length===3)h=[...h].map(x=>x+x).join('');const n=parseInt(h,16)||0;return[n>>16&255,n>>8&255,n&255]};
+const rgb2cmyk=(r,g,b)=>{r/=255;g/=255;b/=255;const k=1-Math.max(r,g,b);if(k>=1)return[0,0,0,100];return[(1-r-k)/(1-k),(1-g-k)/(1-k),(1-b-k)/(1-k),k].map(v=>Math.round(v*100))};
+const cmyk2rgb=(c,m,y,k)=>[255*(1-c/100)*(1-k/100),255*(1-m/100)*(1-k/100),255*(1-y/100)*(1-k/100)];
+const hexAny=s=>{try{return '#'+new fabric.Color(s).toHex()}catch(e){return '#000000'}};
+
+/* ===== custom Blend-If filter (knock out white / black like Photoshop's Blend If) ===== */
+try{fabric.filterBackend=new fabric.Canvas2dFilterBackend()}catch(e){}
+fabric.Image.filters.BlendIf=fabric.util.createClass(fabric.Image.filters.BaseFilter,{
+ type:'BlendIf',mode:'white',threshold:235,soft:30,
+ applyTo2d(o){const d=o.imageData.data,t=+this.threshold,s=Math.max(1,+this.soft),w=this.mode==='white';
+  for(let i=0;i<d.length;i+=4){const l=.299*d[i]+.587*d[i+1]+.114*d[i+2];
+   const a=w?(l>=t?0:l<=t-s?1:(t-l)/s):(l<=t?0:l>=t+s?1:(l-t)/s);d[i+3]=d[i+3]*a}},
+ isNeutralState(){return false},
+ toObject(){return{type:this.type,mode:this.mode,threshold:this.threshold,soft:this.soft}}});
+fabric.Image.filters.BlendIf.fromObject=fabric.Image.filters.BaseFilter.fromObject;
+
+/* ===== document state ===== */
+const qs=new URLSearchParams(location.search),PID=qs.get('p')||'main',KEY='mte-doc-'+PID;
 const c=new fabric.Canvas('c',{preserveObjectStacking:true,backgroundColor:'#fff'});
-let W=1080,H=1080,zf=1,hist=[],hi=-1,lock=false,tm;
-const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(tm);tm=setTimeout(()=>t.style.display='none',3500)};
-const need=(n,v)=>v?true:(toast(n+' library not loaded. Connect once to cache it.'),false);
+fabric.Object.prototype.set({transparentCorners:false,cornerColor:GOLD,cornerStrokeColor:'#000',borderColor:GOLD,cornerSize:matchMedia('(pointer:coarse)').matches?20:11,touchCornerSize:32});
+let D={W:1080,H:1080,unit:'px',dpi:96,cm:'rgb',name:'Untitled'},zf=1,hist=[],hi=-1,lock=false,nt;
+const smartMap=new Map(),soStack=[];
+$('#ver').textContent='v'+VERSION;
 
-/* ---------- canvas, history, autosave ---------- */
-function fit(){const s=$('#stage'),z=Math.min((s.clientWidth-40)/W,(s.clientHeight-40)/H,1)*zf;
- c.setZoom(z);c.setDimensions({width:W*z,height:H*z});c.renderAll()}
-function size(w,h){W=w;H=h;fit();push()}
-function push(){if(lock)return;const s=JSON.stringify({W,H,bg:c.backgroundColor,j:c.toJSON(['name'])});
- hist=hist.slice(0,hi+1);hist.push(s);if(hist.length>60)hist.shift();hi=hist.length-1;
- try{localStorage.setItem('mte-doc',s)}catch(e){}layers()}
-function restore(s){const d=JSON.parse(s);lock=true;W=d.W;H=d.H;
- c.loadFromJSON(d.j,()=>{c.backgroundColor=d.bg||'';lock=false;fit();layers()})}
-$('#undo').onclick=()=>{if(hi>0)restore(hist[--hi])};
-$('#redo').onclick=()=>{if(hi<hist.length-1)restore(hist[++hi])};
+/* ===== workspace registry: future modules (e.g. the video editor) plug in here ===== */
+const MTE={version:VERSION,workspaces:{},
+ addWorkspace(w){/* w={id,label,mount(el),openFile?(file)} */
+  let el=$('#ws-'+w.id);if(!el){el=document.createElement('section');el.className='wsp';el.id='ws-'+w.id;$('#toast').before(el)}
+  const b=document.createElement('button');b.dataset.ws=w.id;b.textContent=w.label;$('#wsTabs').append(b);
+  const sty=document.createElement('style');sty.textContent=`body[data-ws="${w.id}"] #ws-${w.id}{display:flex}`;document.head.append(sty);
+  MTE.workspaces[w.id]=w;w.el=el;w.mount&&w.mount(el);return w},
+ show(id){document.body.dataset.ws=id;$$('#wsTabs button').forEach(b=>b.classList.toggle('on',b.dataset.ws===id));if(id==='design')setTimeout(fit,30)},
+ toast,get canvas(){return c},get doc(){return D}};
+window.MTE=MTE;
+$('#wsTabs').onclick=e=>{if(e.target.dataset.ws)MTE.show(e.target.dataset.ws)};
+
+/* ===== canvas, history, autosave ===== */
+function info(){const u=D.unit!=='px'?` (${r2(fromPx(D.W,D.unit,D.dpi))}×${r2(fromPx(D.H,D.unit,D.dpi))} ${D.unit})`:'';
+ $('#info').textContent=`${D.W}×${D.H}px${u} · ${D.cm.toUpperCase()}`;$('#pname').value=D.name||'';$('#cmode').value=D.cm;
+ document.title=(D.name||'Untitled')+' — MTE Productive Studio';$('#cmykrow').hidden=D.cm!=='cmyk'}
+function fit(){const s=$('#stage');if(!s.clientWidth)return;const pad=innerWidth<800?12:44,
+ z=Math.min((s.clientWidth-pad)/D.W,(s.clientHeight-pad)/D.H,1)*zf;
+ c.setZoom(z);c.setDimensions({width:Math.max(1,D.W*z),height:Math.max(1,D.H*z)});c.renderAll();info()}
+const snapshot=()=>JSON.stringify({v:VERSION,D,j:c.toJSON(PROPS)});
+function push(){if(lock)return;const s=snapshot();hist=hist.slice(0,hi+1);hist.push(s);if(hist.length>40)hist.shift();hi=hist.length-1;
+ try{localStorage.setItem(KEY,s)}catch(e){}dirty=true;const dd=$('#dirty');if(dd)dd.textContent='●';layers()}
+function restore(s){return new Promise(res=>{const d=JSON.parse(s);lock=true;
+ D=Object.assign({W:1080,H:1080,unit:'px',dpi:96,cm:'rgb',name:'Untitled'},d.D||{W:d.W,H:d.H});
+ if(d.bg&&!d.j.background)d.j.background=d.bg;
+ c.loadFromJSON(d.j,()=>{lock=false;fit();layers();res()})})}
+$('#undo').onclick=()=>{if(hi>0)restore(hist[--hi])};$('#redo').onclick=()=>{if(hi<hist.length-1)restore(hist[++hi])};
 ['added','modified','removed'].forEach(e=>c.on('object:'+e,push));
-['created','updated','cleared'].forEach(e=>c.on('selection:'+e,()=>{layers();sync()}));
+['created','updated','cleared'].forEach(e=>c.on('selection:'+e,()=>{if(editing&&e==='cleared')pathDone();layers();sync()}));
 addEventListener('resize',fit);
-addEventListener('keydown',e=>{const t=c.getActiveObject();if(t&&t.isEditing||/INPUT|SELECT/.test(e.target.tagName))return;
- if(e.key==='Delete'||e.key==='Backspace'){c.getActiveObjects().forEach(o=>c.remove(o));c.discardActiveObject()}
- if(e.ctrlKey||e.metaKey){if(e.key==='z'){e.preventDefault();$('#undo').click()}if(e.key==='y'){e.preventDefault();$('#redo').click()}}});
+$('#stage').addEventListener('wheel',e=>{if(e.ctrlKey){e.preventDefault();zf=clamp(zf*(e.deltaY<0?1.1:.9),.2,4);fit()}},{passive:false});
+/* keyboard: delete, undo/redo, arrow-key nudging */
+addEventListener('keydown',e=>{const t=c.getActiveObject();if(document.body.dataset.ws!=='design')return;
+ if(/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)||(t&&t.isEditing))return;
+ if(e.key==='Escape'){if(editing)pathDone();return}
+ if(e.ctrlKey||e.metaKey){if(e.key==='z'){e.preventDefault();$('#undo').click()}if(e.key==='y'){e.preventDefault();$('#redo').click()}if(e.key==='d'){e.preventDefault();add.dup()}return}
+ if(!t)return;
+ if(e.key==='Delete'||e.key==='Backspace'){c.getActiveObjects().forEach(o=>c.remove(o));c.discardActiveObject();return}
+ const st=e.shiftKey?10:1,mv={ArrowLeft:[-st,0],ArrowRight:[st,0],ArrowUp:[0,-st],ArrowDown:[0,st]}[e.key];
+ if(mv&&!editing){e.preventDefault();t.set({left:t.left+mv[0],top:t.top+mv[1]});t.setCoords();c.requestRenderAll();clearTimeout(nt);nt=setTimeout(push,350)}});
 
-/* ---------- adding things ---------- */
-function place(o,fitIn=true){if(fitIn){const k=Math.min(1,W*.8/o.getScaledWidth(),H*.8/o.getScaledHeight());o.scale(o.scaleX*k)}
+/* ===== adding things ===== */
+function place(o,fitIn=true){if(fitIn){const k=Math.min(1,D.W*.8/o.getScaledWidth(),D.H*.8/o.getScaledHeight());o.scale(o.scaleX*k)}
  c.add(o);o.viewportCenter?.();o.setCoords();c.setActiveObject(o);c.requestRenderAll()}
 const WORD=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 240"><text x="300" y="110" text-anchor="middle" font-family="Arial" font-size="48" font-weight="700" letter-spacing="2" fill="${INK}">MEGA TAG</text><text x="300" y="150" text-anchor="middle" font-family="Arial" font-size="30" font-weight="700" letter-spacing="4" fill="${INK}">ENTERPRISE</text><line x1="220" y1="168" x2="380" y2="168" stroke="${GOLD}" stroke-width="3"/><text x="300" y="196" text-anchor="middle" font-family="Arial" font-size="17" fill="#666">Quality Goods &amp; Services</text></svg>`;
+const LOGO=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><circle cx="200" cy="200" r="150" fill="none" stroke="${GOLD}" stroke-width="6"/><text x="200" y="225" text-anchor="middle" font-family="Arial" font-size="90" font-weight="700" fill="${INK}">MTE</text></svg>`;
 const add={
  text:()=>place(new fabric.Textbox('Double-click to edit',{width:420,fontSize:48,fontFamily:'Arial',fill:INK,name:'Text'}),false),
  rect:()=>place(new fabric.Rect({width:300,height:200,fill:GOLD,name:'Rectangle'}),false),
  ell:()=>place(new fabric.Ellipse({rx:120,ry:120,fill:GOLD,name:'Ellipse'}),false),
  tri:()=>place(new fabric.Triangle({width:240,height:210,fill:GOLD,name:'Triangle'}),false),
  line:()=>place(new fabric.Line([0,0,300,0],{stroke:INK,strokeWidth:6,name:'Line'}),false),
- img:()=>{$('#file').click()},
- logo:()=>svgStr(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><circle cx="200" cy="200" r="150" fill="none" stroke="${GOLD}" stroke-width="6"/><text x="200" y="225" text-anchor="middle" font-family="Arial" font-size="90" font-weight="700" fill="${INK}">MTE</text></svg>`,'MTE monogram'),
- word:()=>svgStr(WORD,'MTE wordmark'),
+ img:()=>$('#file').click(),
+ logo:()=>importSvg(LOGO,'MTE monogram'),word:()=>importSvg(WORD,'MTE wordmark'),
  group:()=>{const a=c.getActiveObject();if(a&&a.type==='activeSelection')a.toGroup().set('name','Group');c.requestRenderAll();push()},
  ungroup:()=>{const a=c.getActiveObject();if(a&&a.type==='group'){a.toActiveSelection();c.requestRenderAll();push()}},
- dup:()=>{const a=c.getActiveObject();a&&a.clone(n=>{n.set({left:a.left+20,top:a.top+20});c.add(n);c.setActiveObject(n)},['name'])},
- zin:()=>{zf=Math.min(zf*1.25,4);fit()},zout:()=>{zf=Math.max(zf/1.25,.2);fit()},
- letter:()=>{lock=true;c.clear();c.backgroundColor='#fff';W=794;H=1123;fit();
-  svgStr(WORD,'MTE wordmark',o=>{o.set({left:40,top:20}).scale(.45)});
-  c.add(new fabric.Rect({left:40,top:130,width:714,height:3,fill:GOLD,name:'Rule'}),
-   new fabric.Textbox('Date\n\nRecipient name\nAddress\n\nDear Sir/Madam,\n\nWrite your letter here.',{left:40,top:170,width:714,fontSize:16,fontFamily:'Arial',fill:INK,name:'Body'}),
-   new fabric.Textbox('Mega Tag Enterprise — Quality Goods & Services',{left:40,top:1070,width:714,fontSize:12,fontFamily:'Arial',fill:'#666',name:'Footer'}));
-  lock=false;push()},
- post:()=>{lock=true;c.clear();c.backgroundColor=INK;W=1080;H=1080;fit();
+ dup:()=>{const a=c.getActiveObject();a&&a.clone(n=>{n.set({left:a.left+20,top:a.top+20});c.add(n);c.setActiveObject(n)},PROPS)},
+ del:()=>{c.getActiveObjects().forEach(o=>c.remove(o));c.discardActiveObject()},
+ zin:()=>{zf=Math.min(zf*1.25,4);fit()},zout:()=>{zf=Math.max(zf/1.25,.2);fit()},fit:()=>{zf=1;fit()},
+ post:()=>{lock=true;c.clear();c.backgroundColor=INK;D.W=1080;D.H=1080;D.unit='px';fit();
   c.add(new fabric.Rect({left:60,top:60,width:960,height:960,fill:'',stroke:GOLD,strokeWidth:6,name:'Frame'}),
    new fabric.Textbox('Quality goods,\nbacked by service.',{left:120,top:380,width:840,fontSize:96,fontWeight:'bold',fontFamily:'Arial',fill:'#fff',name:'Headline'}),
    new fabric.Textbox('Mega Tag Enterprise',{left:120,top:900,width:840,fontSize:36,fontFamily:'Arial',fill:GOLD,name:'Sign-off'}));
   lock=false;push()}};
-function svgStr(s,name,cb){fabric.loadSVGFromString(s,(o,opt)=>{const g=fabric.util.groupSVGElements(o,opt);g.set('name',name||'SVG');cb?cb(g):place(g);if(cb)c.add(g)})}
 $('#tools').onclick=e=>{const t=e.target.dataset.t;if(t)add[t]()};
 
-/* ---------- opening files ---------- */
+/* ===== SVG import: every shape/path/text becomes its own editable layer ===== */
+const asTextbox=o=>{if(o.type!=='text')return o;const p=o.toObject();delete p.type;delete p.text;delete p.version;
+ return new fabric.Textbox(o.text,Object.assign(p,{width:o.width*1.06+6,name:(o.text||'Text').slice(0,24)}))};
+function importSvg(str,name,o={}){return new Promise(res=>{fabric.loadSVGFromString(str,(objs,opt)=>{
+ if(!objs||!objs.length){toast('The SVG has no drawable content.');return res()}
+ lock=true;const empty=c.getObjects().length===0,w=opt.width||opt.viewBoxWidth,h=opt.height||opt.viewBoxHeight;let asIs=!!o.asIs;
+ if((empty||o.resize)&&w&&h){D.W=Math.round(w);D.H=Math.round(h);D.unit='px';asIs=true;fit()}
+ (o.replace||[]).forEach(x=>c.remove(x));
+ const before=new Set(c.getObjects()),g=fabric.util.groupSVGElements(objs,opt);
+ if(!asIs){const k=Math.min(1,D.W*.9/g.width,D.H*.9/g.height);g.scale(k);g.set({left:(D.W-g.getScaledWidth())/2,top:(D.H-g.getScaledHeight())/2})}
+ c.add(g);if(g.type==='group')g.toActiveSelection();c.discardActiveObject();
+ const fresh=c.getObjects().filter(x=>!before.has(x));
+ fresh.forEach(x=>{const i=c.getObjects().indexOf(x),t=asTextbox(x);if(t!==x){c.remove(x);c.insertAt(t,i,false)}
+  const y=t;y.name=y.name||x.id||(name?name+' / ':'')+y.type});
+ if(fresh.length===1&&name)fresh[0].name=name;
+ lock=false;c.requestRenderAll();push();res(fresh)})})}
+
+/* ===== properties, gradients, text, blend ===== */
+const kids=o=>o.type==='group'||o.type==='activeSelection'?o._objects.flatMap(kids):[o];
+const tops=()=>c.getActiveObjects();
+function setP(p,v){const a=c.getActiveObject();if(!a)return toast('Select something first.');kids(a).forEach(x=>x.set(p,v));if(p==='opacity')a.set(p,v);a.dirty=true;c.requestRenderAll();push()}
+function grad(type,c1,c2,ang,px){const r=ang*Math.PI/180,dx=Math.cos(r)/2,dy=Math.sin(r)/2;
+ let co=type==='radial'?{x1:.5,y1:.5,r1:0,x2:.5,y2:.5,r2:.5}:{x1:.5-dx,y1:.5-dy,x2:.5+dx,y2:.5+dy};
+ if(px){co.x1*=px.w;co.x2*=px.w;co.y1*=px.h;co.y2*=px.h;if(co.r2!==undefined)co.r2*=Math.max(px.w,px.h)}
+ return new fabric.Gradient({type:type==='radial'?'radial':'linear',gradientUnits:px?'pixels':'percentage',coords:co,colorStops:[{offset:0,color:c1},{offset:1,color:c2}]})}
+function applyFill(cmykVals){const ty=$('#ftype').value,a=$('#fill').value,b=$('#fill2').value,ang=+$('#fang').value||0;
+ $('#lblB').style.display=$('#lblAng').style.display=ty==='solid'?'none':'';
+ if($('#ftarget').value==='bg'){c.backgroundColor=ty==='solid'?a:grad(ty,a,b,ang,{w:D.W,h:D.H});c.renderAll();push();return}
+ const t=c.getActiveObject();if(!t)return toast('Select an object, or set Target to canvas background.');
+ kids(t).forEach(x=>{x.set('fill',ty==='solid'?a:grad(ty,a,b,ang));if(ty==='solid'&&cmykVals)x.cmyk=cmykVals;else delete x.cmyk;x.dirty=true});
+ c.requestRenderAll();push()}
+['ftype','fill','fill2','fang'].forEach(i=>$('#'+i).addEventListener('input',()=>{applyFill();syncCmykFromFill()}));
+$('#ftarget').onchange=()=>{$('#fill').value=$('#ftarget').value==='bg'&&typeof c.backgroundColor==='string'&&c.backgroundColor?hexAny(c.backgroundColor):$('#fill').value};
+function syncCmykFromFill(){const v=rgb2cmyk(...hex2rgb($('#fill').value));['cc','cm','cy','ck'].forEach((k,i)=>$('#'+k).value=v[i])}
+['cc','cm','cy','ck'].forEach(k=>$('#'+k).addEventListener('input',()=>{const v=['cc','cm','cy','ck'].map(i=>clamp(+$('#'+i).value||0,0,100));
+ $('#fill').value=rgb2hex(...cmyk2rgb(...v));$('#ftype').value='solid';applyFill(v)}));
+$('#stroke').oninput=e=>setP('stroke',e.target.value);$('#sw').oninput=e=>setP('strokeWidth',+e.target.value);$('#op').oninput=e=>setP('opacity',+e.target.value);
+$('#ff').onchange=e=>setP('fontFamily',e.target.value);$('#fs').oninput=e=>setP('fontSize',+e.target.value);
+$('#tsp').oninput=e=>setP('charSpacing',+e.target.value);$('#tlh').oninput=e=>setP('lineHeight',+e.target.value||1);
+const tgl=(p,on,off)=>()=>{const a=c.getActiveObject();if(a){const f=kids(a)[0];setP(p,f[p]===on?off:on)}};
+$('#bold').onclick=tgl('fontWeight','bold','normal');$('#ital').onclick=tgl('fontStyle','italic','normal');$('#und').onclick=tgl('underline',true,false);
+const ICO=(ls)=>`<svg viewBox="0 0 18 18">${ls}</svg>`;
+const AL={left:[[2,14],[2,9],[2,14],[2,9]],center:[[2,14],[4.5,9],[2,14],[4.5,9]],right:[[2,14],[7,9],[2,14],[7,9]],justify:[[2,14],[2,14],[2,14],[2,14]]};
+Object.entries(AL).forEach(([k,v])=>{const b=document.createElement('button');b.className='ib';b.dataset.ta=k;b.title='Text align '+k;b.setAttribute('aria-label','Text align '+k);
+ b.innerHTML=ICO(v.map((s,i)=>`<line x1="${s[0]}" x2="${s[0]+s[1]}" y1="${3.5+i*3.8}" y2="${3.5+i*3.8}"/>`).join(''));b.onclick=()=>setP('textAlign',k);$('#taRow').append(b)});
+const OA=[['l','Align left edges','<line x1="2" x2="2" y1="1" y2="17"/><rect x="4" y="4" width="11" height="4"/><rect x="4" y="10" width="7" height="4"/>'],
+ ['cx','Align centres horizontally','<line x1="9" x2="9" y1="1" y2="17"/><rect x="3" y="4" width="12" height="4"/><rect x="5" y="10" width="8" height="4"/>'],
+ ['r','Align right edges','<line x1="16" x2="16" y1="1" y2="17"/><rect x="3" y="4" width="11" height="4"/><rect x="7" y="10" width="7" height="4"/>'],
+ ['t','Align tops','<line x1="1" x2="17" y1="2" y2="2"/><rect x="4" y="4" width="4" height="11"/><rect x="10" y="4" width="4" height="7"/>'],
+ ['my','Align middles vertically','<line x1="1" x2="17" y1="9" y2="9"/><rect x="4" y="3" width="4" height="12"/><rect x="10" y="5" width="4" height="8"/>'],
+ ['b','Align bottoms','<line x1="1" x2="17" y1="16" y2="16"/><rect x="4" y="3" width="4" height="11"/><rect x="10" y="7" width="4" height="7"/>']];
+OA.forEach(([k,t,s])=>{const b=document.createElement('button');b.className='ib';b.title=t;b.setAttribute('aria-label',t);b.innerHTML=ICO(s);b.onclick=()=>alignObjs(k);$('#alRow').append(b)});
+function alignObjs(k){const a=c.getActiveObject();if(!a)return toast('Select something to align.');
+ const objs=a.type==='activeSelection'?a._objects.slice():[a],multi=objs.length>1,m=$('#alto').value,toSel=multi&&m!=='canvas';
+ c.discardActiveObject();const bb=o=>o.getBoundingRect(true,true);let box={left:0,top:0,width:D.W,height:D.H};
+ if(toSel){const bs=objs.map(bb),l=Math.min(...bs.map(b=>b.left)),t=Math.min(...bs.map(b=>b.top)),r=Math.max(...bs.map(b=>b.left+b.width)),bo=Math.max(...bs.map(b=>b.top+b.height));box={left:l,top:t,width:r-l,height:bo-t}}
+ objs.forEach(o=>{const b=bb(o);let dx=0,dy=0;
+  if(k==='l')dx=box.left-b.left;if(k==='cx')dx=box.left+box.width/2-(b.left+b.width/2);if(k==='r')dx=box.left+box.width-(b.left+b.width);
+  if(k==='t')dy=box.top-b.top;if(k==='my')dy=box.top+box.height/2-(b.top+b.height/2);if(k==='b')dy=box.top+box.height-(b.top+b.height);
+  o.set({left:o.left+dx,top:o.top+dy});o.setCoords()});
+ c.setActiveObject(multi?new fabric.ActiveSelection(objs,{canvas:c}):objs[0]);c.requestRenderAll();push()}
+/* blend modes, Blend-If, clipping masks */
+[['source-over','Normal'],['multiply','Multiply'],['screen','Screen'],['overlay','Overlay'],['darken','Darken'],['lighten','Lighten'],['color-dodge','Color dodge'],['color-burn','Color burn'],['hard-light','Hard light'],['soft-light','Soft light'],['difference','Difference'],['exclusion','Exclusion'],['hue','Hue'],['saturation','Saturation'],['color','Color'],['luminosity','Luminosity']]
+ .forEach(([v,t])=>$('#blend').append(new Option('Blend: '+t,v)));
+const setBlend=v=>{const a=c.getActiveObject();if(!a)return toast('Select a layer first.');tops().forEach(o=>{o.globalCompositeOperation=v;o.dirty=true});$('#blend').value=v;c.requestRenderAll();push()};
+$('#blend').onchange=e=>setBlend(e.target.value);$('#bwhite').onclick=()=>setBlend('multiply');$('#bblack').onclick=()=>setBlend('screen');
+function blendIf(){const a=c.getActiveObject();if(!a)return toast('Select an image layer first.');const m=$('#bif').value;let n=0;
+ tops().forEach(o=>{if(o.type!=='image')return;n++;o.filters=(o.filters||[]).filter(f=>f&&f.type!=='BlendIf');
+  if(m!=='off')o.filters.push(new fabric.Image.filters.BlendIf({mode:m,threshold:+$('#bifT').value,soft:+$('#bifS').value}));o.applyFilters()});
+ if(!n)toast('Blend-If works on image layers. For shapes and text use Blend on white / black.');c.requestRenderAll();push()}
+$('#bif').onchange=()=>{$('#bifT').value=$('#bif').value==='black'?25:235;blendIf()};$('#bifT').oninput=blendIf;$('#bifS').oninput=blendIf;
+$('#clipMake').onclick=async()=>{const a=c.getActiveObject();if(!a||a.type!=='activeSelection'||a._objects.length<2)return toast('Select 2+ layers: the shape (lower) and the content to clip (above it).');
+ const objs=a._objects.slice();c.discardActiveObject();const st=c.getObjects();objs.sort((x,y)=>st.indexOf(x)-st.indexOf(y));
+ const base=objs[0];lock=true;
+ for(const o of objs.slice(1)){const m=await new Promise(r=>base.clone(r,PROPS));m.set({absolutePositioned:true});o.clipPath=m;o.maskName=base.name||base.type;o.dirty=true}
+ c.remove(base);lock=false;c.requestRenderAll();push();toast('Clipped. Content now only shows inside the lower shape.')};
+$('#clipRel').onclick=async()=>{let n=0;lock=true;for(const o of tops()){if(!o.clipPath)continue;const m=await new Promise(r=>o.clipPath.clone(r,PROPS));
+ m.set({absolutePositioned:false,name:o.maskName||'Mask'});o.clipPath=null;o.dirty=true;c.insertAt(m,c.getObjects().indexOf(o),false);n++}
+ lock=false;c.requestRenderAll();push();if(!n)toast('Select a clipped layer.')};
+/* path point editing (works on SVG paths) */
+let editing=null;
+function pathEdit(){const o=c.getActiveObject();if(editing)return pathDone();
+ if(!o||o.type!=='path')return toast('Select a path layer (e.g. from an imported SVG) or convert a shape with "To path".');
+ editing=o;o._ctl=o.controls;o._bd=o.hasBorders;const ctl={};
+ o.path.forEach((cmd,i)=>{for(let j=1;j<cmd.length;j+=2){ctl['p'+i+'_'+j]=new fabric.Control({
+  positionHandler:(dim,m,obj)=>fabric.util.transformPoint(new fabric.Point(cmd[j]-obj.pathOffset.x,cmd[j+1]-obj.pathOffset.y),fabric.util.multiplyTransformMatrices(obj.canvas.viewportTransform,obj.calcTransformMatrix())),
+  actionHandler:(e,tr,x,y)=>{const obj=tr.target,p=fabric.util.transformPoint(new fabric.Point(x,y),fabric.util.invertTransform(obj.calcTransformMatrix()));
+   cmd[j]=p.x+obj.pathOffset.x;cmd[j+1]=p.y+obj.pathOffset.y;obj.dirty=true;return true},
+  actionName:'edit-path',cursorStyle:'crosshair',
+  render:(ctx,l,t)=>{ctx.save();ctx.fillStyle=((cmd[0]==='C'&&j<5)||(cmd[0]==='Q'&&j<3))?'#fff':GOLD;ctx.strokeStyle='#000';ctx.beginPath();ctx.arc(l,t,5,0,6.3);ctx.fill();ctx.stroke();ctx.restore()}})}});
+ o.controls=ctl;o.hasBorders=false;o.objectCaching=false;o.lockMovementX=o.lockMovementY=o.lockRotation=o.lockScalingX=o.lockScalingY=true;
+ $('#pEdit').classList.add('on');c.requestRenderAll();toast('Drag the points. Gold = anchors, white = curve handles. Esc or "Edit points" to finish.')}
+function pathDone(){const o=editing;if(!o)return;editing=null;o.controls=o._ctl;o.hasBorders=o._bd;o.lockMovementX=o.lockMovementY=o.lockRotation=o.lockScalingX=o.lockScalingY=false;o.objectCaching=true;
+ try{let b;if(o._calcDimensions){const d=o._calcDimensions();b={l:d.left,t:d.top,w:d.width,h:d.height}}else{const xs=[],ys=[];o.path.forEach(m=>{for(let j=1;j<m.length;j+=2){xs.push(m[j]);ys.push(m[j+1])}});b={l:Math.min(...xs),t:Math.min(...ys),w:Math.max(...xs)-Math.min(...xs),h:Math.max(...ys)-Math.min(...ys)}}
+  const p0=o.pathOffset,p1=new fabric.Point(b.l+b.w/2,b.t+b.h/2),v=fabric.util.transformPoint(new fabric.Point(p1.x-p0.x,p1.y-p0.y),o.calcTransformMatrix(),true),ctr=o.getCenterPoint();
+  o.set({width:b.w,height:b.h,pathOffset:p1});o.setPositionByOrigin(new fabric.Point(ctr.x+v.x,ctr.y+v.y),'center','center')}catch(e){console.warn(e)}
+ o.dirty=true;o.setCoords();$('#pEdit').classList.remove('on');c.requestRenderAll();push()}
+$('#pEdit').onclick=pathEdit;
+$('#toPath').onclick=()=>{const o=c.getActiveObject();if(!o||o.type==='path')return toast(o?'Already a path.':'Select a rectangle, triangle or ellipse.');
+ const w=o.width,h=o.height;let d;
+ if(o.type==='rect')d=`M0 0L${w} 0L${w} ${h}L0 ${h}Z`;else if(o.type==='triangle')d=`M${w/2} 0L${w} ${h}L0 ${h}Z`;
+ else if(o.type==='ellipse'){const rx=o.rx,ry=o.ry,k=.5523;d=`M0 ${ry}C0 ${ry-k*ry} ${rx-k*rx} 0 ${rx} 0C${rx+k*rx} 0 ${2*rx} ${ry-k*ry} ${2*rx} ${ry}C${2*rx} ${ry+k*ry} ${rx+k*rx} ${2*ry} ${rx} ${2*ry}C${rx-k*rx} ${2*ry} 0 ${ry+k*ry} 0 ${ry}Z`}
+ else return toast('To path supports rectangle, triangle and ellipse.');
+ const p=new fabric.Path(d,{fill:o.fill,stroke:o.stroke,strokeWidth:o.strokeWidth,opacity:o.opacity,name:(o.name||o.type)+' path'});
+ p.set({left:o.left,top:o.top,scaleX:o.scaleX,scaleY:o.scaleY,angle:o.angle,originX:o.originX,originY:o.originY});
+ const i=c.getObjects().indexOf(o);c.remove(o);c.insertAt(p,i,false);c.setActiveObject(p);c.requestRenderAll();push()};
+/* SVG code window: view, edit, re-apply and export markup */
+function svgSource(){const a=c.getActiveObject(),z=c.getZoom();
+ if(a&&a.type!=='activeSelection'){c.discardActiveObject();const s=a.toSVG();c.setActiveObject(a);return`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${D.W}" height="${D.H}" viewBox="0 0 ${D.W} ${D.H}">\n${s}\n</svg>`}
+ return svgDoc()}
+function svgDoc(){const bg=c.backgroundColor;c.discardActiveObject();const u=D.unit!=='px'?D.unit:'px',w=u==='px'?D.W:r2(fromPx(D.W,u,D.dpi)),h=u==='px'?D.H:r2(fromPx(D.H,u,D.dpi));
+ const z=c.getZoom(),cw=c.width,ch=c.height;c.setZoom(1);c.setDimensions({width:D.W,height:D.H});
+ const s=c.toSVG({viewBox:{x:0,y:0,width:D.W,height:D.H},width:w+u,height:h+u});c.setZoom(z);c.setDimensions({width:cw,height:ch});c.renderAll();return s}
+let svgSel=null;
+$('#svgCode').onclick=()=>{const a=c.getActiveObject();svgSel=a&&a.type!=='activeSelection'?a:null;$('#svgTa').value=svgSource();$('#dSvg').showModal()};
+$('#svgClose').onclick=()=>$('#dSvg').close();
+$('#svgApply').onclick=async()=>{const s=$('#svgTa').value;$('#dSvg').close();
+ if(svgSel){await importSvg(s,svgSel.name,{asIs:true,replace:[svgSel]})}else{lock=true;c.clear();c.backgroundColor='';lock=false;await importSvg(s,'',{asIs:true,resize:true})}};
+$('#svgDl').onclick=()=>dl(URL.createObjectURL(new Blob([$('#svgTa').value],{type:'image/svg+xml'})),(D.name||'design')+'.svg');
+/* palette, layers, sync */
+[GOLD,INK,'#666666','#FFFFFF','#D32F2F','#1976D2'].forEach(h=>{const b=document.createElement('button');b.className='sw';b.style.background=h;b.title=h;b.setAttribute('aria-label','Apply '+h);
+ b.onclick=()=>{$('#fill').value=h;$('#ftype').value='solid';applyFill(D.cm==='cmyk'?rgb2cmyk(...hex2rgb(h)):null);syncCmykFromFill()};$('#pal').append(b)});
+function sync(){const a=c.getActiveObject();if(!a)return;const f=kids(a)[0]||a;
+ $('#op').value=a.opacity??1;if(f.fontSize){$('#fs').value=Math.round(f.fontSize);$('#ff').value=f.fontFamily;$('#tsp').value=f.charSpacing||0;$('#tlh').value=f.lineHeight||1.16}
+ if(f.fill instanceof fabric.Gradient){const g=f.fill,s=g.colorStops;$('#ftype').value=g.type==='radial'?'radial':'linear';$('#fill').value=hexAny(s[0].color);$('#fill2').value=hexAny(s[s.length-1].color);
+  const cc=g.coords;$('#fang').value=Math.round(((Math.atan2(cc.y2-cc.y1,cc.x2-cc.x1)*180/Math.PI)+360)%360)}
+ else if(typeof f.fill==='string'&&f.fill){$('#ftype').value='solid';$('#fill').value=hexAny(f.fill)}
+ $('#lblB').style.display=$('#lblAng').style.display=$('#ftype').value==='solid'?'none':'';
+ if(f.stroke)$('#stroke').value=hexAny(f.stroke);$('#sw').value=f.strokeWidth||0;
+ if(D.cm==='cmyk')(f.cmyk||rgb2cmyk(...hex2rgb($('#fill').value))).forEach((v,i)=>$('#'+['cc','cm','cy','ck'][i]).value=v);
+ $$('[data-ta]').forEach(b=>b.classList.toggle('on',b.dataset.ta===f.textAlign));
+ $('#blend').value=a.globalCompositeOperation||'source-over';
+ const bi=(f.filters||[]).find(x=>x&&x.type==='BlendIf');$('#bif').value=bi?bi.mode:'off';if(bi){$('#bifT').value=bi.threshold;$('#bifS').value=bi.soft}
+ $('#smartEdit').hidden=!a.smartId}
+function layers(){const L=$('#layers');L.textContent='';const act=c.getActiveObject();
+ c.getObjects().slice().reverse().forEach(o=>{const d=document.createElement('div');d.className='ly'+(act===o?' on':'');
+  const mk=(t,fn,l)=>{const b=document.createElement('button');b.textContent=t;b.setAttribute('aria-label',l);b.onclick=ev=>{ev.stopPropagation();fn()};return b};
+  const n=document.createElement('span');n.textContent=(o.name||o.type)+(o.clipPath?' ◧':'')+(o.smartId?' ◈':'');n.onclick=()=>{c.setActiveObject(o);c.requestRenderAll();layers();sync()};
+  d.append(mk(o.visible===false?'○':'●',()=>{o.visible=o.visible===false;c.requestRenderAll();push()},'Toggle visibility'),n,
+   mk('↑',()=>{c.bringForward(o);push()},'Move up'),mk('↓',()=>{c.sendBackwards(o);push()},'Move down'),mk('✕',()=>{c.remove(o)},'Delete layer'));
+  L.append(d)})}
+
+/* ===== new project / canvas size ===== */
+const PRESETS=[['Social','Instagram Post (4:5)',1080,1350,'px'],['Social','Instagram Square',1080,1080,'px'],['Social','Story / Reel',1080,1920,'px'],['Social','Facebook Post',1200,630,'px'],['Social','Facebook Cover',820,312,'px'],['Social','LinkedIn Post',1200,627,'px'],['Social','X / Twitter Post',1600,900,'px'],['Social','YouTube Thumbnail',1280,720,'px'],['Social','YouTube Video',1920,1080,'px'],['Social','Logo',2000,2000,'px'],
+ ['Print','A3',297,420,'mm'],['Print','A4',210,297,'mm'],['Print','A5',148,210,'mm'],['Print','A6',105,148,'mm'],['Print','US Letter',8.5,11,'in'],['Print','US Legal',8.5,14,'in'],['Print','Poster 18×24',18,24,'in'],['Print','Brochure (Tri-fold)',297,210,'mm'],['Print','T-shirt print 12×16',12,16,'in'],
+ ['Cards','Call / Business card',90,54,'mm'],['Cards','Business card (US)',3.5,2,'in'],['Cards','Postcard 6×4',6,4,'in'],['Cards','Invitation 5×7',5,7,'in'],['Cards','Sticker 3×3',3,3,'in'],['Cards','Barcode label 50×30',50,30,'mm'],
+ ['Web','Desktop 1920×1080',1920,1080,'px'],['Web','Mobile 390×844',390,844,'px'],['Web','Banner 728×90',728,90,'px']];
+let nMode='new',nCat='Social',nuPrev='px';
+function nPxTxt(){const px=toPx(+$('#nw').value,$('#nu').value,+$('#nd').value),py=toPx(+$('#nh').value,$('#nu').value,+$('#nd').value);$('#nPx').textContent=`= ${Math.round(px)} × ${Math.round(py)} px at ${$('#nd').value} DPI`+(px*py>40e6?' (very large: may be slow on phones)':'')}
+function nFill(w,h,u,d){nuPrev=u;$('#nw').value=w;$('#nh').value=h;$('#nu').value=u;if(d)$('#nd').value=d;nPxTxt()}
+function nCats(){$('#dCats').textContent='';[...new Set(PRESETS.map(p=>p[0]))].concat('Custom').forEach(k=>{const b=document.createElement('button');b.textContent=k;b.className=k===nCat?'on':'';b.onclick=()=>{nCat=k;nCats()};$('#dCats').append(b)});
+ $('#dPre').textContent='';if(nCat==='Custom')return;PRESETS.filter(p=>p[0]===nCat).forEach(p=>{const b=document.createElement('button');b.innerHTML=`${p[1]}<small>${p[2]} × ${p[3]} ${p[4]}</small>`;
+  b.onclick=()=>nFill(p[2],p[3],p[4],p[4]==='px'?96:150);$('#dPre').append(b)})}
+function openNew(mode){nMode=mode;$('#dNewT').textContent=mode==='new'?'New project':'Canvas size';$('#nGo').textContent=mode==='new'?'Create':'Apply';$('#nTabL').style.display=mode==='new'?'':'none';
+ if(mode==='size'){nFill(r2(fromPx(D.W,D.unit,D.dpi)),r2(fromPx(D.H,D.unit,D.dpi)),D.unit,D.dpi);$('#ncm').value=D.cm}nCats();nPxTxt();$('#dNew').showModal()}
+$('#nu').onchange=()=>{const d=+$('#nd').value,w=toPx(+$('#nw').value,nuPrev,d),h=toPx(+$('#nh').value,nuPrev,d);nuPrev=$('#nu').value;$('#nw').value=r2(fromPx(w,nuPrev,d));$('#nh').value=r2(fromPx(h,nuPrev,d));nPxTxt()};
+['nw','nh','nd'].forEach(i=>$('#'+i).addEventListener('input',nPxTxt));$('#nCancel').onclick=()=>$('#dNew').close();
+$('#bNew').onclick=()=>{document.body.dataset.ws!=='design'&&MTE.show('design');nuPrev=$('#nu').value;openNew('new')};$('#bSize').onclick=()=>openNew('size');
+$('#nGo').onclick=()=>{const u=$('#nu').value,d=+$('#nd').value,w=Math.round(toPx(+$('#nw').value,u,d)),h=Math.round(toPx(+$('#nh').value,u,d));
+ if(!(w>0&&h>0&&w<=16000&&h<=16000))return toast('Size must be between 1 and 16000 px.');
+ const spec={W:w,H:h,unit:u,dpi:d,cm:$('#ncm').value};$('#dNew').close();
+ if(nMode==='size'){Object.assign(D,spec);D.unit=u;fit();push();return}
+ if($('#nTab').checked){const id=Date.now().toString(36),p=new URLSearchParams({p:id,w,h,u,d,cm:spec.cm,bg:$('#nbg').value});
+  const win=window.open(location.pathname+'?'+p,'_blank');if(win)return;toast('Pop-up blocked: created in this tab instead.')}
+ lock=true;c.clear();c.backgroundColor=$('#nbg').value;Object.assign(D,spec,{name:'Untitled'});lock=false;hist=[];hi=-1;fit();push()};
+$('#cmode').onchange=e=>{D.cm=e.target.value;info();push();toast(D.cm==='cmyk'?'CMYK mode: colours are authored in CMYK; vector colours export as DeviceCMYK. No ICC profile is applied.':'RGB mode.')};
+$('#pname').oninput=e=>{D.name=e.target.value;document.title=(D.name||'Untitled')+' — MTE Productive Studio'};$('#pname').onchange=push;
+
+/* ===== opening files ===== */
 $('#open').onclick=()=>$('#file').click();
 $('#file').onchange=async e=>{for(const f of e.target.files)await openFile(f);e.target.value=''};
 const st=$('#stage');['dragover','dragenter'].forEach(v=>st.addEventListener(v,e=>{e.preventDefault();st.classList.add('drag')}));
 ['dragleave','drop'].forEach(v=>st.addEventListener(v,e=>{e.preventDefault();st.classList.remove('drag')}));
 st.addEventListener('drop',async e=>{for(const f of e.dataTransfer.files)await openFile(f)});
 const rd=f=>new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result);x.readAsDataURL(f)});
+const loadImg=u=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=u});
+const OFFICE=/^(docx|pptx|xlsx|xlsm|xls|ods|csv|odt|odp|doc|ppt|rtf)$/;
 async function openFile(f){const ext=f.name.split('.').pop().toLowerCase();
  try{
-  if(ext==='svg')return svgStr(await f.text(),f.name);
-  if(ext==='psd')return openPsd(f);
-  if(ext==='pdf'||ext==='ai')return openPdf(f);
-  if(ext==='mte'||ext==='json'){hist=[];hi=-1;restore(await f.text());return setTimeout(push,300)}
+  if(OFFICE.test(ext)){const w=MTE.workspaces.office;MTE.show('office');return w.openFile(f)}
+  if(ext==='svg')return importSvg(await f.text(),f.name.replace(/\.svg$/i,''));
+  if(ext==='psd')return openPsd(await f.arrayBuffer(),f.name);
+  if(ext==='pdf'||ext==='ai')return askPdf(await f.arrayBuffer(),f.name);
+  if(ext==='mte'||ext==='json'){fh=null;hist=[];hi=-1;await restore(await f.text());return push()}
   fabric.Image.fromURL(await rd(f),i=>{i.set('name',f.name);place(i)})
  }catch(err){console.error(err);toast('Could not open '+f.name+': '+err.message)}}
-function openPsd(f){if(!need('PSD',window.agPsd))return;
- return f.arrayBuffer().then(b=>{const p=agPsd.readPsd(b);lock=true;c.clear();c.backgroundColor='';W=p.width;H=p.height;
-  const walk=l=>(l||[]).forEach(x=>{if(x.children)return walk(x.children);if(!x.canvas)return;
-   c.add(new fabric.Image(x.canvas,{left:x.left,top:x.top,opacity:x.opacity??1,visible:!x.hidden,name:x.name}))});
-  walk(p.children);lock=false;fit();push();toast('PSD opened: layers are editable as images; text is flattened.')})}
-async function openPdf(f){if(!need('PDF',window.pdfjsLib))return;
- pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
- const d=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise,pg=await d.getPage(1),v=pg.getViewport({scale:2}),cv=document.createElement('canvas');
- cv.width=v.width;cv.height=v.height;await pg.render({canvasContext:cv.getContext('2d'),viewport:v}).promise;
- lock=true;c.clear();c.backgroundColor='#fff';W=v.width/2;H=v.height/2;fit();
- c.add(new fabric.Image(cv,{left:0,top:0,scaleX:.5,scaleY:.5,name:f.name+' (page 1)'}));lock=false;push();
- toast('Page 1 of '+d.numPages+' placed as a flat layer. Add text and shapes on top.')}
+const blendFromPsd=b=>{const m=(b||'normal').replace(/ /g,'-');return m==='normal'||m==='pass-through'?'source-over':['multiply','screen','overlay','darken','lighten','color-dodge','color-burn','hard-light','soft-light','difference','exclusion','hue','saturation','color','luminosity'].includes(m)?m:'source-over'};
+const blendToPsd=g=>g&&g!=='source-over'?g.replace(/-/g,' '):'normal';
+/* PSD: layers, live text and smart objects */
+async function openPsd(buf,fname){await lib('psd');const p=agPsd.readPsd(buf);lock=true;c.clear();c.backgroundColor='';D.W=p.width;D.H=p.height;D.unit='px';D.name=fname.replace(/\.[^.]+$/,'');
+ const files=new Map();(p.linkedFiles||[]).forEach(x=>files.set(x.id,x));let nT=0,nS=0,nR=0;
+ const walk=(ls,pre)=>(ls||[]).forEach(x=>{if(x.children)return walk(x.children,pre+(x.name||'Group')+' / ');
+  const base={opacity:x.opacity??1,visible:!x.hidden,name:pre+(x.name||'Layer'),globalCompositeOperation:blendFromPsd(x.blendMode)};
+  if(x.text&&x.text.text){const st=x.text.style||{},ps=x.text.paragraphStyle||{},tr=x.text.transform||[1,0,0,1,0,0],fs=(st.fontSize||24)*Math.abs(tr[3]||1),col=st.fillColor,fn=(st.font&&st.font.name)||'Arial';
+   const fam=fn.replace(/(MT)?(-?(Bold|Italic|Regular|Oblique|Black|Light|Medium).*)?$/i,'')||'Arial';
+   c.add(new fabric.Textbox(x.text.text.replace(/\r/g,'\n'),Object.assign(base,{left:x.left||0,top:x.top||0,width:Math.max(24,((x.right||0)-(x.left||0))*1.08+6),fontSize:fs,fontFamily:fam,fontWeight:/bold|black/i.test(fn)?'bold':'normal',fontStyle:/italic|oblique/i.test(fn)?'italic':'normal',fill:col&&col.r!==undefined?rgb2hex(col.r,col.g,col.b):'#000',textAlign:ps.justification||'left'})));nT++;return}
+  if(!x.canvas)return;const img=new fabric.Image(x.canvas,Object.assign(base,{left:x.left||0,top:x.top||0}));
+  const lf=x.placedLayer&&files.get(x.placedLayer.id);if(lf&&lf.data){const id='so'+Date.now().toString(36)+(nS++);img.smartId=id;img.name+=' [smart object]';smartMap.set(id,{name:lf.name||'smart',data:lf.data})}
+  c.add(img);nR++});
+ walk(p.children,'');lock=false;fit();push();toast(`PSD opened: ${nT} live text, ${nR} pixel/shape layers, ${nS} smart objects. Shape and mask layers arrive as pixels.`)}
+/* smart object editing: open the embedded content, edit, then write it back */
+$('#smartEdit').onclick=async()=>{const o=c.getActiveObject();if(!o||!o.smartId)return;const e=smartMap.get(o.smartId);
+ if(!e)return toast('Smart object content is not in memory (a reload clears it). Re-open the PSD.');
+ soStack.push({state:snapshot(),id:o.smartId,w:o.getScaledWidth(),h:o.getScaledHeight()});$('#soBar').style.display='flex';
+ const ext=(e.name.split('.').pop()||'').toLowerCase();hist=[];hi=-1;
+ try{if(e.proj)await restore(e.proj);
+  else if(ext==='psd'||ext==='psb')await openPsd(e.data.buffer.slice(e.data.byteOffset,e.data.byteOffset+e.data.byteLength),e.name);
+  else if(ext==='pdf'||ext==='ai')await askPdf(e.data.buffer.slice(e.data.byteOffset,e.data.byteOffset+e.data.byteLength),e.name);
+  else if(ext==='svg')await importSvg(new TextDecoder().decode(e.data),e.name);
+  else{const mime=ext==='jpg'||ext==='jpeg'?'image/jpeg':'image/'+(ext||'png'),url=URL.createObjectURL(new Blob([e.data],{type:mime})),im=await loadImg(url);
+   lock=true;c.clear();c.backgroundColor='';D.W=im.naturalWidth;D.H=im.naturalHeight;lock=false;fit();c.add(new fabric.Image(im,{left:0,top:0,name:e.name}));push()}
+ }catch(err){toast('Could not open smart object: '+err.message);soCancel()}};
+async function soDone(){const fr=soStack.pop();if(!fr)return;c.discardActiveObject();const url=renderURL('png',true),proj=snapshot();$('#soBar').style.display=soStack.length?'flex':'none';
+ await restore(fr.state);hist=[fr.state];hi=0;const o=c.getObjects().find(x=>x.smartId===fr.id);
+ if(o)o.setSrc(url,()=>{o.set({scaleX:fr.w/o.width,scaleY:fr.h/o.height});o.dirty=true;const e=smartMap.get(fr.id);if(e)e.proj=proj;c.requestRenderAll();push();toast('Smart object updated.')})}
+async function soCancel(){const fr=soStack.pop();if(!fr)return;$('#soBar').style.display=soStack.length?'flex':'none';await restore(fr.state);hist=[fr.state];hi=0}
+$('#soDone').onclick=soDone;$('#soCancel').onclick=soCancel;
 
-/* ---------- properties and layers ---------- */
-const kids=o=>o.type==='group'||o.type==='activeSelection'?o._objects.flatMap(kids):[o];
-function setP(p,v){const a=c.getActiveObject();if(!a)return;kids(a).forEach(x=>x.set(p,v));if(p==='opacity')a.set(p,v);c.requestRenderAll();push()}
-$('#fill').oninput=e=>setP('fill',e.target.value);$('#stroke').oninput=e=>setP('stroke',e.target.value);
-$('#sw').oninput=e=>setP('strokeWidth',+e.target.value);$('#op').oninput=e=>setP('opacity',+e.target.value);
-$('#ff').onchange=e=>setP('fontFamily',e.target.value);$('#fs').oninput=e=>setP('fontSize',+e.target.value);
-$('#bold').onclick=()=>{const a=c.getActiveObject();a&&setP('fontWeight',a.fontWeight==='bold'?'normal':'bold')};
-$('#bg').oninput=e=>{c.backgroundColor=e.target.value;c.renderAll();push()};
-$('#preset').onchange=e=>size(...e.target.value.split(',').map(Number));
-[GOLD,INK,'#666666','#FFFFFF'].forEach(h=>{const b=document.createElement('button');b.className='sw';b.style.background=h;b.title=h;b.setAttribute('aria-label','Apply '+h);b.onclick=()=>setP('fill',h);$('#pal').append(b)});
-function sync(){const a=c.getActiveObject();if(!a)return;$('#op').value=a.opacity??1;if(a.fontSize)$('#fs').value=Math.round(a.fontSize);if(typeof a.fill==='string'&&/^#/.test(a.fill))$('#fill').value=a.fill}
-function layers(){const L=$('#layers');L.textContent='';const act=c.getActiveObject();
- c.getObjects().slice().reverse().forEach(o=>{const d=document.createElement('div');d.className='ly'+(act===o?' on':'');
-  const mk=(t,fn,l)=>{const b=document.createElement('button');b.textContent=t;b.setAttribute('aria-label',l);b.onclick=ev=>{ev.stopPropagation();fn()};return b};
-  const n=document.createElement('span');n.textContent=o.name||o.type;n.onclick=()=>{c.setActiveObject(o);c.requestRenderAll();layers()};
-  d.append(mk(o.visible===false?'○':'●',()=>{o.visible=o.visible===false;c.requestRenderAll();push()},'Toggle visibility'),n,
-   mk('↑',()=>{c.bringForward(o);push()},'Move up'),mk('↓',()=>{c.sendBackwards(o);push()},'Move down'),mk('✕',()=>{c.remove(o)},'Delete layer'));
-  L.append(d)})}
+/* PDF / AI import: embedded project > PDF layers (OCG) > vector > flat */
+let pdfPending=null;
+async function askPdf(buf,name){await lib('pdf');pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+ const d=await pdfjsLib.getDocument({data:new Uint8Array(buf.slice(0))}).promise;
+ try{const att=await d.getAttachments(),a=att&&Object.values(att).find(x=>/mte-project\.json$/i.test(x.filename));
+  if(a&&confirm('This PDF contains an editable MTE project. Restore it with all layers and live text?\n(Cancel imports the PDF pages instead.)')){hist=[];hi=-1;await restore(new TextDecoder().decode(a.content));push();return toast('Editable project restored from PDF.')}}catch(e){}
+ pdfPending={d,name};$('#pdfPg').max=d.numPages;$('#pdfPg').value=1;
+ let n=0;try{const o=await d.getOptionalContentConfig();for(const _ of o)n++}catch(e){}
+ $('#pdfInfo').textContent=`${d.numPages} page(s), ${n} PDF layer(s) found.`+(n?'':' No layers: Layers mode will import a flat page.');$('#pdfMode').value=n?'layers':'vector';$('#dPdf').showModal()}
+$('#pdfCancel').onclick=()=>$('#dPdf').close();
+$('#pdfGo').onclick=async()=>{$('#dPdf').close();const {d,name}=pdfPending;toast('Importing PDF…',true);try{await importPdf(d,name,$('#pdfMode').value,clamp(+$('#pdfPg').value||1,1,d.numPages))}catch(e){console.error(e);toast('PDF import failed: '+e.message)}};
+function trimCv(cv){const w=cv.width,h=cv.height,x=cv.getContext('2d'),d=x.getImageData(0,0,w,h).data;let x0=w,y0=h,x1=-1,y1=-1;
+ for(let y=0;y<h;y++)for(let i=0;i<w;i++)if(d[(y*w+i)*4+3]){if(i<x0)x0=i;if(i>x1)x1=i;if(y<y0)y0=y;if(y>y1)y1=y}
+ if(x1<0)return null;const o=document.createElement('canvas');o.width=x1-x0+1;o.height=y1-y0+1;o.getContext('2d').drawImage(cv,-x0,-y0);return{canvas:o,x:x0,y:y0,w:o.width,h:o.height}}
+async function importPdf(d,name,mode,pn){const pg=await d.getPage(pn),Q=2,vp1=pg.getViewport({scale:96/72}),vp=pg.getViewport({scale:96/72*Q});
+ const drawTo=async(occ)=>{const cv=document.createElement('canvas');cv.width=Math.ceil(vp.width);cv.height=Math.ceil(vp.height);
+  await pg.render({canvasContext:cv.getContext('2d'),viewport:vp,background:'rgba(0,0,0,0)',optionalContentConfigPromise:occ?Promise.resolve(occ):undefined}).promise;return cv};
+ const reset=()=>{lock=true;c.clear();c.backgroundColor='';D.W=Math.round(vp1.width);D.H=Math.round(vp1.height);D.unit='px';D.dpi=96;D.name=name.replace(/\.[^.]+$/,'');fit()};
+ const addCv=(cv,x,y,nm)=>c.add(new fabric.Image(cv,{left:x/Q,top:y/Q,scaleX:1/Q,scaleY:1/Q,name:nm}));
+ if(mode==='vector'&&window.pdfjsLib&&pdfjsLib.SVGGraphics){
+  const ops=await pg.getOperatorList(),g=new pdfjsLib.SVGGraphics(pg.commonObjs,pg.objs);g.embedFonts=true;const svg=await g.getSVG(ops,vp1);
+  reset();c.backgroundColor='#fff';lock=false;await importSvg(new XMLSerializer().serializeToString(svg),'',{asIs:true});return toast('Vector import done. Complex text and gradients may need cleanup; use Layers mode for exact looks.')}
+ if(mode==='layers'){let occ=null,ids=[];try{occ=await d.getOptionalContentConfig();ids=[...occ].map(([id,g])=>[id,g.name||id])}catch(e){}
+  if(ids.length){ids.forEach(([id])=>occ.setVisibility(id,false));const base=await drawTo(occ),bd=base.getContext('2d').getImageData(0,0,base.width,base.height);reset();c.backgroundColor='#fff';
+   const bt=trimCv(base);if(bt)addCv(bt.canvas,bt.x,bt.y,'Base (non-layer content)');
+   for(const [id,nm] of ids){ids.forEach(([i])=>occ.setVisibility(i,i===id));const cv=await drawTo(occ),ctx=cv.getContext('2d'),im=ctx.getImageData(0,0,cv.width,cv.height),a=im.data,b=bd.data;
+    for(let i=0;i<a.length;i+=4)if(a[i+3]&&a[i]===b[i]&&a[i+1]===b[i+1]&&a[i+2]===b[i+2]&&a[i+3]===b[i+3])a[i+3]=0;
+    ctx.putImageData(im,0,0);const t=trimCv(cv);if(t)addCv(t.canvas,t.x,t.y,nm)}
+   lock=false;fit();push();return toast(`Imported ${ids.length} PDF layers as editable layers.`)}
+  toast('No PDF layers found: importing as a flat page.')}
+ const cv=await drawTo(null);reset();c.backgroundColor='#fff';addCv(cv,0,0,name+' (page '+pn+')');lock=false;fit();push()}
 
-/* ---------- export ---------- */
-function render(fmt,transparent){const z=c.getZoom(),w=c.width,h=c.height,bg=c.backgroundColor,s=+$('#sc').value;
- c.discardActiveObject();c.setZoom(1);c.setDimensions({width:W,height:H});
+/* ===== export ===== */
+const dl=(u,n)=>{const a=document.createElement('a');a.href=u;a.download=n;document.body.append(a);a.click();a.remove()};
+function renderURL(fmt,transparent){const z=c.getZoom(),w=c.width,h=c.height,bg=c.backgroundColor,s=+$('#sc').value||1;
+ c.discardActiveObject();c.setZoom(1);c.setDimensions({width:D.W,height:D.H});
  if(transparent)c.backgroundColor='';else if(!bg)c.backgroundColor='#ffffff';
- const out=fmt==='svg'?c.toSVG():c.toDataURL({format:fmt,quality:.92,multiplier:s});
- c.backgroundColor=bg;c.setZoom(z);c.setDimensions({width:w,height:h});c.renderAll();return out}
-const dl=(u,n)=>{const a=document.createElement('a');a.href=u;a.download=n;a.click()};
-$('#export').onclick=()=>{const f=$('#fmt').value,n='mte-design';
- if(f==='png-t')dl(render('png',true),n+'-transparent.png');
- else if(f==='png')dl(render('png'),n+'.png');
- else if(f==='jpg'||f==='jpeg')dl(render('jpeg'),n+'.'+f);
- else if(f==='webp')dl(render('webp'),n+'.webp');
- else if(f==='svg')dl(URL.createObjectURL(new Blob([render('svg')],{type:'image/svg+xml'})),n+'.svg');
- else if(f==='mte')dl(URL.createObjectURL(new Blob([hist[hi]],{type:'application/json'})),n+'.mte');
- else if(f==='pdf'){if(!need('PDF export',window.jspdf))return;const {jsPDF}=window.jspdf;
-  const p=new jsPDF({orientation:W>H?'l':'p',unit:'px',format:[W,H],hotfixes:['px_scaling']});
-  p.addImage(render('png'),'PNG',0,0,W,H);p.save(n+'.pdf')}};
+ const out=c.toDataURL({format:fmt,quality:.92,multiplier:s});c.backgroundColor=bg;c.setZoom(z);c.setDimensions({width:w,height:h});c.renderAll();return out}
+async function layerCv(o,s){const sc=new fabric.StaticCanvas(null,{width:D.W*s,height:D.H*s,enableRetinaScaling:false,renderOnAddRemove:false});sc.setZoom(s);
+ const cl=await new Promise(r=>o.clone(r,PROPS));cl.set({opacity:1,globalCompositeOperation:'source-over',visible:true});sc.add(cl);sc.renderAll();return trimCv(sc.lowerCanvasEl)}
+/* --- layered PDF writer (optional-content layers, live base-14 text, embedded project) --- */
+const TE=new TextEncoder(),n3=v=>String(+(+v).toFixed(3));
+const pdfHex=s=>{let h='FEFF';for(const ch of s){const c=ch.codePointAt(0);if(c>0xFFFF){const x=c-0x10000;h+=(0xD800+(x>>10)).toString(16).padStart(4,'0')+(0xDC00+(x&1023)).toString(16).padStart(4,'0')}else h+=c.toString(16).padStart(4,'0')}return'<'+h+'>'};
+async function flate(u8){if(typeof CompressionStream==='undefined')return null;const cs=new CompressionStream('deflate'),w=cs.writable.getWriter();w.write(u8);w.close();return new Uint8Array(await new Response(cs.readable).arrayBuffer())}
+async function streamObj(dict,bytes){const z=await flate(bytes),b=z||bytes,h=TE.encode(`<< ${dict}${z?' /Filter /FlateDecode':''} /Length ${b.length} >>\nstream\n`),t=TE.encode('\nendstream'),o=new Uint8Array(h.length+b.length+t.length);o.set(h);o.set(b,h.length);o.set(t,h.length+b.length);return o}
+function pdfFile(objs,root,infoN){const parts=[],off=[];let len=0;const put=b=>{if(typeof b==='string')b=TE.encode(b);parts.push(b);len+=b.length};
+ put('%PDF-1.7\n%\u00e2\u00e3\u00cf\u00d3\n');objs.forEach((o,i)=>{off[i]=len;put((i+1)+' 0 obj\n');put(o);put('\nendobj\n')});
+ const x=len;put('xref\n0 '+(objs.length+1)+'\n0000000000 65535 f \n');off.forEach(o=>put(String(o).padStart(10,'0')+' 00000 n \n'));
+ put(`trailer\n<< /Size ${objs.length+1} /Root ${root} 0 R /Info ${infoN} 0 R >>\nstartxref\n${x}\n%%EOF\n`);return new Blob(parts,{type:'application/pdf'})}
+async function rgbaObj(cv,P){const w=cv.width,h=cv.height,d=cv.getContext('2d').getImageData(0,0,w,h).data,rgb=new Uint8Array(w*h*3),a=new Uint8Array(w*h);let ha=false;
+ for(let i=0,p=0,q=0;i<d.length;i+=4,p+=3,q++){rgb[p]=d[i];rgb[p+1]=d[i+1];rgb[p+2]=d[i+2];a[q]=d[i+3];if(a[q]!==255)ha=true}
+ let sm=0;if(ha){P.push(await streamObj(`/Type /XObject /Subtype /Image /Width ${w} /Height ${h} /ColorSpace /DeviceGray /BitsPerComponent 8`,a));sm=P.length}
+ P.push(await streamObj(`/Type /XObject /Subtype /Image /Width ${w} /Height ${h} /ColorSpace /DeviceRGB /BitsPerComponent 8${sm?` /SMask ${sm} 0 R`:''}`,rgb));return P.length}
+const WIN={'\u2018':145,'\u2019':146,'\u201C':147,'\u201D':148,'\u2022':149,'\u2013':150,'\u2014':151,'\u20AC':128,'\u2026':133};
+const pdfTxt=s=>[...s].map(ch=>{const k=ch.charCodeAt(0),v=WIN[ch]||(k<256?k:63);return v===40||v===41||v===92?'\\'+ch:v>=32&&v<127?ch:'\\'+v.toString(8).padStart(3,'0')}).join('');
+function pdfFont(o){const f=(o.fontFamily||'').toLowerCase(),b=o.fontWeight==='bold'||+o.fontWeight>=600,i=o.fontStyle==='italic'||o.fontStyle==='oblique',
+ fam=/courier|mono/.test(f)?'C':/times|georgia|garamond|palatino|serif/.test(f)&&!/sans/.test(f)?'T':'H';
+ return{H:['Helvetica','Helvetica-Bold','Helvetica-Oblique','Helvetica-BoldOblique'],T:['Times-Roman','Times-Bold','Times-Italic','Times-BoldItalic'],C:['Courier','Courier-Bold','Courier-Oblique','Courier-BoldOblique']}[fam][(b?1:0)+(i?2:0)]}
+const colOp=(hex,cm,stroke)=>{if(cm){const k=Math.min(...[0,1,2].map(i=>1-hex2rgb(hex)[i]/255));return(stroke?'':'')+cm.map(v=>n3(v/100)).join(' ')+(stroke?' K':' k')}return hex2rgb(hex).map(v=>n3(v/255)).join(' ')+(stroke?' RG':' rg')};
+function textOps(o,pt,PH,fontRes){const lines=(o._textLines||o.text.split('\n')).map(l=>Array.isArray(l)?l.join(''):l),sx=Math.abs(o.scaleX||1),sy=Math.abs(o.scaleY||1),
+ fs=o.fontSize*sy*pt,a=(o.angle||0)*Math.PI/180,co=Math.cos(a),si=Math.sin(a),tl=o.getPointByOrigin('left','top'),fn=pdfFont(o);
+ if(!fontRes.has(fn))fontRes.set(fn,'F'+(fontRes.size+1));
+ const hex=hexAny(o.fill),cm=(D.cm==='cmyk'||o.cmyk)?(o.cmyk||rgb2cmyk(...hex2rgb(hex))):null;let top=0,out=`BT\n${colOp(hex,cm)}\n/${fontRes.get(fn)} ${n3(fs)} Tf\n${n3(sx/sy*100)} Tz\n${n3((o.charSpacing||0)/1000*fs)} Tc\n`;
+ lines.forEach((ln,i)=>{const hl=o.getHeightOfLine(i),base=top+hl/o.lineHeight*(1-.222),lw=o.getLineWidth(i),
+  off=o.textAlign==='center'?(o.width-lw)/2:o.textAlign==='right'?o.width-lw:0,lx=off*sx,ly=base*sy,px=tl.x+lx*co-ly*si,py=tl.y+lx*si+ly*co;top+=hl;
+  out+=`${n3(co)} ${n3(-si)} ${n3(si)} ${n3(co)} ${n3(px*pt)} ${n3(PH-py*pt)} Tm\n(${pdfTxt(ln)}) Tj\n`});return out+'ET'}
+const PDFBM={multiply:'Multiply',screen:'Screen',overlay:'Overlay',darken:'Darken',lighten:'Lighten','color-dodge':'ColorDodge','color-burn':'ColorBurn','hard-light':'HardLight','soft-light':'SoftLight',difference:'Difference',exclusion:'Exclusion',hue:'Hue',saturation:'Saturation',color:'Color',luminosity:'Luminosity'};
+async function buildPdf({layered,live,embed}){const s=+$('#sc').value||1,pt=72/D.dpi,PW=D.W*pt,PH=D.H*pt;c.discardActiveObject();
+ const P=['','','','',''],ocgs=[],props=[],xo=[],gss=[],ops=[],fontRes=new Map();let nL=0;
+ const layer=name=>{P.push(`<< /Type /OCG /Name ${pdfHex(name)} >>`);ocgs.push(P.length);nL++;props.push(`/L${nL} ${P.length} 0 R`);return nL};
+ const gs=(op,bm)=>{if(op>=1&&!bm)return'';gss.push(`/G${gss.length+1} << /ca ${n3(op)} /CA ${n3(op)}${bm?' /BM /'+bm:''} >>`);return`/G${gss.length} gs `};
+ const bg=c.backgroundColor;
+ if(!layered){const cv=await(async()=>{const im=await loadImg(renderURL('png',false)),k=document.createElement('canvas');k.width=im.naturalWidth;k.height=im.naturalHeight;k.getContext('2d').drawImage(im,0,0);return k})();
+  const n=await rgbaObj(cv,P);xo.push(`/Im1 ${n} 0 R`);ops.push(`q ${n3(PW)} 0 0 ${n3(PH)} 0 0 cm /Im1 Do Q`)}
+ else{
+  if(typeof bg==='string'&&bg){const l=layer('Background'),hex=hexAny(bg);ops.push(`/OC /L${l} BDC q ${colOp(hex,D.cm==='cmyk'?rgb2cmyk(...hex2rgb(hex)):null)} 0 0 ${n3(PW)} ${n3(PH)} re f Q EMC`)}
+  else if(bg){const sc=new fabric.StaticCanvas(null,{width:D.W*s,height:D.H*s,enableRetinaScaling:false});sc.setZoom(s);sc.backgroundColor=bg;sc.renderAll();const n=await rgbaObj(sc.lowerCanvasEl,P),l=layer('Background');xo.push(`/Bg ${n} 0 R`);ops.push(`/OC /L${l} BDC q ${n3(PW)} 0 0 ${n3(PH)} 0 0 cm /Bg Do Q EMC`)}
+  let k=0;for(const o of c.getObjects()){if(o.visible===false)continue;k++;const nm=o.name||o.type,bm=PDFBM[o.globalCompositeOperation]||'',g=gs(o.opacity??1,bm);
+   const isTxt=/text/.test(o.type)&&typeof o.fill==='string'&&o.fill&&!o.stroke&&!o.clipPath&&!o.shadow;
+   if(live&&isTxt){const l=layer(nm);ops.push(`/OC /L${l} BDC q ${g}${textOps(o,pt,PH,fontRes)} Q EMC`);continue}
+   const r=await layerCv(o,s);if(!r)continue;const n=await rgbaObj(r.canvas,P),l=layer(nm);xo.push(`/Im${k} ${n} 0 R`);
+   ops.push(`/OC /L${l} BDC q ${g}${n3(r.w/s*pt)} 0 0 ${n3(r.h/s*pt)} ${n3(r.x/s*pt)} ${n3(PH-(r.y+r.h)/s*pt)} cm /Im${k} Do Q EMC`)}}
+ let names='',af='';
+ if(embed){const pj=await streamObj('/Type /EmbeddedFile /Subtype /application#2Fjson',TE.encode(snapshot()));P.push(pj);const ef=P.length;
+  P.push(`<< /Type /Filespec /F (mte-project.json) /UF (mte-project.json) /EF << /F ${ef} 0 R >> /Desc (Editable MTE Productive Studio project) >>`);names=`/Names << /EmbeddedFiles << /Names [(mte-project.json) ${P.length} 0 R] >> >>`}
+ const fonts=[...fontRes].map(([f,r])=>`/${r} << /Type /Font /Subtype /Type1 /BaseFont /${f} /Encoding /WinAnsiEncoding >>`).join(' ');
+ P[4]=await streamObj('',TE.encode(ops.join('\n')));
+ P[0]=`<< /Type /Catalog /Pages 2 0 R ${names}${ocgs.length?` /OCProperties << /OCGs [${ocgs.map(x=>x+' 0 R').join(' ')}] /D << /Order [${ocgs.slice().reverse().map(x=>x+' 0 R').join(' ')}] /ON [${ocgs.map(x=>x+' 0 R').join(' ')}] >> >>`:''} >>`;
+ P[1]='<< /Type /Pages /Kids [3 0 R] /Count 1 >>';
+ P[2]=`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${n3(PW)} ${n3(PH)}] /Contents 5 0 R /Resources << /XObject << ${xo.join(' ')} >> /Properties << ${props.join(' ')} >> /ExtGState << ${gss.join(' ')} >> /Font << ${fonts} >> >> >>`;
+ const now=new Date().toISOString().replace(/[-:T]/g,'').slice(0,14);
+ P[3]=`<< /Title ${pdfHex(D.name||'Untitled')} /Producer (MTE Productive Studio v${VERSION}) /Creator (MTE Productive Studio) /CreationDate (D:${now}Z) >>`;
+ return pdfFile(P,1,4)}
+/* --- PSD writer (live text layers, blend modes, opacity) --- */
+async function buildPsd(live){await lib('psd');const s=+$('#sc').value||1,ch=[];c.discardActiveObject();
+ const bgc=document.createElement('canvas');bgc.width=D.W*s;bgc.height=D.H*s;const bx=bgc.getContext('2d');
+ if(c.backgroundColor){const sc=new fabric.StaticCanvas(null,{width:D.W*s,height:D.H*s,enableRetinaScaling:false});sc.setZoom(s);sc.backgroundColor=c.backgroundColor;sc.renderAll();bx.drawImage(sc.lowerCanvasEl,0,0);ch.push({name:'Background',canvas:bgc,left:0,top:0})}
+ for(const o of c.getObjects()){const r=await layerCv(o,s);if(!r)continue;
+  const L={name:o.name||o.type,left:r.x,top:r.y,canvas:r.canvas,opacity:o.opacity??1,hidden:o.visible===false,blendMode:blendToPsd(o.globalCompositeOperation)};
+  if(live&&/text/.test(o.type)&&typeof o.fill==='string'){const [R,G,B]=hex2rgb(hexAny(o.fill)),fs=o.fontSize*Math.abs(o.scaleY||1)*s,tl=o.getPointByOrigin('left','top'),b=/bold/i.test(o.fontWeight)||+o.fontWeight>=600;
+   const fam=(o.fontFamily||'Arial').replace(/\s/g,'');L.text={text:o.text.replace(/\n/g,'\r'),transform:[1,0,0,1,tl.x*s,tl.y*s+fs],antiAlias:'smooth',orientation:'horizontal',style:{font:{name:fam+(b?'-Bold':'MT')},fontSize:fs,fillColor:{r:R,g:G,b:B}},paragraphStyle:{justification:o.textAlign||'left'}}}
+  ch.push(L)}
+ const buf=agPsd.writePsd({width:D.W*s,height:D.H*s,children:ch},{generateThumbnail:true});return new Blob([buf],{type:'image/vnd.adobe.photoshop'})}
+async function saveProject(as){const data=snapshot(),n=(D.name||'mte-design').replace(/[^\w\- ]+/g,'')||'mte-design';
+ try{if(window.showSaveFilePicker){if(!fh||as)fh=await showSaveFilePicker({suggestedName:n+'.mte',types:[{description:'MTE project',accept:{'application/json':['.mte']}}]});const w=await fh.createWritable();await w.write(data);await w.close()}
+ else dl(URL.createObjectURL(new Blob([data],{type:'application/json'})),n+'.mte');
+ dirty=false;$('#dirty').textContent='';toast('Saved '+n+'.mte')}catch(e){if(e.name!=='AbortError')toast('Save failed: '+e.message)}}
+$('#bSave').onclick=()=>saveProject();$('#bSaveAs').onclick=()=>saveProject(true);
+addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'&&document.body.dataset.ws==='design'){e.preventDefault();saveProject(e.shiftKey)}});
+$('#export').onclick=async()=>{const f=$('#fmt').value,n=D.name||'mte-design';toast('Exporting…',true);
+ try{
+  if(f==='png-t')dl(renderURL('png',true),n+'-transparent.png');
+  else if(f==='png')dl(renderURL('png'),n+'.png');
+  else if(f==='jpg'||f==='jpeg')dl(renderURL('jpeg'),n+'.'+f);
+  else if(f==='webp')dl(renderURL('webp'),n+'.webp');
+  else if(f==='svg')dl(URL.createObjectURL(new Blob([svgDoc()],{type:'image/svg+xml'})),n+'.svg');
+  else if(f==='mte')dl(URL.createObjectURL(new Blob([snapshot()],{type:'application/json'})),n+'.mte');
+  else if(f==='pdf'||f==='pdf-l'||f==='ai'){const b=await buildPdf({layered:f!=='pdf',live:$('#xlive').checked,embed:$('#xproj').checked});dl(URL.createObjectURL(b),n+(f==='ai'?'.ai':f==='pdf'?'.pdf':'-layered.pdf'))}
+  else if(f==='psd')dl(URL.createObjectURL(await buildPsd($('#xlive').checked)),n+'.psd');
+  toast('Exported '+f.toUpperCase());fit()}catch(e){console.error(e);toast('Export failed: '+e.message);fit()}};
 
-/* ---------- boot: restore, offline, updates ---------- */
-try{const s=localStorage.getItem('mte-doc');if(s){restore(s);hist=[s];hi=0}else{fit();push()}}catch(e){fit();push()}
-if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').then(r=>{
- r.addEventListener('updatefound',()=>{const w=r.installing;w.addEventListener('statechange',()=>{
-  if(w.state==='installed'&&navigator.serviceWorker.controller){const t=$('#toast');t.innerHTML='';const b=document.createElement('button');
-   b.textContent='Update ready. Reload';b.className='pri';b.onclick=()=>w.postMessage('skip');t.append(b);t.style.display='block'}})});
- navigator.serviceWorker.addEventListener('controllerchange',()=>location.reload())}));
+/* ===== Video workspace hook: drop your editor next to index.html as video.html ===== */
+MTE.addWorkspace({id:'video',label:'Video',mount(el){const f=document.createElement('iframe');f.title='MTE Video Editor';f.style.cssText='flex:1;border:0;width:100%;min-height:60vh;background:#000';el.append(f)}});
+$('#wsTabs').addEventListener('click',e=>{if(e.target.dataset.ws==='video'){const f=$('#ws-video iframe');if(f&&!f.getAttribute('src'))f.src='video.html'}});
+/* ===== Office workspace: DOCX / PPTX / XLSX quick editors + LibreOffice engine slot ===== */
+MTE.addWorkspace({id:'office',label:'Office',
+ mount(el){
+  el.innerHTML=`<div class="row"><button class="pri" id="ofOpen">Open document</button><button id="ofSave" disabled>Save copy</button><button id="ofLo">LibreOffice engine…</button><span id="ofName" class="m"></span></div>
+  <small class="m">Quick editor: changes text in DOCX and PPTX in place (formatting, images and layout are preserved) and cell values in XLSX/ODS/CSV. For full layout editing use the LibreOffice engine (see summary notes). Always saves a copy.</small>
+  <div id="ofBody" style="overflow:auto;flex:1"></div>`;
+  const body=el.querySelector('#ofBody');let st=null;
+  const b64=u8=>u8;
+  const dlBlob=(blob,n)=>{dl(URL.createObjectURL(blob),n)};
+  el.querySelector('#ofOpen').onclick=()=>{const i=document.createElement('input');i.type='file';i.accept='.docx,.pptx,.xlsx,.xlsm,.xls,.ods,.csv';i.onchange=()=>i.files[0]&&this.openFile(i.files[0]);i.click()};
+  const info=m=>{body.textContent='';const p=document.createElement('p');p.textContent=m;body.append(p)};
+  const paraList=(xml,ns,p,t,host,title)=>{const h=document.createElement('h3');h.textContent=title;host.append(h);
+   [...xml.getElementsByTagNameNS(ns,p)].forEach(pe=>{const ts=[...pe.getElementsByTagNameNS(ns,t)];if(!ts.length)return;
+    const ta=document.createElement('textarea');ta.className='pp';ta.rows=1;ta.value=ts.map(x=>x.textContent).join('');
+    const grow=()=>{ta.style.height='auto';ta.style.height=ta.scrollHeight+4+'px'};
+    ta.oninput=()=>{ts[0].textContent=ta.value;ts[0].setAttributeNS('http://www.w3.org/XML/1998/namespace','xml:space','preserve');ts.slice(1).forEach(x=>x.textContent='');st.dirty=true;grow()};host.append(ta);setTimeout(grow,0)})};
+  this.openFile=async f=>{const ext=f.name.split('.').pop().toLowerCase();el.querySelector('#ofName').textContent=f.name;st={name:f.name,ext,dirty:false};body.textContent='';
+   try{
+    if(ext==='docx'||ext==='pptx'){await lib('zip');const z=await JSZip.loadAsync(await f.arrayBuffer()),W='http://schemas.openxmlformats.org/wordprocessingml/2006/main',A='http://schemas.openxmlformats.org/drawingml/2006/main';
+     st.zip=z;st.parts=[];
+     const paths=ext==='docx'?['word/document.xml']:Object.keys(z.files).filter(n=>/^ppt\/slides\/slide\d+\.xml$/.test(n)).sort((a,b)=>parseInt(a.match(/\d+/))-parseInt(b.match(/\d+/)));
+     for(const pth of paths){const xml=new DOMParser().parseFromString(await z.file(pth).async('string'),'application/xml');st.parts.push({pth,xml});
+      ext==='docx'?paraList(xml,W,'p','t',body,'Document text'):paraList(xml,A,'p','t',body,'Slide '+parseInt(pth.match(/\d+/)))}
+     if(!body.querySelector('textarea'))info('No editable text found.')}
+    else if(/^(xlsx|xlsm|xls|ods|csv)$/.test(ext)){await lib('xlsx');const wb=XLSX.read(await f.arrayBuffer(),{type:'array',cellStyles:true});st.wb=wb;sheetView(wb,wb.SheetNames[0])}
+    else{info('This format needs the LibreOffice engine. Use "LibreOffice engine…".')}
+    el.querySelector('#ofSave').disabled=!(st.parts||st.wb)}catch(e){console.error(e);info('Could not open: '+e.message)}};
+  const sheetView=(wb,name)=>{body.textContent='';const sel=document.createElement('select');wb.SheetNames.forEach(n=>sel.append(new Option(n,n)));sel.value=name;sel.onchange=()=>sheetView(wb,sel.value);body.append(sel);
+   const ws=wb.Sheets[name],rg=XLSX.utils.decode_range(ws['!ref']||'A1:A1'),R=Math.min(Math.max(rg.e.r+6,25),400),C=Math.min(Math.max(rg.e.c+3,10),60),tb=document.createElement('table');tb.className='sh';
+   const hr=tb.insertRow();hr.insertCell().outerHTML='<th></th>';for(let j=0;j<C;j++)hr.insertCell().outerHTML=`<th>${XLSX.utils.encode_col(j)}</th>`;
+   for(let i=0;i<R;i++){const tr=tb.insertRow();tr.insertCell().outerHTML=`<th>${i+1}</th>`;for(let j=0;j<C;j++){const a=XLSX.utils.encode_cell({r:i,c:j}),cell=ws[a],inp=document.createElement('input');
+     inp.value=cell?(cell.f?'='+cell.f:(cell.v??'')):'';inp.onchange=()=>{const v=inp.value;if(v==='')delete ws[a];else if(v[0]==='=')ws[a]={t:'n',f:v.slice(1)};else if(!isNaN(+v))ws[a]={t:'n',v:+v};else ws[a]={t:'s',v};
+      const r=XLSX.utils.decode_range(ws['!ref']||'A1:A1');r.e.r=Math.max(r.e.r,i);r.e.c=Math.max(r.e.c,j);ws['!ref']=XLSX.utils.encode_range(r);st.dirty=true};tr.insertCell().append(inp)}}
+   const w=document.createElement('div');w.style.overflow='auto';w.append(tb);body.append(w)};
+  el.querySelector('#ofSave').onclick=async()=>{if(!st)return;const base=st.name.replace(/\.[^.]+$/,'');
+   try{if(st.parts){st.parts.forEach(p=>st.zip.file(p.pth,new XMLSerializer().serializeToString(p.xml)));
+     dlBlob(await st.zip.generateAsync({type:'blob',compression:'DEFLATE',mimeType:st.ext==='docx'?'application/vnd.openxmlformats-officedocument.wordprocessingml.document':'application/vnd.openxmlformats-officedocument.presentationml.presentation'}),base+'-edited.'+st.ext)}
+    else if(st.wb){const bt={xlsx:'xlsx',xlsm:'xlsx',xls:'xls',ods:'ods',csv:'csv'}[st.ext];const out=XLSX.write(st.wb,{bookType:bt,type:'array'});dlBlob(new Blob([out]),base+'-edited.'+(bt==='xlsx'?'xlsx':st.ext))}
+    toast('Saved a copy.')}catch(e){toast('Save failed: '+e.message)}};
+  /* LibreOffice engine: a page you host (ZetaOffice/LibreOffice WASM or Collabora) embedded in an iframe.
+     Contract: engine posts {mte:'ready'}; app replies {mte:'open',name,bytes}; app asks {mte:'save'}; engine replies {mte:'saved',name,bytes}. */
+  el.querySelector('#ofLo').onclick=()=>{let u='';try{u=localStorage.getItem('mte-lo-url')||''}catch(e){}
+   u=prompt('LibreOffice engine page URL (hosted ZetaOffice/LibreOffice WASM bridge or Collabora). Leave empty to clear.',u);if(u===null)return;try{localStorage.setItem('mte-lo-url',u)}catch(e){}
+   if(!u){info('Engine cleared.');return}
+   body.textContent='';const fr=document.createElement('iframe');fr.src=u;fr.style.cssText='width:100%;height:100%;min-height:70dvh;border:1px solid var(--l);background:#fff';fr.allow='cross-origin-isolated';body.append(fr);
+   const h=ev=>{if(ev.source!==fr.contentWindow||!ev.data)return;if(ev.data.mte==='ready'&&this.pending){const buf=this.pending;fr.contentWindow.postMessage({mte:'open',name:this.pendingName,bytes:buf},'*')}
+    if(ev.data.mte==='saved')dlBlob(new Blob([ev.data.bytes]),ev.data.name||'document')};addEventListener('message',h)};
+  this.openFileBytes=null;
+ }});
+const _ofOpen=MTE.workspaces.office.openFile;
+MTE.workspaces.office.openFile=async f=>{MTE.workspaces.office.pending=await f.arrayBuffer();MTE.workspaces.office.pendingName=f.name;return _ofOpen&&_ofOpen(f)};
+
+/* ===== boot ===== */
+(function boot(){
+ let s=null;try{s=localStorage.getItem(KEY)||(PID==='main'?localStorage.getItem('mte-doc'):null)}catch(e){}
+ if(qs.has('w')&&!s){D=Object.assign(D,{W:+qs.get('w')||1080,H:+qs.get('h')||1080,unit:qs.get('u')||'px',dpi:+qs.get('d')||96,cm:qs.get('cm')||'rgb'});c.backgroundColor=qs.get('bg')||'#ffffff';
+  history.replaceState(null,'',location.pathname+'?p='+PID);fit();push()}
+ else if(s){restore(s).then(()=>{hist=[s];hi=0})}
+ else{fit();push()}
+ if(qs.get('new')==='1'&&!qs.has('w'))setTimeout(()=>{nuPrev=$('#nu').value;openNew('new')},200);
+ syncCmykFromFill();applyFill&&($('#lblB').style.display=$('#lblAng').style.display='none');
+ $('#bMore').onclick=()=>$('#hmore').classList.toggle('show');$('#fab').onclick=()=>$('#side').classList.toggle('open');
+ if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').then(r=>{
+  r.addEventListener('updatefound',()=>{const w=r.installing;w.addEventListener('statechange',()=>{
+   if(w.state==='installed'&&navigator.serviceWorker.controller){const t=$('#toast');t.innerHTML='';const b=document.createElement('button');
+    b.textContent='Update ready. Reload';b.className='pri';b.onclick=()=>w.postMessage('skip');t.append(b);t.style.display='block'}})});
+  navigator.serviceWorker.addEventListener('controllerchange',()=>location.reload())}))})();
 </script></body></html>
