@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MTE Productive Studio</title>
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg">
+<meta name="theme-color" content="#1A1A1A">
+<style>
+:root{--g:#C9932E;--d:#1A1A1A;--p:#242424;--l:#3a3a3a;--m:#9a9a9a;--t:#f2f2f2;font-family:Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}html,body{height:100%;margin:0;background:var(--d);color:var(--t);font-size:13px}
+body{display:grid;grid-template-rows:auto 1fr;grid-template-columns:76px 1fr 260px;grid-template-areas:"top top top" "tools stage side"}
+header{grid-area:top;display:flex;gap:8px;align-items:center;padding:8px 12px;border-bottom:2px solid var(--g);flex-wrap:wrap}
+header b{font-size:15px;letter-spacing:.06em;margin-right:8px}header b i{color:var(--g);font-style:normal}
+button,select,input{font:inherit;color:var(--t);background:var(--p);border:1px solid var(--l);border-radius:4px;padding:6px 9px}
+button{cursor:pointer}button:hover{border-color:var(--g)}button.pri{background:var(--g);color:var(--d);border-color:var(--g);font-weight:700}
+input[type=color]{padding:0;width:34px;height:28px}input[type=number]{width:70px}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--g);outline-offset:1px}
+#tools{grid-area:tools;display:flex;flex-direction:column;gap:6px;padding:8px;border-right:1px solid var(--l);overflow:auto}
+#tools button{width:100%;padding:8px 2px;font-size:12px}
+#stage{grid-area:stage;overflow:auto;display:grid;place-items:center;background:#101010;padding:20px;position:relative}
+#stage.drag{outline:3px dashed var(--g);outline-offset:-10px}
+.cw{box-shadow:0 0 0 1px var(--l),0 10px 40px #000;background:repeating-conic-gradient(#2c2c2c 0 25%,#222 0 50%) 0 0/16px 16px}
+#side{grid-area:side;border-left:1px solid var(--l);overflow:auto;padding:10px;display:flex;flex-direction:column;gap:12px}
+h3{margin:0 0 6px;font-size:12px;color:var(--g)}.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.sw{width:22px;height:22px;padding:0;border-radius:50%}
+.ly{display:flex;gap:4px;align-items:center;padding:3px;border:1px solid transparent;border-radius:4px}
+.ly.on{border-color:var(--g);background:var(--p)}.ly span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.ly button{padding:1px 6px}
+#toast{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:var(--g);color:var(--d);padding:8px 14px;border-radius:6px;font-weight:700;display:none;z-index:9}
+@media(max-width:800px){body{grid-template-columns:1fr;grid-template-rows:auto auto 55vh auto;grid-template-areas:"top" "tools" "stage" "side"}#tools{flex-direction:row;flex-wrap:wrap;border-right:0}#tools button{width:auto;padding:8px 12px}}
+</style></head><body>
+<header>
+ <b>MEGA TAG <i>/</i> PRODUCTIVE STUDIO</b>
+ <button id="open">Open file</button><input id="file" type="file" multiple hidden accept=".svg,.psd,.pdf,.ai,.png,.jpg,.jpeg,.webp,.gif,.mte,.json">
+ <button id="undo" title="Ctrl+Z">Undo</button><button id="redo" title="Ctrl+Y">Redo</button>
+ <select id="preset" aria-label="Canvas size"><option value="1080,1080">Square 1080</option><option value="1080,1920">Story 1080×1920</option><option value="1920,1080">Video 1920×1080</option><option value="794,1123">A4 (96 dpi)</option><option value="1200,630">Link preview</option></select>
+ <label>Bg <input id="bg" type="color" value="#ffffff"></label>
+ <span style="flex:1"></span>
+ <label>Scale <select id="sc"><option>1</option><option>2</option><option>3</option><option>4</option></select></label>
+ <select id="fmt" aria-label="Export format"><option value="png-t">PNG (transparent)</option><option value="png">PNG</option><option value="jpg">JPG</option><option value="jpeg">JPEG</option><option value="webp">WEBP</option><option value="svg">SVG</option><option value="pdf">PDF</option><option value="mte">MTE project</option></select>
+ <button class="pri" id="export">Export</button>
+</header>
+<nav id="tools" aria-label="Tools">
+ <button data-t="text">Text</button><button data-t="rect">Rectangle</button><button data-t="ell">Ellipse</button><button data-t="tri">Triangle</button><button data-t="line">Line</button><button data-t="img">Image</button>
+ <button data-t="logo">MTE logo</button><button data-t="word">Wordmark</button>
+ <button data-t="group">Group</button><button data-t="ungroup">Ungroup</button><button data-t="dup">Duplicate</button>
+ <button data-t="letter">Letterhead</button><button data-t="post">Social post</button>
+ <button data-t="zin">Zoom +</button><button data-t="zout">Zoom −</button>
+</nav>
+<main id="stage"><div class="cw"><canvas id="c"></canvas></div></main>
+<aside id="side">
+ <section><h3>Properties</h3>
+  <div class="row"><label>Fill <input id="fill" type="color" value="#C9932E"></label><label>Stroke <input id="stroke" type="color" value="#1A1A1A"></label><label>Width <input id="sw" type="number" min="0" value="0"></label></div>
+  <div class="row"><label>Opacity <input id="op" type="range" min="0" max="1" step=".05" value="1"></label></div>
+  <div class="row"><select id="ff"><option>Arial</option><option>Helvetica</option><option>Georgia</option><option>Times New Roman</option><option>Verdana</option><option>Courier New</option><option>Impact</option></select><input id="fs" type="number" min="6" value="48"><button id="bold"><b>B</b></button></div>
+  <div class="row" id="pal"></div>
+ </section>
+ <section><h3>Layers</h3><div id="layers"></div></section>
+ <section><small style="color:var(--m)">Opens SVG, PSD, PDF, AI (PDF-based), PNG/JPG/WEBP and .mte projects. Drag files onto the canvas.</small></section>
+</aside>
+<div id="toast" role="status"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ag-psd@28.2.0/dist/bundle.js"></script>
+<script>
+const $=s=>document.querySelector(s),GOLD='#C9932E',INK='#1A1A1A';
+const c=new fabric.Canvas('c',{preserveObjectStacking:true,backgroundColor:'#fff'});
+let W=1080,H=1080,zf=1,hist=[],hi=-1,lock=false,tm;
+const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(tm);tm=setTimeout(()=>t.style.display='none',3500)};
+const need=(n,v)=>v?true:(toast(n+' library not loaded. Connect once to cache it.'),false);
+
+/* ---------- canvas, history, autosave ---------- */
+function fit(){const s=$('#stage'),z=Math.min((s.clientWidth-40)/W,(s.clientHeight-40)/H,1)*zf;
+ c.setZoom(z);c.setDimensions({width:W*z,height:H*z});c.renderAll()}
+function size(w,h){W=w;H=h;fit();push()}
+function push(){if(lock)return;const s=JSON.stringify({W,H,bg:c.backgroundColor,j:c.toJSON(['name'])});
+ hist=hist.slice(0,hi+1);hist.push(s);if(hist.length>60)hist.shift();hi=hist.length-1;
+ try{localStorage.setItem('mte-doc',s)}catch(e){}layers()}
+function restore(s){const d=JSON.parse(s);lock=true;W=d.W;H=d.H;
+ c.loadFromJSON(d.j,()=>{c.backgroundColor=d.bg||'';lock=false;fit();layers()})}
+$('#undo').onclick=()=>{if(hi>0)restore(hist[--hi])};
+$('#redo').onclick=()=>{if(hi<hist.length-1)restore(hist[++hi])};
+['added','modified','removed'].forEach(e=>c.on('object:'+e,push));
+['created','updated','cleared'].forEach(e=>c.on('selection:'+e,()=>{layers();sync()}));
+addEventListener('resize',fit);
+addEventListener('keydown',e=>{const t=c.getActiveObject();if(t&&t.isEditing||/INPUT|SELECT/.test(e.target.tagName))return;
+ if(e.key==='Delete'||e.key==='Backspace'){c.getActiveObjects().forEach(o=>c.remove(o));c.discardActiveObject()}
+ if(e.ctrlKey||e.metaKey){if(e.key==='z'){e.preventDefault();$('#undo').click()}if(e.key==='y'){e.preventDefault();$('#redo').click()}}});
+
+/* ---------- adding things ---------- */
+function place(o,fitIn=true){if(fitIn){const k=Math.min(1,W*.8/o.getScaledWidth(),H*.8/o.getScaledHeight());o.scale(o.scaleX*k)}
+ c.add(o);o.viewportCenter?.();o.setCoords();c.setActiveObject(o);c.requestRenderAll()}
+const WORD=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 240"><text x="300" y="110" text-anchor="middle" font-family="Arial" font-size="48" font-weight="700" letter-spacing="2" fill="${INK}">MEGA TAG</text><text x="300" y="150" text-anchor="middle" font-family="Arial" font-size="30" font-weight="700" letter-spacing="4" fill="${INK}">ENTERPRISE</text><line x1="220" y1="168" x2="380" y2="168" stroke="${GOLD}" stroke-width="3"/><text x="300" y="196" text-anchor="middle" font-family="Arial" font-size="17" fill="#666">Quality Goods &amp; Services</text></svg>`;
+const add={
+ text:()=>place(new fabric.Textbox('Double-click to edit',{width:420,fontSize:48,fontFamily:'Arial',fill:INK,name:'Text'}),false),
+ rect:()=>place(new fabric.Rect({width:300,height:200,fill:GOLD,name:'Rectangle'}),false),
+ ell:()=>place(new fabric.Ellipse({rx:120,ry:120,fill:GOLD,name:'Ellipse'}),false),
+ tri:()=>place(new fabric.Triangle({width:240,height:210,fill:GOLD,name:'Triangle'}),false),
+ line:()=>place(new fabric.Line([0,0,300,0],{stroke:INK,strokeWidth:6,name:'Line'}),false),
+ img:()=>{$('#file').click()},
+ logo:()=>svgStr(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><circle cx="200" cy="200" r="150" fill="none" stroke="${GOLD}" stroke-width="6"/><text x="200" y="225" text-anchor="middle" font-family="Arial" font-size="90" font-weight="700" fill="${INK}">MTE</text></svg>`,'MTE monogram'),
+ word:()=>svgStr(WORD,'MTE wordmark'),
+ group:()=>{const a=c.getActiveObject();if(a&&a.type==='activeSelection')a.toGroup().set('name','Group');c.requestRenderAll();push()},
+ ungroup:()=>{const a=c.getActiveObject();if(a&&a.type==='group'){a.toActiveSelection();c.requestRenderAll();push()}},
+ dup:()=>{const a=c.getActiveObject();a&&a.clone(n=>{n.set({left:a.left+20,top:a.top+20});c.add(n);c.setActiveObject(n)},['name'])},
+ zin:()=>{zf=Math.min(zf*1.25,4);fit()},zout:()=>{zf=Math.max(zf/1.25,.2);fit()},
+ letter:()=>{lock=true;c.clear();c.backgroundColor='#fff';W=794;H=1123;fit();
+  svgStr(WORD,'MTE wordmark',o=>{o.set({left:40,top:20}).scale(.45)});
+  c.add(new fabric.Rect({left:40,top:130,width:714,height:3,fill:GOLD,name:'Rule'}),
+   new fabric.Textbox('Date\n\nRecipient name\nAddress\n\nDear Sir/Madam,\n\nWrite your letter here.',{left:40,top:170,width:714,fontSize:16,fontFamily:'Arial',fill:INK,name:'Body'}),
+   new fabric.Textbox('Mega Tag Enterprise — Quality Goods & Services',{left:40,top:1070,width:714,fontSize:12,fontFamily:'Arial',fill:'#666',name:'Footer'}));
+  lock=false;push()},
+ post:()=>{lock=true;c.clear();c.backgroundColor=INK;W=1080;H=1080;fit();
+  c.add(new fabric.Rect({left:60,top:60,width:960,height:960,fill:'',stroke:GOLD,strokeWidth:6,name:'Frame'}),
+   new fabric.Textbox('Quality goods,\nbacked by service.',{left:120,top:380,width:840,fontSize:96,fontWeight:'bold',fontFamily:'Arial',fill:'#fff',name:'Headline'}),
+   new fabric.Textbox('Mega Tag Enterprise',{left:120,top:900,width:840,fontSize:36,fontFamily:'Arial',fill:GOLD,name:'Sign-off'}));
+  lock=false;push()}};
+function svgStr(s,name,cb){fabric.loadSVGFromString(s,(o,opt)=>{const g=fabric.util.groupSVGElements(o,opt);g.set('name',name||'SVG');cb?cb(g):place(g);if(cb)c.add(g)})}
+$('#tools').onclick=e=>{const t=e.target.dataset.t;if(t)add[t]()};
+
+/* ---------- opening files ---------- */
+$('#open').onclick=()=>$('#file').click();
+$('#file').onchange=async e=>{for(const f of e.target.files)await openFile(f);e.target.value=''};
+const st=$('#stage');['dragover','dragenter'].forEach(v=>st.addEventListener(v,e=>{e.preventDefault();st.classList.add('drag')}));
+['dragleave','drop'].forEach(v=>st.addEventListener(v,e=>{e.preventDefault();st.classList.remove('drag')}));
+st.addEventListener('drop',async e=>{for(const f of e.dataTransfer.files)await openFile(f)});
+const rd=f=>new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result);x.readAsDataURL(f)});
+async function openFile(f){const ext=f.name.split('.').pop().toLowerCase();
+ try{
+  if(ext==='svg')return svgStr(await f.text(),f.name);
+  if(ext==='psd')return openPsd(f);
+  if(ext==='pdf'||ext==='ai')return openPdf(f);
+  if(ext==='mte'||ext==='json'){hist=[];hi=-1;restore(await f.text());return setTimeout(push,300)}
+  fabric.Image.fromURL(await rd(f),i=>{i.set('name',f.name);place(i)})
+ }catch(err){console.error(err);toast('Could not open '+f.name+': '+err.message)}}
+function openPsd(f){if(!need('PSD',window.agPsd))return;
+ return f.arrayBuffer().then(b=>{const p=agPsd.readPsd(b);lock=true;c.clear();c.backgroundColor='';W=p.width;H=p.height;
+  const walk=l=>(l||[]).forEach(x=>{if(x.children)return walk(x.children);if(!x.canvas)return;
+   c.add(new fabric.Image(x.canvas,{left:x.left,top:x.top,opacity:x.opacity??1,visible:!x.hidden,name:x.name}))});
+  walk(p.children);lock=false;fit();push();toast('PSD opened: layers are editable as images; text is flattened.')})}
+async function openPdf(f){if(!need('PDF',window.pdfjsLib))return;
+ pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+ const d=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise,pg=await d.getPage(1),v=pg.getViewport({scale:2}),cv=document.createElement('canvas');
+ cv.width=v.width;cv.height=v.height;await pg.render({canvasContext:cv.getContext('2d'),viewport:v}).promise;
+ lock=true;c.clear();c.backgroundColor='#fff';W=v.width/2;H=v.height/2;fit();
+ c.add(new fabric.Image(cv,{left:0,top:0,scaleX:.5,scaleY:.5,name:f.name+' (page 1)'}));lock=false;push();
+ toast('Page 1 of '+d.numPages+' placed as a flat layer. Add text and shapes on top.')}
+
+/* ---------- properties and layers ---------- */
+const kids=o=>o.type==='group'||o.type==='activeSelection'?o._objects.flatMap(kids):[o];
+function setP(p,v){const a=c.getActiveObject();if(!a)return;kids(a).forEach(x=>x.set(p,v));if(p==='opacity')a.set(p,v);c.requestRenderAll();push()}
+$('#fill').oninput=e=>setP('fill',e.target.value);$('#stroke').oninput=e=>setP('stroke',e.target.value);
+$('#sw').oninput=e=>setP('strokeWidth',+e.target.value);$('#op').oninput=e=>setP('opacity',+e.target.value);
+$('#ff').onchange=e=>setP('fontFamily',e.target.value);$('#fs').oninput=e=>setP('fontSize',+e.target.value);
+$('#bold').onclick=()=>{const a=c.getActiveObject();a&&setP('fontWeight',a.fontWeight==='bold'?'normal':'bold')};
+$('#bg').oninput=e=>{c.backgroundColor=e.target.value;c.renderAll();push()};
+$('#preset').onchange=e=>size(...e.target.value.split(',').map(Number));
+[GOLD,INK,'#666666','#FFFFFF'].forEach(h=>{const b=document.createElement('button');b.className='sw';b.style.background=h;b.title=h;b.setAttribute('aria-label','Apply '+h);b.onclick=()=>setP('fill',h);$('#pal').append(b)});
+function sync(){const a=c.getActiveObject();if(!a)return;$('#op').value=a.opacity??1;if(a.fontSize)$('#fs').value=Math.round(a.fontSize);if(typeof a.fill==='string'&&/^#/.test(a.fill))$('#fill').value=a.fill}
+function layers(){const L=$('#layers');L.textContent='';const act=c.getActiveObject();
+ c.getObjects().slice().reverse().forEach(o=>{const d=document.createElement('div');d.className='ly'+(act===o?' on':'');
+  const mk=(t,fn,l)=>{const b=document.createElement('button');b.textContent=t;b.setAttribute('aria-label',l);b.onclick=ev=>{ev.stopPropagation();fn()};return b};
+  const n=document.createElement('span');n.textContent=o.name||o.type;n.onclick=()=>{c.setActiveObject(o);c.requestRenderAll();layers()};
+  d.append(mk(o.visible===false?'○':'●',()=>{o.visible=o.visible===false;c.requestRenderAll();push()},'Toggle visibility'),n,
+   mk('↑',()=>{c.bringForward(o);push()},'Move up'),mk('↓',()=>{c.sendBackwards(o);push()},'Move down'),mk('✕',()=>{c.remove(o)},'Delete layer'));
+  L.append(d)})}
+
+/* ---------- export ---------- */
+function render(fmt,transparent){const z=c.getZoom(),w=c.width,h=c.height,bg=c.backgroundColor,s=+$('#sc').value;
+ c.discardActiveObject();c.setZoom(1);c.setDimensions({width:W,height:H});
+ if(transparent)c.backgroundColor='';else if(!bg)c.backgroundColor='#ffffff';
+ const out=fmt==='svg'?c.toSVG():c.toDataURL({format:fmt,quality:.92,multiplier:s});
+ c.backgroundColor=bg;c.setZoom(z);c.setDimensions({width:w,height:h});c.renderAll();return out}
+const dl=(u,n)=>{const a=document.createElement('a');a.href=u;a.download=n;a.click()};
+$('#export').onclick=()=>{const f=$('#fmt').value,n='mte-design';
+ if(f==='png-t')dl(render('png',true),n+'-transparent.png');
+ else if(f==='png')dl(render('png'),n+'.png');
+ else if(f==='jpg'||f==='jpeg')dl(render('jpeg'),n+'.'+f);
+ else if(f==='webp')dl(render('webp'),n+'.webp');
+ else if(f==='svg')dl(URL.createObjectURL(new Blob([render('svg')],{type:'image/svg+xml'})),n+'.svg');
+ else if(f==='mte')dl(URL.createObjectURL(new Blob([hist[hi]],{type:'application/json'})),n+'.mte');
+ else if(f==='pdf'){if(!need('PDF export',window.jspdf))return;const {jsPDF}=window.jspdf;
+  const p=new jsPDF({orientation:W>H?'l':'p',unit:'px',format:[W,H],hotfixes:['px_scaling']});
+  p.addImage(render('png'),'PNG',0,0,W,H);p.save(n+'.pdf')}};
+
+/* ---------- boot: restore, offline, updates ---------- */
+try{const s=localStorage.getItem('mte-doc');if(s){restore(s);hist=[s];hi=0}else{fit();push()}}catch(e){fit();push()}
+if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').then(r=>{
+ r.addEventListener('updatefound',()=>{const w=r.installing;w.addEventListener('statechange',()=>{
+  if(w.state==='installed'&&navigator.serviceWorker.controller){const t=$('#toast');t.innerHTML='';const b=document.createElement('button');
+   b.textContent='Update ready. Reload';b.className='pri';b.onclick=()=>w.postMessage('skip');t.append(b);t.style.display='block'}})});
+ navigator.serviceWorker.addEventListener('controllerchange',()=>location.reload())}));
+</script></body></html>
