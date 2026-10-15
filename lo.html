@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MTE LibreOffice</title>
+<style>
+html,body{margin:0;height:100%;background:#1A1A1A;color:#eee;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
+#bar{display:flex;gap:10px;align-items:center;padding:6px 10px;border-bottom:2px solid #C9932E;height:32px}
+#bar b{flex:1}button{background:#C9932E;color:#1A1A1A;border:0;border-radius:4px;padding:6px 12px;font-weight:700;cursor:pointer}
+button:disabled{opacity:.4;cursor:default}#msg{padding:16px;color:#ccc}
+#qtcanvas{display:block;width:100%;height:calc(100% - 46px);border:0;padding:0}
+</style></head>
+<body onselectstart="event.preventDefault()">
+<div id="bar"><b>MTE Productive Studio · LibreOffice</b><span id="st">starting…</span><button id="dl" disabled>Download copy</button></div>
+<div id="msg"></div>
+<canvas id="qtcanvas" contenteditable="true" oncontextmenu="event.preventDefault()" onkeydown="event.preventDefault()"></canvas>
+<script>
+'use strict';
+/* ZetaOffice (LibreOffice WASM) host. Open it from the Studio's Office tab ("Edit in LibreOffice").
+   Needs: cross-origin isolation (sw.js adds the headers), zeta.js next to this file, Chrome/Edge/Firefox.
+   To self-host the engine: copy the soffice.* files next to this page and set soffice_base_url = ''. */
+const soffice_base_url='https://cdn.zetaoffice.net/zetaoffice_latest/';
+const $=s=>document.querySelector(s),bc=new BroadcastChannel('mte-lo');
+let port=null,ready=false,pend=null,last=null;
+const say=t=>$('#st').textContent=t;
+if(!self.crossOriginIsolated){$('#msg').textContent='LibreOffice needs a cross-origin isolated page. Open the Studio once over HTTPS (or localhost) so its service worker installs, then reload this page.';say('blocked');}
+else{
+ var Module={canvas:$('#qtcanvas'),uno_scripts:['./zeta.js','./lo-thread.js'],locateFile:(p,prefix)=>(prefix||soffice_base_url)+p};
+ if(soffice_base_url)Module.mainScriptUrlOrBlob=new Blob(["importScripts('"+soffice_base_url+"soffice.js');"],{type:'text/javascript'});
+ setInterval(()=>dispatchEvent(new Event('resize')),1000);
+ const s=document.createElement('script');s.src=soffice_base_url+'soffice.js';s.onerror=()=>say('could not load soffice.js');document.body.append(s);
+ const t=setInterval(()=>{if(Module.uno_main){clearInterval(t);Module.uno_main.then(p=>{port=p;port.onmessage=onThread})}},200);
+}
+function onThread(e){const m=e.data||{};
+ if(m.cmd==='ready'){ready=true;say('engine ready');bc.postMessage({mte:'ready'});if(pend){port.postMessage(pend,[pend.bytes]);pend=null}}
+ if(m.cmd==='opened'){say('editing '+m.name);$('#dl').disabled=false}
+ if(m.cmd==='saved'){last={name:m.name,bytes:m.bytes};bc.postMessage({mte:'saved',name:m.name,bytes:m.bytes});if(wantDl){wantDl=false;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([m.bytes]));a.download=m.name;a.click()}}
+ if(m.cmd==='error'){say('error');bc.postMessage({mte:'error',msg:m.msg});$('#msg').textContent='LibreOffice error: '+m.msg}}
+let wantDl=false;
+$('#dl').onclick=()=>{wantDl=true;port&&port.postMessage({cmd:'save'})};
+bc.onmessage=ev=>{const m=ev.data||{};
+ if(m.mte==='ping'&&ready)bc.postMessage({mte:'ready'});
+ if(m.mte==='open'){const msg={cmd:'open',name:m.name,bytes:m.bytes};if(ready)port.postMessage(msg,[msg.bytes]);else pend=msg}
+ if(m.mte==='save'&&port)port.postMessage({cmd:'save'})};
+</script></body></html>
