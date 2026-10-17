@@ -1,193 +1,1301 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>MTE Productive Studio</title>
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg">
 <meta name="theme-color" content="#1A1A1A">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('mte-theme')||'dark'}catch(e){}</script>
 <style>
-:root{--g:#C9932E;--d:#1A1A1A;--p:#242424;--l:#3a3a3a;--m:#9a9a9a;--t:#f2f2f2;font-family:Helvetica,Arial,sans-serif}
+:root{--ink:#1A1A1A;--gt:#C9932E;--stage:#101010;--ck1:#2c2c2c;--ck2:#222;--on:#3a2f17;--sh:#000;color-scheme:dark;--g:#C9932E;--d:#1A1A1A;--p:#242424;--l:#3a3a3a;--m:#9a9a9a;--t:#f2f2f2;font-family:Helvetica,Arial,sans-serif}
+:root[data-theme=light]{--d:#f4f3ef;--p:#ffffff;--l:#cfcdc6;--m:#5b5b5b;--t:#1A1A1A;--gt:#85590a;--stage:#e3e1da;--ck1:#d9d7d0;--ck2:#ecebe6;--on:#f3e2b8;--sh:#0003;color-scheme:light}
 *{box-sizing:border-box}html,body{height:100%;margin:0;background:var(--d);color:var(--t);font-size:13px}
-body{display:grid;grid-template-rows:auto 1fr;grid-template-columns:76px 1fr 260px;grid-template-areas:"top top top" "tools stage side"}
-header{grid-area:top;display:flex;gap:8px;align-items:center;padding:8px 12px;border-bottom:2px solid var(--g);flex-wrap:wrap}
-header b{font-size:15px;letter-spacing:.06em;margin-right:8px}header b i{color:var(--g);font-style:normal}
-button,select,input{font:inherit;color:var(--t);background:var(--p);border:1px solid var(--l);border-radius:4px;padding:6px 9px}
-button{cursor:pointer}button:hover{border-color:var(--g)}button.pri{background:var(--g);color:var(--d);border-color:var(--g);font-weight:700}
-input[type=color]{padding:0;width:34px;height:28px}input[type=number]{width:70px}
-button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--g);outline-offset:1px}
-#tools{grid-area:tools;display:flex;flex-direction:column;gap:6px;padding:8px;border-right:1px solid var(--l);overflow:auto}
+body{height:100dvh;display:grid;grid-template-rows:auto 1fr;grid-template-columns:76px 1fr 280px;grid-template-areas:"top top top" "tools stage side";overflow:hidden}
+header{grid-area:top;border-bottom:2px solid var(--g);padding:6px 10px;padding-top:max(6px,env(safe-area-inset-top))}
+#hmain,#hmore{display:flex;gap:6px;align-items:center;flex-wrap:wrap}#hmore{margin-top:6px}
+.lg{width:28px;height:28px;border-radius:6px}.brand{font-size:14px;letter-spacing:.05em}.brand i{color:var(--gt);font-style:normal}
+.ver{font-size:10px;color:var(--ink);background:var(--g);border-radius:9px;padding:1px 6px;font-weight:700}
+.sp{flex:1}
+button,select,input,textarea{font:inherit;color:var(--t);background:var(--p);border:1px solid var(--l);border-radius:4px;padding:6px 9px}
+button{cursor:pointer}button:hover{border-color:var(--g)}button.pri{background:var(--g);color:var(--ink);border-color:var(--g);font-weight:700}
+button.on{border-color:var(--g);background:var(--on)}
+input[type=color]{padding:0;width:34px;height:28px}input[type=number]{width:68px}input[type=range]{padding:0}
+label{display:inline-flex;gap:4px;align-items:center}.chk input{width:auto}
+:focus-visible{outline:2px solid var(--g);outline-offset:1px}
+#wsTabs{display:flex;gap:4px;margin-left:8px}
+#tools{grid-area:tools;display:flex;flex-direction:column;gap:5px;padding:8px;border-right:1px solid var(--l);overflow:auto}
 #tools button{width:100%;padding:8px 2px;font-size:12px}
-#stage{grid-area:stage;overflow:auto;display:grid;place-items:center;background:#101010;padding:20px;position:relative}
+#stage{grid-area:stage;overflow:auto;display:grid;place-items:center;background:var(--stage);padding:20px;position:relative;touch-action:pan-x pan-y}
 #stage.drag{outline:3px dashed var(--g);outline-offset:-10px}
-.cw{box-shadow:0 0 0 1px var(--l),0 10px 40px #000;background:repeating-conic-gradient(#2c2c2c 0 25%,#222 0 50%) 0 0/16px 16px}
+.cw{box-shadow:0 0 0 1px var(--l),0 10px 40px var(--sh);background:repeating-conic-gradient(var(--ck1) 0 25%,var(--ck2) 0 50%) 0 0/16px 16px}
 #side{grid-area:side;border-left:1px solid var(--l);overflow:auto;padding:10px;display:flex;flex-direction:column;gap:12px}
-h3{margin:0 0 6px;font-size:12px;color:var(--g)}.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+h3{margin:0 0 6px;font-size:12px;color:var(--gt)}.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
 .sw{width:22px;height:22px;padding:0;border-radius:50%}
+.ib{padding:5px 7px;line-height:0}.ib svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6}
 .ly{display:flex;gap:4px;align-items:center;padding:3px;border:1px solid transparent;border-radius:4px}
-.ly.on{border-color:var(--g);background:var(--p)}.ly span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
-.ly button{padding:1px 6px}
-#toast{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:var(--g);color:var(--d);padding:8px 14px;border-radius:6px;font-weight:700;display:none;z-index:9}
-@media(max-width:800px){body{grid-template-columns:1fr;grid-template-rows:auto auto 55vh auto;grid-template-areas:"top" "tools" "stage" "side"}#tools{flex-direction:row;flex-wrap:wrap;border-right:0}#tools button{width:auto;padding:8px 12px}}
-</style></head><body>
+.ly.on{border-color:var(--g);background:var(--p)}.ly span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}.ly button{padding:1px 6px}
+#toast{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:var(--g);color:var(--ink);padding:8px 14px;border-radius:6px;font-weight:700;display:none;z-index:99;max-width:92vw}
+#fab,#soBar{display:none}
+#soBar{position:fixed;top:0;left:0;right:0;z-index:50;background:var(--g);color:var(--ink);padding:6px 10px;gap:8px;align-items:center;font-weight:700}
+.wsp{grid-column:1/-1;grid-row:2/-1;display:none;flex-direction:column;overflow:auto;padding:10px;gap:8px}
+body:not([data-ws=design]) :is(#tools,#stage,#side,#hmore,#fab){display:none!important}
+body[data-ws=office] #ws-office{display:flex}
+dialog{background:var(--d);color:var(--t);border:2px solid var(--g);border-radius:10px;padding:14px;max-width:min(720px,96vw);width:96vw;max-height:92dvh;overflow:auto}
+dialog::backdrop{background:#000a}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
+.grid button{text-align:left;padding:8px}.grid small{display:block;color:var(--m)}
+table.sh{border-collapse:collapse}.sh td,.sh th{border:1px solid var(--l);padding:0}.sh th{background:var(--p);padding:2px 6px;color:var(--m);font-weight:400}
+.sh input{border:0;border-radius:0;width:96px;background:transparent}
+textarea.pp{width:100%;min-height:34px;resize:vertical}
+small.m{color:var(--m)}
+#hmore.hide{display:none}
+#selOv{position:absolute;left:0;top:0;pointer-events:none;touch-action:none;z-index:5}
+.pop{position:fixed;z-index:60;background:var(--p);border:1px solid var(--g);border-radius:10px;padding:6px;box-shadow:0 8px 30px var(--sh);display:flex;flex-direction:column;min-width:220px;max-height:80dvh;overflow:auto}
+.pop[hidden]{display:none}.pop button{display:flex;justify-content:space-between;gap:16px;text-align:left;border:0;background:transparent;padding:7px 8px;width:100%}.pop button:hover{background:var(--on)}.pop hr{border:0;border-top:1px solid var(--l);margin:4px 0;width:100%}.pop kbd{color:var(--m);font:11px Helvetica,Arial,sans-serif}
+#mkGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}#mkGrid button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px}
+#shapeMenu{position:fixed;z-index:60;display:grid;grid-template-columns:repeat(4,64px);gap:6px;background:var(--p);border:1px solid var(--g);border-radius:10px;padding:8px;box-shadow:0 8px 30px var(--sh)}
+#shapeMenu[hidden]{display:none}#shapeMenu .mh{grid-column:1/-1;color:var(--gt);font-size:11px;font-weight:700}
+#shapeMenu button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;font-size:10px}
+@media(max-width:800px){
+ body{grid-template-columns:1fr;grid-template-rows:auto 1fr auto;grid-template-areas:"top" "stage" "tools"}
+ header{padding:4px 6px;padding-top:max(4px,env(safe-area-inset-top))}
+ .brand{display:none}#hmain button{padding:6px 8px}
+ #hmore{display:none}#hmore.show{display:flex}
+ #tools{flex-direction:row;border-right:0;border-top:1px solid var(--l);overflow-x:auto;overflow-y:hidden;padding:5px 6px calc(5px + env(safe-area-inset-bottom));flex-wrap:nowrap;gap:4px}
+ #tools button{width:auto;flex:0 0 auto;min-width:54px;min-height:40px;padding:6px 8px}
+ #stage{padding:6px}
+ #side{position:fixed;left:0;right:0;bottom:calc(52px + env(safe-area-inset-bottom));max-height:55dvh;z-index:20;background:var(--d);border:1px solid var(--g);border-radius:12px 12px 0 0;transform:translateY(120%);transition:transform .2s}
+ #side.open{transform:none}
+ #fab{display:block;position:fixed;right:10px;bottom:calc(62px + env(safe-area-inset-bottom));z-index:21;border-radius:20px;background:var(--g);color:var(--ink);font-weight:700;border-color:var(--g)}
+ button,select,input{min-height:34px}
+}
+.fxg{display:grid;grid-template-columns:190px 1fr;gap:12px}.fxr{display:flex;gap:6px;align-items:center;padding:5px;border-radius:4px;cursor:pointer}.fxr.on{background:var(--on)}.fxr span{flex:1}#fxPane .row label{display:flex;justify-content:space-between;gap:8px;min-width:230px}
+@media(max-width:800px){.fxg{grid-template-columns:1fr}}
+</style></head><body data-ws="design">
 <header>
- <b>MEGA TAG <i>/</i> PRODUCTIVE STUDIO</b>
- <button id="open">Open file</button><input id="file" type="file" multiple hidden accept=".svg,.psd,.pdf,.ai,.png,.jpg,.jpeg,.webp,.gif,.mte,.json">
- <button id="undo" title="Ctrl+Z">Undo</button><button id="redo" title="Ctrl+Y">Redo</button>
- <select id="preset" aria-label="Canvas size"><option value="1080,1080">Square 1080</option><option value="1080,1920">Story 1080×1920</option><option value="1920,1080">Video 1920×1080</option><option value="794,1123">A4 (96 dpi)</option><option value="1200,630">Link preview</option></select>
- <label>Bg <input id="bg" type="color" value="#ffffff"></label>
- <span style="flex:1"></span>
- <label>Scale <select id="sc"><option>1</option><option>2</option><option>3</option><option>4</option></select></label>
- <select id="fmt" aria-label="Export format"><option value="png-t">PNG (transparent)</option><option value="png">PNG</option><option value="jpg">JPG</option><option value="jpeg">JPEG</option><option value="webp">WEBP</option><option value="svg">SVG</option><option value="pdf">PDF</option><option value="mte">MTE project</option></select>
- <button class="pri" id="export">Export</button>
+ <div id="hmain">
+  <img src="icon.svg" alt="" class="lg"><b class="brand">MTE <i>Productive</i> Studio</b><span class="ver" id="ver"></span>
+  <nav id="wsTabs" aria-label="Workspaces"><button data-ws="design" class="on">Design</button></nav>
+  <span class="sp"></span>
+  <button id="bNew" class="pri">+ New</button><button id="open">Open</button><button class="pri" id="bSave" title="Save project (Ctrl+S)">Save</button><button id="bSaveAs" title="Save as (Ctrl+Shift+S)">Save as</button><span id="dirty" title="Unsaved changes" style="color:var(--gt)"></span>
+  <button id="undo" title="Ctrl+Z" aria-label="Undo">&#8630;</button><button id="redo" title="Ctrl+Y" aria-label="Redo">&#8631;</button>
+  <button class="pri" id="export">Export</button><button id="bTheme" aria-label="Switch light or dark mode" title="Light / dark mode">&#9728;</button><button id="bMore" aria-label="Project options" aria-expanded="true" title="Show or hide the project options row: name, canvas size, colour mode, scale and export format">&#9776;</button>
+  <input id="file" type="file" multiple hidden accept=".svg,.psd,.pdf,.ai,.png,.jpg,.jpeg,.webp,.gif,.mte,.json,.docx,.pptx,.xlsx,.xls,.ods,.csv,.odt,.odp">
+ </div>
+ <div id="hmore">
+  <input id="pname" placeholder="Project name" style="width:140px" aria-label="Project name">
+  <button id="bSize" title="Canvas size"><span id="info"></span></button><button id="bMods" title="Where the Video and Office modules load from (file or GitHub repo link)">Modules&hellip;</button>
+  <label>Colour <select id="cmode"><option value="rgb">RGB</option><option value="cmyk">CMYK</option></select></label>
+  <label>Scale <select id="sc"><option>1</option><option>2</option><option>3</option><option value="3.125">300 dpi</option><option>4</option></select></label>
+  <select id="fmt" aria-label="Export format"><option value="png-t">PNG (transparent)</option><option value="png">PNG</option><option value="jpg">JPG</option><option value="jpeg">JPEG</option><option value="webp">WEBP</option><option value="svg">SVG (editable)</option><option value="pdf-l">PDF (layered)</option><option value="pdf">PDF (flat)</option><option value="psd">PSD (layers, live text)</option><option value="ai">AI (PDF-compatible, layered)</option><option value="mte">MTE project</option></select>
+  <label class="chk"><input type="checkbox" id="xlive" checked>Live text</label><label class="chk"><input type="checkbox" id="xproj" checked>Embed project</label>
+ </div>
 </header>
+<div id="soBar"><span>Editing smart object</span><button id="soDone" class="pri" style="background:var(--d);color:var(--g)">Update &amp; return</button><button id="soCancel">Cancel</button></div>
 <nav id="tools" aria-label="Tools">
- <button data-t="text">Text</button><button data-t="rect">Rectangle</button><button data-t="ell">Ellipse</button><button data-t="tri">Triangle</button><button data-t="line">Line</button><button data-t="img">Image</button>
- <button data-t="logo">MTE logo</button><button data-t="word">Wordmark</button>
- <button data-t="group">Group</button><button data-t="ungroup">Ungroup</button><button data-t="dup">Duplicate</button>
- <button data-t="letter">Letterhead</button><button data-t="post">Social post</button>
- <button data-t="zin">Zoom +</button><button data-t="zout">Zoom −</button>
+ <button data-t="text">Text</button><button id="bShapes" aria-haspopup="true" aria-expanded="false" title="Shapes and lines">Shapes &#9662;</button><button data-t="img">Image</button><button data-t="brush" id="bBrush" title="Paint brush">Brush</button><button id="bSel" aria-haspopup="true" aria-expanded="false" title="Marquee selection, copy, cut and paste">Select &#9662;</button><button data-t="logo">MTE logo</button><button data-t="word">Wordmark</button>
+ <button data-t="manual" title="Manual selection brush">Paint Select</button><button data-t="objsel" title="Object selection: box or click">Obj Select</button><button data-t="erase" title="Eraser">Eraser</button><button data-t="shpopt" title="Shape borders">Border</button><button data-t="curves" title="Curves adjustment layer">Curves</button><button data-t="pen" title="Curvature pen">Curv. Pen</button><button data-t="blur" title="Blur tool">Blur</button><button data-t="fx" title="Layer styles (FX)">FX</button><button data-t="mask" id="bMask" title="Layer mask">Mask &#9662;</button>
+ <button data-t="group">Group</button><button data-t="ungroup">Ungroup</button><button data-t="dup">Duplicate</button><button data-t="del">Delete</button>
+ <button data-t="post">Social post</button><button data-t="zin">Zoom +</button><button data-t="zout">Zoom &minus;</button><button data-t="fit">Fit</button>
 </nav>
 <main id="stage"><div class="cw"><canvas id="c"></canvas></div></main>
+<button id="fab">Panel</button>
+<div id="shapeMenu" role="menu" hidden></div>
+<div id="selMenu" class="pop" role="menu" hidden></div>
 <aside id="side">
- <section><h3>Properties</h3>
-  <div class="row"><label>Fill <input id="fill" type="color" value="#C9932E"></label><label>Stroke <input id="stroke" type="color" value="#1A1A1A"></label><label>Width <input id="sw" type="number" min="0" value="0"></label></div>
+ <section><h3>Fill &amp; stroke</h3>
+  <div class="row"><select id="ftarget" aria-label="Target"><option value="sel">Target: selection</option><option value="bg">Target: canvas background</option></select><select id="ftype"><option value="solid">Solid</option><option value="linear">Linear gradient</option><option value="radial">Radial gradient</option></select></div>
+  <div class="row"><button id="bgT" title="Photoshop-style transparent canvas (checkerboard)">Make background transparent</button></div>
+  <div class="row"><label>A <input id="fill" type="color" value="#C9932E"></label><label id="lblB">B <input id="fill2" type="color" value="#1A1A1A"></label><label id="lblAng">Angle <input id="fang" type="number" value="90" min="0" max="360"></label></div>
+  <div class="row" id="cmykrow" hidden><label>C<input id="cc" type="number" min="0" max="100" value="0"></label><label>M<input id="cm" type="number" min="0" max="100" value="0"></label><label>Y<input id="cy" type="number" min="0" max="100" value="0"></label><label>K<input id="ck" type="number" min="0" max="100" value="0"></label></div>
+  <div class="row"><label>Stroke <input id="stroke" type="color" value="#1A1A1A"></label><label>Width <input id="sw" type="number" min="0" value="0"></label></div>
   <div class="row"><label>Opacity <input id="op" type="range" min="0" max="1" step=".05" value="1"></label></div>
-  <div class="row"><select id="ff"><option>Arial</option><option>Helvetica</option><option>Georgia</option><option>Times New Roman</option><option>Verdana</option><option>Courier New</option><option>Impact</option></select><input id="fs" type="number" min="6" value="48"><button id="bold"><b>B</b></button></div>
   <div class="row" id="pal"></div>
  </section>
+ <section><h3>Text</h3>
+  <div class="row"><select id="ff"><option>Arial</option><option>Helvetica</option><option>Georgia</option><option>Times New Roman</option><option>Verdana</option><option>Trebuchet MS</option><option>Tahoma</option><option>Courier New</option><option>Impact</option></select><input id="fs" type="number" min="6" value="48"></div>
+  <div class="row"><button id="bold"><b>B</b></button><button id="ital"><i>I</i></button><button id="und"><u>U</u></button><button id="strk" title="Strikethrough"><s>S</s></button><button id="ovl" title="Overline"><span style="text-decoration:overline">O</span></button><span id="taRow"></span></div>
+  <div class="row"><button id="sup" title="Superscript (select text while editing)">x&sup2;</button><button id="sub" title="Subscript (select text while editing)">x&#8322;</button><button data-case="up" title="UPPERCASE">AA</button><button data-case="lo" title="lowercase">aa</button><button data-case="ti" title="Title Case">Aa</button><button id="fontImp" title="Import font files (.ttf .otf .woff .woff2)">+ Font</button><input id="fontFile" type="file" accept=".ttf,.otf,.woff,.woff2" multiple hidden></div>
+  <div class="row"><label>Spacing <input id="tsp" type="number" value="0" step="10"></label><label>Line <input id="tlh" type="number" value="1.16" step=".05"></label></div>
+ </section>
+ <section><h3>Align</h3>
+  <div class="row"><select id="alto"><option value="auto">Auto (selection if 2+)</option><option value="canvas">To canvas</option><option value="sel">To selection</option></select></div>
+  <div class="row" id="alRow"></div>
+ </section>
+ <section><h3>Effects</h3>
+  <div class="row"><select id="blend" aria-label="Blend mode"></select></div>
+  <div class="row"><button id="bwhite" title="Multiply: white disappears">Blend on white</button><button id="bblack" title="Screen: black disappears">Blend on black</button></div>
+  <div class="row"><select id="bif"><option value="off">Blend-If: off</option><option value="white">Knock out white</option><option value="black">Knock out black</option></select><label>Level <input id="bifT" type="range" min="0" max="255" value="235"></label><label>Soft <input id="bifS" type="range" min="1" max="100" value="30"></label></div>
+  <div class="row"><button id="clipMake">Clip to layer below</button><button id="clipRel">Release clip</button></div>
+  <div class="row"><button id="pEdit">Edit points</button><button id="toPath">To path</button><button id="svgCode">SVG code</button><button id="smartEdit" hidden>Edit smart object</button></div>
+ </section>
+ <section id="brushSec" hidden><h3>Brush</h3>
+  <div class="row"><select id="bpre" aria-label="Brush preset"></select><button id="bimp" title="Import a brush tip: PNG with transparency, or a dark-on-light image">+ Tip</button><input id="bfile" type="file" accept="image/*,.abr" multiple hidden></div>
+  <div class="row"><label>Colour <input id="bcol" type="color" value="#1A1A1A"></label><label>Size <input id="bsz" type="range" min="1" max="200" value="24"></label></div>
+  <div class="row"><label>Opacity <input id="bop" type="range" min="0.05" max="1" step="0.05" value="1"></label><label>Spacing <input id="bsp" type="range" min="2" max="200" value="25"></label></div>
+  <div class="row"><label>Scatter <input id="bsc" type="range" min="0" max="200" value="0"></label><label>Size jitter <input id="bjt" type="range" min="0" max="100" value="0"></label></div>
+  <div class="row"><label class="chk"><input type="checkbox" id="bfollow">Follow stroke</label><select id="bblend" aria-label="Brush blend mode"><option value="source-over">Normal</option><option value="multiply">Multiply</option><option value="screen">Screen</option><option value="overlay">Overlay</option></select></div>
+  <small class="m">Spacing, scatter, jitter and follow apply to stamp brushes (Soft stamp, Chalk, Splatter, Dry bristle and imported tips). Each stroke becomes its own layer.</small>
+ </section>
+ <section id="lyOpSec"><h3>Layer opacity</h3>
+  <div class="row"><label>Opacity <input id="lyOp" type="range" min="0" max="100" value="100"></label><label><input id="lyOpN" type="number" min="0" max="100" value="100" style="width:64px"> %</label></div>
+  <div class="row"><button data-op="25">25%</button><button data-op="50">50%</button><button data-op="75">75%</button><button data-op="100">100%</button></div>
+  <div class="row" id="lyFiRow" hidden><label>Fill transparency <input id="lyFi" type="range" min="0" max="100" value="100"></label></div>
+  <small class="m">Opacity fades the whole layer, effects included. Fill fades only the colour of shapes and text; borders stay solid.</small></section>
+ <section id="mnSec" hidden><h3>Paint selection</h3>
+  <div class="row"><select id="mnMode" aria-label="Paint mode"><option value="add">Paint to select</option><option value="sub">Paint to remove from selection</option><option value="new">New selection</option></select><label>Size <input id="mnSz" type="range" min="4" max="300" value="40"></label></div>
+  <div class="row"><label><input id="mnSnap" type="checkbox"> Snap to similar colour</label><label>Tolerance <input id="mnTol" type="range" min="5" max="120" value="35"></label></div>
+  <div class="row"><button id="mnDel" class="pri">Delete selected pixels</button><button id="mnInv">Invert selection</button><button id="mnCopy">Isolate to new layer</button><button id="mnNone">Deselect</button></div>
+  <small class="m">Paint over the part you want. Switch to "remove from selection" to rub parts back out. Pick the layer in Layers first before deleting pixels.</small></section>
+ <section id="objSec" hidden><h3>Object selection</h3>
+  <div class="row"><label>Method <select id="osMeth" aria-label="Selection method"><option value="sam">AI: click or drag a box</option><option value="det">AI: detect people and objects</option><option value="col">Colour (works offline)</option></select></label></div>
+  <div id="aiDetRow" hidden><div class="row"><select id="aiKind" aria-label="What to detect"><option value="pan">People and objects</option><option value="cloth">People parts (hair, face, clothes)</option></select><button id="aiDet">Detect</button></div><div class="row" id="aiChips"></div></div>
+  <small class="m" id="aiMsg" aria-live="polite"></small>
+  <div class="row"><select id="osMode" aria-label="Selection mode"><option value="new">New selection</option><option value="add">Add to selection</option><option value="sub">Subtract</option></select><label id="osTolRow">Tolerance <input id="osTol" type="range" min="5" max="120" value="35"></label></div>
+  <div class="row"><button id="osInv">Invert selection</button><button id="osCopy">Isolate to new layer</button><button id="osMask">Mask layer</button><button id="osNone">Deselect</button></div>
+  <small class="m">AI methods run in your browser (internet needed the first time, about 40 MB, then cached): click an object or drag a box and it finds the whole person, animal or thing; detection lists what it sees. Colour works offline. Use Add or Subtract to refine.</small></section>
+ <section id="erSec" hidden><h3>Eraser</h3>
+  <div class="row"><label>Size <input id="erSz" type="range" min="2" max="400" value="50"></label><label>Hardness <input id="erHd" type="range" min="0" max="100" value="60"></label><label>Strength <input id="erOp" type="range" min="5" max="100" value="100"></label></div>
+  <small class="m">Rubs out pixels of the picked layer so the background shows through (text and shapes are turned into pixels). Stays inside a selection if you have one.</small></section>
+ <section id="shpSec" hidden><h3>Shape borders</h3>
+  <div class="row"><label>Border colour <input id="spCol" type="color" value="#1A1A1A"></label><label>Width <input id="spW" type="number" min="0" max="300" value="4"></label><label><input id="spNo" type="checkbox"> No border</label></div>
+  <div class="row"><label>Style <select id="spSt"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select></label><label>Corner join <select id="spJoin"><option value="miter">Sharp</option><option value="round">Round</option><option value="bevel">Bevel</option></select></label></div>
+  <div class="row"><label>Corner rounding <input id="spR" type="range" min="0" max="300" value="0"></label></div>
+  <small class="m">Rectangles round natively. Triangles and polygons become editable paths when rounded. Ellipses have no corners.</small></section>
+ <section id="curvesSec" hidden><h3>Curves</h3>
+  <div class="row"><select id="crPre" aria-label="Preset"></select><select id="crCh" aria-label="Channel"><option value="rgb">RGB</option><option value="r">Red</option><option value="g">Green</option><option value="b">Blue</option></select><button id="crAuto" title="Stretch the tones automatically">Auto</button></div>
+  <canvas id="crCv" width="256" height="256" style="width:100%;max-width:256px;touch-action:none;border:1px solid var(--l)"></canvas>
+  <div class="row"><label>Input <input id="crI" type="number" min="0" max="255"></label><label>Output <input id="crO" type="number" min="0" max="255"></label></div>
+  <div class="row"><label>Strength <input id="crS" type="range" min="0" max="1" step=".05" value="1"></label><button id="crRes">Reset</button></div>
+  <small class="m">Click the curve to add a point, drag to shape it, double-click a point to remove it. The layer changes everything below it and can be hidden or deleted at any time.</small></section>
+ <section id="penSec" hidden><h3>Curvature pen</h3>
+  <div class="row"><select id="penMode"><option value="path">Path (outline)</option><option value="shape">Shape (filled)</option></select><label>Stroke <input id="penSt" type="color" value="#1A1A1A"></label><label>Width <input id="penW" type="number" value="6" min="0"></label><label>Fill <input id="penFi" type="color" value="#C9932E"></label></div>
+  <div class="row"><button id="penDone" class="pri">Finish</button><button id="penClose">Close &amp; finish</button><button id="penCancel">Cancel</button></div>
+  <small class="m">Click to add points; the path curves smoothly through them. Drag a point to move it, double-click it for a sharp corner, click the first point to close, Delete removes a point, Enter finishes. Use Edit points later to fine-tune.</small></section>
+ <section id="blurSec" hidden><h3>Blur tool</h3>
+  <div class="row"><select id="blMode" aria-label="Blur mode"><option value="brush">Brush</option><option value="layer">Whole layer</option><option value="sel">Selected area</option></select><button id="blGo" class="pri">Apply blur</button></div>
+  <div class="row"><label>Size <input id="blSz" type="range" min="4" max="300" value="60"></label><label>Hardness <input id="blHd" type="range" min="0" max="100" value="30"></label></div>
+  <div class="row"><label>Strength <input id="blSt" type="range" min="5" max="100" value="60"></label><label>Blur <input id="blRad" type="range" min="1" max="40" value="6"></label></div>
+  <small class="m">Brush: paint on the picked layer (it stays inside a marquee selection if you have one). Whole layer / Selected area blur in one go with Apply blur.</small></section>
+ <section id="maskSec" hidden><h3>Layer mask</h3>
+  <div class="row"><select id="lmMode" aria-label="Mask paint mode"><option value="hide">Paint: hide</option><option value="show">Paint: reveal</option></select><button id="lmDone" class="pri">Done</button></div>
+  <div class="row"><label>Size <input id="lmSz" type="range" min="2" max="300" value="50"></label><label>Hardness <input id="lmHd" type="range" min="0" max="100" value="60"></label></div>
+  <div class="row"><label>Opacity <input id="lmOp" type="range" min="5" max="100" value="100"></label></div></section>
  <section><h3>Layers</h3><div id="layers"></div></section>
- <section><small style="color:var(--m)">Opens SVG, PSD, PDF, AI (PDF-based), PNG/JPG/WEBP and .mte projects. Drag files onto the canvas.</small></section>
+ <section><small class="m">Opens SVG, PSD, PDF, AI, images, .mte and Office files (DOCX, PPTX, XLSX). Drop files onto the canvas. Arrow keys nudge (Shift = 10px).</small></section>
 </aside>
+<section class="wsp" id="ws-office" aria-label="Office"></section>
 <div id="toast" role="status"></div>
+
+<dialog id="dNew"><h3 id="dNewT">New project</h3>
+ <div class="chips" id="dCats"></div><div class="grid" id="dPre"></div>
+ <h3 style="margin-top:12px">Custom size</h3>
+ <div class="row"><label>Width <input id="nw" type="number" step="any" min="1" value="1080"></label><label>Height <input id="nh" type="number" step="any" min="1" value="1080"></label>
+ <select id="nu" aria-label="Units"><option>px</option><option>in</option><option>mm</option><option>cm</option></select>
+ <label>DPI <select id="nd"><option>72</option><option selected>96</option><option>150</option><option>300</option></select></label></div>
+ <div class="row"><label>Colour <select id="ncm"><option value="rgb">RGB</option><option value="cmyk">CMYK</option></select></label><label>Background <input id="nbg" type="color" value="#ffffff"></label><label class="chk"><input type="checkbox" id="nTrans">Transparent</label><label class="chk" id="nTabL"><input type="checkbox" id="nTab" checked>Open in new tab</label></div>
+ <small class="m" id="nPx"></small>
+ <div class="row" style="margin-top:10px"><button class="pri" id="nGo">Create</button><button id="nCancel">Cancel</button></div>
+</dialog>
+<dialog id="dFx"><h3>Layer Style (FX)</h3>
+ <div class="fxg"><div id="fxList"></div><div id="fxPane"></div></div>
+ <div class="row" style="margin-top:10px"><button class="pri" id="fxOk">OK</button><button id="fxCancel">Cancel</button><button id="fxClear">Remove all effects</button><label class="chk"><input type="checkbox" id="fxVis" checked>Effects visible</label></div>
+ <small class="m">Effects are non-destructive: untick one to hide it, change it any time, or remove all. They follow the layer when you move or scale it. Not available on layers inside a group.</small></dialog>
+<dialog id="dMod"><h3>Video and Office modules</h3>
+ <small class="m">Each module is its own HTML file. Enter your GitHub repo link and the files load from the repo's GitHub Pages site (https://you.github.io/repo/office.html), so Pages must be enabled for that repo. Leave it blank to load video.html and office.html from the same folder as this app. A full https:// address in a file box overrides everything.</small>
+ <div class="row" style="margin-top:8px"><label style="flex:1">GitHub repo link <input id="modRepo" type="url" placeholder="https://github.com/you/your-repo" style="width:100%"></label></div>
+ <div class="row"><label>Video file or URL <input id="modVideo" placeholder="video.html"></label><label>Office file or URL <input id="modOffice" placeholder="office.html"></label></div>
+ <small class="m" id="modPrev"></small>
+ <div class="row" style="margin-top:8px"><button class="pri" id="modSave">Save</button><button id="modTest">Open Office in a new tab</button><button id="modClose">Close</button></div></dialog>
+<dialog id="dSvg"><h3>SVG code</h3><textarea id="svgTa" class="pp" style="min-height:44dvh;font-family:monospace;font-size:12px" spellcheck="false"></textarea>
+ <div class="row" style="margin-top:8px"><button class="pri" id="svgApply">Apply</button><button id="svgDl">Download .svg</button><button id="svgClose">Close</button></div></dialog>
+<dialog id="dPdf"><h3>Import PDF / AI</h3>
+ <div class="row"><label>Mode <select id="pdfMode"><option value="layers">Layers (one editable layer per PDF layer)</option><option value="vector">Vector (editable paths, best effort)</option><option value="flat">Flat page</option></select></label><label>Page <input id="pdfPg" type="number" min="1" value="1"></label></div>
+ <small class="m" id="pdfInfo"></small>
+ <div class="row" style="margin-top:10px"><button class="pri" id="pdfGo">Import</button><button id="pdfCancel">Cancel</button></div></dialog>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/ag-psd@28.2.0/dist/bundle.js"></script>
 <script>
-const $=s=>document.querySelector(s),GOLD='#C9932E',INK='#1A1A1A';
+/* ===== MTE Productive Studio — keep VERSION in sync with sw.js (V) ===== */
+const VERSION='0.0.8';let dirty=false,fh=null;
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],GOLD='#C9932E',INK='#1A1A1A';
+const PROPS=['name','smartId','maskName','cmyk'];
+const LIBS={pdf:['https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js','pdfjsLib'],psd:['https://cdn.jsdelivr.net/npm/ag-psd@28.2.0/dist/bundle.js','agPsd'],zip:['https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js','JSZip'],xlsx:['https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js','XLSX']};
+const lib=k=>window[LIBS[k][1]]?Promise.resolve():new Promise((ok,no)=>{const s=document.createElement('script');s.src=LIBS[k][0];s.onload=ok;s.onerror=()=>no(new Error(k+' library failed to load. Connect once to cache it.'));document.head.append(s)});
+let tm;const toast=(m,keep)=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(tm);if(!keep)tm=setTimeout(()=>t.style.display='none',4200)};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+/* units and colour helpers */
+const toPx=(v,u,d)=>u==='in'?v*d:u==='cm'?v/2.54*d:u==='mm'?v/25.4*d:v;
+const fromPx=(p,u,d)=>u==='in'?p/d:u==='cm'?p/d*2.54:u==='mm'?p/d*25.4:p;
+const r2=n=>Math.round(n*100)/100;
+const rgb2hex=(r,g,b)=>'#'+[r,g,b].map(v=>clamp(Math.round(v),0,255).toString(16).padStart(2,'0')).join('');
+const hex2rgb=h=>{h=(h||'#000').replace('#','');if(h.length===3)h=[...h].map(x=>x+x).join('');const n=parseInt(h,16)||0;return[n>>16&255,n>>8&255,n&255]};
+const rgb2cmyk=(r,g,b)=>{r/=255;g/=255;b/=255;const k=1-Math.max(r,g,b);if(k>=1)return[0,0,0,100];return[(1-r-k)/(1-k),(1-g-k)/(1-k),(1-b-k)/(1-k),k].map(v=>Math.round(v*100))};
+const cmyk2rgb=(c,m,y,k)=>[255*(1-c/100)*(1-k/100),255*(1-m/100)*(1-k/100),255*(1-y/100)*(1-k/100)];
+const hexAny=s=>{try{return '#'+new fabric.Color(s).toHex()}catch(e){return '#000000'}};
+
+/* ===== custom Blend-If filter (knock out white / black like Photoshop's Blend If) ===== */
+try{fabric.filterBackend=new fabric.Canvas2dFilterBackend()}catch(e){}
+fabric.Image.filters.BlendIf=fabric.util.createClass(fabric.Image.filters.BaseFilter,{
+ type:'BlendIf',mode:'white',threshold:235,soft:30,
+ applyTo2d(o){const d=o.imageData.data,t=+this.threshold,s=Math.max(1,+this.soft),w=this.mode==='white';
+  for(let i=0;i<d.length;i+=4){const l=.299*d[i]+.587*d[i+1]+.114*d[i+2];
+   const a=w?(l>=t?0:l<=t-s?1:(t-l)/s):(l<=t?0:l>=t+s?1:(l-t)/s);d[i+3]=d[i+3]*a}},
+ isNeutralState(){return false},
+ toObject(){return{type:this.type,mode:this.mode,threshold:this.threshold,soft:this.soft}}});
+fabric.Image.filters.BlendIf.fromObject=fabric.Image.filters.BaseFilter.fromObject;
+
+/* ===== document state ===== */
+const qs=new URLSearchParams(location.search),PID=qs.get('p')||'main',KEY='mte-doc-'+PID;
 const c=new fabric.Canvas('c',{preserveObjectStacking:true,backgroundColor:'#fff'});
-let W=1080,H=1080,zf=1,hist=[],hi=-1,lock=false,tm;
-const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(tm);tm=setTimeout(()=>t.style.display='none',3500)};
-const need=(n,v)=>v?true:(toast(n+' library not loaded. Connect once to cache it.'),false);
+fabric.Object.prototype.set({transparentCorners:false,cornerColor:GOLD,cornerStrokeColor:'#000',borderColor:GOLD,cornerSize:matchMedia('(pointer:coarse)').matches?20:11,touchCornerSize:32});
+let D={W:1080,H:1080,unit:'px',dpi:96,cm:'rgb',name:'Untitled'},zf=1,hist=[],hi=-1,lock=false,nt;
+const smartMap=new Map(),soStack=[];
+$('#ver').textContent='v'+VERSION;
 
-/* ---------- canvas, history, autosave ---------- */
-function fit(){const s=$('#stage'),z=Math.min((s.clientWidth-40)/W,(s.clientHeight-40)/H,1)*zf;
- c.setZoom(z);c.setDimensions({width:W*z,height:H*z});c.renderAll()}
-function size(w,h){W=w;H=h;fit();push()}
-function push(){if(lock)return;const s=JSON.stringify({W,H,bg:c.backgroundColor,j:c.toJSON(['name'])});
- hist=hist.slice(0,hi+1);hist.push(s);if(hist.length>60)hist.shift();hi=hist.length-1;
- try{localStorage.setItem('mte-doc',s)}catch(e){}layers()}
-function restore(s){const d=JSON.parse(s);lock=true;W=d.W;H=d.H;
- c.loadFromJSON(d.j,()=>{c.backgroundColor=d.bg||'';lock=false;fit();layers()})}
-$('#undo').onclick=()=>{if(hi>0)restore(hist[--hi])};
-$('#redo').onclick=()=>{if(hi<hist.length-1)restore(hist[++hi])};
+/* ===== workspace registry: future modules (e.g. the video editor) plug in here ===== */
+const MTE={version:VERSION,workspaces:{},
+ addWorkspace(w){/* w={id,label,mount(el),openFile?(file)} */
+  let el=$('#ws-'+w.id);if(!el){el=document.createElement('section');el.className='wsp';el.id='ws-'+w.id;$('#toast').before(el)}
+  const b=document.createElement('button');b.dataset.ws=w.id;b.textContent=w.label;$('#wsTabs').append(b);
+  const sty=document.createElement('style');sty.textContent=`body[data-ws="${w.id}"] #ws-${w.id}{display:flex}`;document.head.append(sty);
+  MTE.workspaces[w.id]=w;w.el=el;w.mount&&w.mount(el);return w},
+ show(id){document.body.dataset.ws=id;$$('#wsTabs button').forEach(b=>b.classList.toggle('on',b.dataset.ws===id));if(id==='design')setTimeout(fit,30)},
+ toast,get canvas(){return c},get doc(){return D}};
+window.MTE=MTE;
+$('#wsTabs').onclick=e=>{if(e.target.dataset.ws)MTE.show(e.target.dataset.ws)};
+
+/* ===== canvas, history, autosave ===== */
+function info(){const u=D.unit!=='px'?` (${r2(fromPx(D.W,D.unit,D.dpi))}×${r2(fromPx(D.H,D.unit,D.dpi))} ${D.unit})`:'';
+ $('#info').textContent=`${D.W}×${D.H}px${u} · ${D.cm.toUpperCase()}`;$('#pname').value=D.name||'';$('#cmode').value=D.cm;
+ document.title=(D.name||'Untitled')+' — MTE Productive Studio';$('#cmykrow').hidden=D.cm!=='cmyk'}
+function fit(){const s=$('#stage');if(!s.clientWidth)return;const pad=innerWidth<800?12:44,
+ z=Math.min((s.clientWidth-pad)/D.W,(s.clientHeight-pad)/D.H,1)*zf;
+ c.setZoom(z);c.setDimensions({width:Math.max(1,D.W*z),height:Math.max(1,D.H*z)});c.renderAll();info();try{selOvSize()}catch(e){}try{ovSize()}catch(e){}}
+const snapshot=()=>{try{fxSync()}catch(e){}return JSON.stringify({v:VERSION,D,j:c.toJSON(PROPS)})};
+function push(){if(lock)return;const s=snapshot();hist=hist.slice(0,hi+1);hist.push(s);if(hist.length>40)hist.shift();hi=hist.length-1;
+ try{localStorage.setItem(KEY,s)}catch(e){}dirty=true;const dd=$('#dirty');if(dd)dd.textContent='●';layers()}
+function restore(s){return new Promise(res=>{const d=JSON.parse(s);lock=true;
+ D=Object.assign({W:1080,H:1080,unit:'px',dpi:96,cm:'rgb',name:'Untitled'},d.D||{W:d.W,H:d.H});
+ if(d.bg&&!d.j.background)d.j.background=d.bg;
+ c.loadFromJSON(d.j,()=>{lock=false;fit();layers();res()})})}
+$('#undo').onclick=()=>{if(hi>0)restore(hist[--hi])};$('#redo').onclick=()=>{if(hi<hist.length-1)restore(hist[++hi])};
 ['added','modified','removed'].forEach(e=>c.on('object:'+e,push));
-['created','updated','cleared'].forEach(e=>c.on('selection:'+e,()=>{layers();sync()}));
+['created','updated','cleared'].forEach(e=>c.on('selection:'+e,()=>{if(editing&&e==='cleared')pathDone();layers();sync()}));
 addEventListener('resize',fit);
-addEventListener('keydown',e=>{const t=c.getActiveObject();if(t&&t.isEditing||/INPUT|SELECT/.test(e.target.tagName))return;
- if(e.key==='Delete'||e.key==='Backspace'){c.getActiveObjects().forEach(o=>c.remove(o));c.discardActiveObject()}
- if(e.ctrlKey||e.metaKey){if(e.key==='z'){e.preventDefault();$('#undo').click()}if(e.key==='y'){e.preventDefault();$('#redo').click()}}});
+$('#stage').addEventListener('wheel',e=>{if(e.ctrlKey){e.preventDefault();zf=clamp(zf*(e.deltaY<0?1.1:.9),.2,4);fit()}},{passive:false});
+/* keyboard: delete, undo/redo, arrow-key nudging */
+addEventListener('keydown',e=>{const t=c.getActiveObject();if(document.body.dataset.ws!=='design')return;
+ if(/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)||(t&&t.isEditing))return;
+ if(e.key==='Escape'){if(editing)pathDone();else if(SX){SX=null;selDraw()}else if(selM)setSelM(null);return}
+ if(e.ctrlKey||e.metaKey){const k=e.key.toLowerCase(),sh=e.shiftKey;
+  if(k==='c'){e.preventDefault();sh?SXops.merged():SXops.copy();return}
+  if(k==='x'){e.preventDefault();SXops.cut();return}
+  if(k==='v'&&(clipPx||clipObj)){e.preventDefault();sh?SXops.pasteIn():SXops.paste();return}
+  if(k==='j'){e.preventDefault();sh?SXops.viaCut():SXops.viaCopy();return}
+  if(k==='a'&&selM){e.preventDefault();SXops.all();return}}
+ if(e.ctrlKey||e.metaKey){if(e.key==='z'){e.preventDefault();$('#undo').click()}if(e.key==='y'){e.preventDefault();$('#redo').click()}if(e.key==='d'){e.preventDefault();add.dup()}return}
+ if((e.key==='Delete'||e.key==='Backspace')&&SX){e.preventDefault();SXops.clear();return}
+ if(!t)return;
+ if(e.key==='Delete'||e.key==='Backspace'){c.getActiveObjects().forEach(o=>c.remove(o));c.discardActiveObject();return}
+ const st=e.shiftKey?10:1,mv={ArrowLeft:[-st,0],ArrowRight:[st,0],ArrowUp:[0,-st],ArrowDown:[0,st]}[e.key];
+ if(mv&&!editing){e.preventDefault();t.set({left:t.left+mv[0],top:t.top+mv[1]});t.setCoords();c.requestRenderAll();clearTimeout(nt);nt=setTimeout(push,350)}});
 
-/* ---------- adding things ---------- */
-function place(o,fitIn=true){if(fitIn){const k=Math.min(1,W*.8/o.getScaledWidth(),H*.8/o.getScaledHeight());o.scale(o.scaleX*k)}
+/* ===== adding things ===== */
+function place(o,fitIn=true){if(fitIn){const k=Math.min(1,D.W*.8/o.getScaledWidth(),D.H*.8/o.getScaledHeight());o.scale(o.scaleX*k)}
  c.add(o);o.viewportCenter?.();o.setCoords();c.setActiveObject(o);c.requestRenderAll()}
 const WORD=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 240"><text x="300" y="110" text-anchor="middle" font-family="Arial" font-size="48" font-weight="700" letter-spacing="2" fill="${INK}">MEGA TAG</text><text x="300" y="150" text-anchor="middle" font-family="Arial" font-size="30" font-weight="700" letter-spacing="4" fill="${INK}">ENTERPRISE</text><line x1="220" y1="168" x2="380" y2="168" stroke="${GOLD}" stroke-width="3"/><text x="300" y="196" text-anchor="middle" font-family="Arial" font-size="17" fill="#666">Quality Goods &amp; Services</text></svg>`;
+const LOGO=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><circle cx="200" cy="200" r="150" fill="none" stroke="${GOLD}" stroke-width="6"/><text x="200" y="225" text-anchor="middle" font-family="Arial" font-size="90" font-weight="700" fill="${INK}">MTE</text></svg>`;
 const add={
  text:()=>place(new fabric.Textbox('Double-click to edit',{width:420,fontSize:48,fontFamily:'Arial',fill:INK,name:'Text'}),false),
  rect:()=>place(new fabric.Rect({width:300,height:200,fill:GOLD,name:'Rectangle'}),false),
  ell:()=>place(new fabric.Ellipse({rx:120,ry:120,fill:GOLD,name:'Ellipse'}),false),
  tri:()=>place(new fabric.Triangle({width:240,height:210,fill:GOLD,name:'Triangle'}),false),
  line:()=>place(new fabric.Line([0,0,300,0],{stroke:INK,strokeWidth:6,name:'Line'}),false),
- img:()=>{$('#file').click()},
- logo:()=>svgStr(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><circle cx="200" cy="200" r="150" fill="none" stroke="${GOLD}" stroke-width="6"/><text x="200" y="225" text-anchor="middle" font-family="Arial" font-size="90" font-weight="700" fill="${INK}">MTE</text></svg>`,'MTE monogram'),
- word:()=>svgStr(WORD,'MTE wordmark'),
+ img:()=>$('#file').click(),
+ logo:()=>importSvg(LOGO,'MTE monogram'),word:()=>importSvg(WORD,'MTE wordmark'),
  group:()=>{const a=c.getActiveObject();if(a&&a.type==='activeSelection')a.toGroup().set('name','Group');c.requestRenderAll();push()},
  ungroup:()=>{const a=c.getActiveObject();if(a&&a.type==='group'){a.toActiveSelection();c.requestRenderAll();push()}},
- dup:()=>{const a=c.getActiveObject();a&&a.clone(n=>{n.set({left:a.left+20,top:a.top+20});c.add(n);c.setActiveObject(n)},['name'])},
- zin:()=>{zf=Math.min(zf*1.25,4);fit()},zout:()=>{zf=Math.max(zf/1.25,.2);fit()},
- letter:()=>{lock=true;c.clear();c.backgroundColor='#fff';W=794;H=1123;fit();
-  svgStr(WORD,'MTE wordmark',o=>{o.set({left:40,top:20}).scale(.45)});
-  c.add(new fabric.Rect({left:40,top:130,width:714,height:3,fill:GOLD,name:'Rule'}),
-   new fabric.Textbox('Date\n\nRecipient name\nAddress\n\nDear Sir/Madam,\n\nWrite your letter here.',{left:40,top:170,width:714,fontSize:16,fontFamily:'Arial',fill:INK,name:'Body'}),
-   new fabric.Textbox('Mega Tag Enterprise — Quality Goods & Services',{left:40,top:1070,width:714,fontSize:12,fontFamily:'Arial',fill:'#666',name:'Footer'}));
-  lock=false;push()},
- post:()=>{lock=true;c.clear();c.backgroundColor=INK;W=1080;H=1080;fit();
+ dup:()=>{const a=c.getActiveObject();a&&a.clone(n=>{n.set({left:a.left+20,top:a.top+20});c.add(n);c.setActiveObject(n)},PROPS)},
+ del:()=>{c.getActiveObjects().forEach(o=>c.remove(o));c.discardActiveObject()},
+ zin:()=>{zf=Math.min(zf*1.25,4);fit()},zout:()=>{zf=Math.max(zf/1.25,.2);fit()},fit:()=>{zf=1;fit()},
+ post:()=>{lock=true;c.clear();c.backgroundColor=INK;D.W=1080;D.H=1080;D.unit='px';fit();
   c.add(new fabric.Rect({left:60,top:60,width:960,height:960,fill:'',stroke:GOLD,strokeWidth:6,name:'Frame'}),
    new fabric.Textbox('Quality goods,\nbacked by service.',{left:120,top:380,width:840,fontSize:96,fontWeight:'bold',fontFamily:'Arial',fill:'#fff',name:'Headline'}),
    new fabric.Textbox('Mega Tag Enterprise',{left:120,top:900,width:840,fontSize:36,fontFamily:'Arial',fill:GOLD,name:'Sign-off'}));
   lock=false;push()}};
-function svgStr(s,name,cb){fabric.loadSVGFromString(s,(o,opt)=>{const g=fabric.util.groupSVGElements(o,opt);g.set('name',name||'SVG');cb?cb(g):place(g);if(cb)c.add(g)})}
-$('#tools').onclick=e=>{const t=e.target.dataset.t;if(t)add[t]()};
+$('#tools').onclick=e=>{const t=e.target.dataset.t;if(!t)return;if(brushOn&&t!=='brush')toggleBrush();if(T6.t&&!/^(blur|pen|mask|erase|manual)$/.test(t))T6.stop();add[t]()};
 
-/* ---------- opening files ---------- */
+/* ===== SVG import: every shape/path/text becomes its own editable layer ===== */
+const asTextbox=o=>{if(o.type!=='text')return o;const p=o.toObject();delete p.type;delete p.text;delete p.version;
+ return new fabric.Textbox(o.text,Object.assign(p,{width:o.width*1.06+6,name:(o.text||'Text').slice(0,24)}))};
+function importSvg(str,name,o={}){return new Promise(res=>{fabric.loadSVGFromString(str,(objs,opt)=>{
+ if(!objs||!objs.length){toast('The SVG has no drawable content.');return res()}
+ lock=true;const empty=c.getObjects().length===0,w=opt.width||opt.viewBoxWidth,h=opt.height||opt.viewBoxHeight;let asIs=!!o.asIs;
+ if((empty||o.resize)&&w&&h){D.W=Math.round(w);D.H=Math.round(h);D.unit='px';asIs=true;fit()}
+ (o.replace||[]).forEach(x=>c.remove(x));
+ const before=new Set(c.getObjects()),g=fabric.util.groupSVGElements(objs,opt);
+ if(!asIs){const k=Math.min(1,D.W*.9/g.width,D.H*.9/g.height);g.scale(k);g.set({left:(D.W-g.getScaledWidth())/2,top:(D.H-g.getScaledHeight())/2})}
+ c.add(g);if(g.type==='group')g.toActiveSelection();c.discardActiveObject();
+ const fresh=c.getObjects().filter(x=>!before.has(x));
+ fresh.forEach(x=>{const i=c.getObjects().indexOf(x),t=asTextbox(x);if(t!==x){c.remove(x);c.insertAt(t,i,false)}
+  const y=t;y.name=y.name||x.id||(name?name+' / ':'')+y.type});
+ if(fresh.length===1&&name)fresh[0].name=name;
+ lock=false;c.requestRenderAll();push();res(fresh)})})}
+
+/* ===== properties, gradients, text, blend ===== */
+const kids=o=>o.type==='group'||o.type==='activeSelection'?o._objects.flatMap(kids):[o];
+const tops=()=>c.getActiveObjects();
+function setP(p,v){const a=c.getActiveObject();if(!a)return toast('Select something first.');kids(a).forEach(x=>x.set(p,v));if(p==='opacity')a.set(p,v);a.dirty=true;c.requestRenderAll();push()}
+function grad(type,c1,c2,ang,px){const r=ang*Math.PI/180,dx=Math.cos(r)/2,dy=Math.sin(r)/2;
+ let co=type==='radial'?{x1:.5,y1:.5,r1:0,x2:.5,y2:.5,r2:.5}:{x1:.5-dx,y1:.5-dy,x2:.5+dx,y2:.5+dy};
+ if(px){co.x1*=px.w;co.x2*=px.w;co.y1*=px.h;co.y2*=px.h;if(co.r2!==undefined)co.r2*=Math.max(px.w,px.h)}
+ return new fabric.Gradient({type:type==='radial'?'radial':'linear',gradientUnits:px?'pixels':'percentage',coords:co,colorStops:[{offset:0,color:c1},{offset:1,color:c2}]})}
+function applyFill(cmykVals){const ty=$('#ftype').value,a=$('#fill').value,b=$('#fill2').value,ang=+$('#fang').value||0;
+ $('#lblB').style.display=$('#lblAng').style.display=ty==='solid'?'none':'';
+ if($('#ftarget').value==='bg'){c.backgroundColor=ty==='solid'?a:grad(ty,a,b,ang,{w:D.W,h:D.H});c.renderAll();push();return}
+ const t=c.getActiveObject();if(!t)return toast('Select an object, or set Target to canvas background.');
+ kids(t).forEach(x=>{x.set('fill',ty==='solid'?a:grad(ty,a,b,ang));if(ty==='solid'&&cmykVals)x.cmyk=cmykVals;else delete x.cmyk;x.dirty=true});
+ c.requestRenderAll();push()}
+['ftype','fill','fill2','fang'].forEach(i=>$('#'+i).addEventListener('input',()=>{applyFill();syncCmykFromFill()}));
+$('#ftarget').onchange=()=>{$('#fill').value=$('#ftarget').value==='bg'&&typeof c.backgroundColor==='string'&&c.backgroundColor?hexAny(c.backgroundColor):$('#fill').value};
+function syncCmykFromFill(){const v=rgb2cmyk(...hex2rgb($('#fill').value));['cc','cm','cy','ck'].forEach((k,i)=>$('#'+k).value=v[i])}
+['cc','cm','cy','ck'].forEach(k=>$('#'+k).addEventListener('input',()=>{const v=['cc','cm','cy','ck'].map(i=>clamp(+$('#'+i).value||0,0,100));
+ $('#fill').value=rgb2hex(...cmyk2rgb(...v));$('#ftype').value='solid';applyFill(v)}));
+$('#stroke').oninput=e=>setP('stroke',e.target.value);$('#sw').oninput=e=>setP('strokeWidth',+e.target.value);$('#op').oninput=e=>setP('opacity',+e.target.value);
+$('#ff').onchange=e=>setP('fontFamily',e.target.value);$('#fs').oninput=e=>setP('fontSize',+e.target.value);
+$('#tsp').oninput=e=>setP('charSpacing',+e.target.value);$('#tlh').oninput=e=>setP('lineHeight',+e.target.value||1);
+const SEL=a=>a&&a.isEditing&&a.selectionStart!==a.selectionEnd;
+const tgl=(p,on,off)=>()=>{const a=c.getActiveObject();if(!a)return;
+ if(SEL(a)){const cur=a.getSelectionStyles(a.selectionStart,a.selectionEnd,true),all=cur.length&&cur.every(x=>x[p]===on);a.setSelectionStyles({[p]:all?off:on});a.dirty=true;c.requestRenderAll();push();return}
+ const f=kids(a)[0];setP(p,f[p]===on?off:on)};
+$('#bold').onclick=tgl('fontWeight','bold','normal');$('#ital').onclick=tgl('fontStyle','italic','normal');$('#und').onclick=tgl('underline',true,false);
+$('#strk').onclick=tgl('linethrough',true,false);$('#ovl').onclick=tgl('overline',true,false);
+['sup','sub'].forEach(k=>$('#'+k).onclick=()=>{const a=c.getActiveObject(),f=k==='sup'?'setSuperscript':'setSubscript';
+ if(SEL(a)&&a[f]){a[f](a.selectionStart,a.selectionEnd);a.dirty=true;c.requestRenderAll();push()}else toast('Double-click a text layer, select some characters, then tap this.')});
+const CASEF={up:t=>t.toUpperCase(),lo:t=>t.toLowerCase(),ti:t=>t.toLowerCase().replace(/(^|[^\p{L}'])(\p{L})/gu,(m,a,b)=>a+b.toUpperCase())};
+document.querySelectorAll('[data-case]').forEach(b=>b.onclick=()=>{const a=c.getActiveObject(),ts=a?kids(a).filter(o=>/text/.test(o.type)):[];if(!ts.length)return toast('Select a text layer first.');
+ ts.forEach(o=>{o.set('text',CASEF[b.dataset.case](o.text));o.dirty=true});c.requestRenderAll();push()});
+addEventListener('keydown',e=>{const a=c.getActiveObject();if(!(e.ctrlKey||e.metaKey)||!a||!a.isEditing)return;const m={b:'#bold',i:'#ital',u:'#und'}[e.key.toLowerCase()];if(m){e.preventDefault();$(m).click()}});
+const ICO=(ls)=>`<svg viewBox="0 0 18 18">${ls}</svg>`;
+const AL={left:[[2,14],[2,9],[2,14],[2,9]],center:[[2,14],[4.5,9],[2,14],[4.5,9]],right:[[2,14],[7,9],[2,14],[7,9]],justify:[[2,14],[2,14],[2,14],[2,14]]};
+Object.entries(AL).forEach(([k,v])=>{const b=document.createElement('button');b.className='ib';b.dataset.ta=k;b.title='Text align '+k;b.setAttribute('aria-label','Text align '+k);
+ b.innerHTML=ICO(v.map((s,i)=>`<line x1="${s[0]}" x2="${s[0]+s[1]}" y1="${3.5+i*3.8}" y2="${3.5+i*3.8}"/>`).join(''));b.onclick=()=>setP('textAlign',k);$('#taRow').append(b)});
+const OA=[['l','Align left edges','<line x1="2" x2="2" y1="1" y2="17"/><rect x="4" y="4" width="11" height="4"/><rect x="4" y="10" width="7" height="4"/>'],
+ ['cx','Align centres horizontally','<line x1="9" x2="9" y1="1" y2="17"/><rect x="3" y="4" width="12" height="4"/><rect x="5" y="10" width="8" height="4"/>'],
+ ['r','Align right edges','<line x1="16" x2="16" y1="1" y2="17"/><rect x="3" y="4" width="11" height="4"/><rect x="7" y="10" width="7" height="4"/>'],
+ ['t','Align tops','<line x1="1" x2="17" y1="2" y2="2"/><rect x="4" y="4" width="4" height="11"/><rect x="10" y="4" width="4" height="7"/>'],
+ ['my','Align middles vertically','<line x1="1" x2="17" y1="9" y2="9"/><rect x="4" y="3" width="4" height="12"/><rect x="10" y="5" width="4" height="8"/>'],
+ ['b','Align bottoms','<line x1="1" x2="17" y1="16" y2="16"/><rect x="4" y="3" width="4" height="11"/><rect x="10" y="7" width="4" height="7"/>']];
+OA.forEach(([k,t,s])=>{const b=document.createElement('button');b.className='ib';b.title=t;b.setAttribute('aria-label',t);b.innerHTML=ICO(s);b.onclick=()=>alignObjs(k);$('#alRow').append(b)});
+function alignObjs(k){const a=c.getActiveObject();if(!a)return toast('Select something to align.');
+ const objs=a.type==='activeSelection'?a._objects.slice():[a],multi=objs.length>1,m=$('#alto').value,toSel=multi&&m!=='canvas';
+ c.discardActiveObject();const bb=o=>o.getBoundingRect(true,true);let box={left:0,top:0,width:D.W,height:D.H};
+ if(toSel){const bs=objs.map(bb),l=Math.min(...bs.map(b=>b.left)),t=Math.min(...bs.map(b=>b.top)),r=Math.max(...bs.map(b=>b.left+b.width)),bo=Math.max(...bs.map(b=>b.top+b.height));box={left:l,top:t,width:r-l,height:bo-t}}
+ objs.forEach(o=>{const b=bb(o);let dx=0,dy=0;
+  if(k==='l')dx=box.left-b.left;if(k==='cx')dx=box.left+box.width/2-(b.left+b.width/2);if(k==='r')dx=box.left+box.width-(b.left+b.width);
+  if(k==='t')dy=box.top-b.top;if(k==='my')dy=box.top+box.height/2-(b.top+b.height/2);if(k==='b')dy=box.top+box.height-(b.top+b.height);
+  o.set({left:o.left+dx,top:o.top+dy});o.setCoords()});
+ c.setActiveObject(multi?new fabric.ActiveSelection(objs,{canvas:c}):objs[0]);c.requestRenderAll();push()}
+/* blend modes, Blend-If, clipping masks */
+[['source-over','Normal'],['multiply','Multiply'],['screen','Screen'],['overlay','Overlay'],['darken','Darken'],['lighten','Lighten'],['color-dodge','Color dodge'],['color-burn','Color burn'],['hard-light','Hard light'],['soft-light','Soft light'],['difference','Difference'],['exclusion','Exclusion'],['hue','Hue'],['saturation','Saturation'],['color','Color'],['luminosity','Luminosity']]
+ .forEach(([v,t])=>$('#blend').append(new Option('Blend: '+t,v)));
+const setBlend=v=>{const a=c.getActiveObject();if(!a)return toast('Select a layer first.');tops().forEach(o=>{o.globalCompositeOperation=v;o.dirty=true});$('#blend').value=v;c.requestRenderAll();push()};
+$('#blend').onchange=e=>setBlend(e.target.value);$('#bwhite').onclick=()=>setBlend('multiply');$('#bblack').onclick=()=>setBlend('screen');
+function blendIf(){const a=c.getActiveObject();if(!a)return toast('Select an image layer first.');const m=$('#bif').value;let n=0;
+ tops().forEach(o=>{if(o.type!=='image')return;n++;o.filters=(o.filters||[]).filter(f=>f&&f.type!=='BlendIf');
+  if(m!=='off')o.filters.push(new fabric.Image.filters.BlendIf({mode:m,threshold:+$('#bifT').value,soft:+$('#bifS').value}));o.applyFilters()});
+ if(!n)toast('Blend-If works on image layers. For shapes and text use Blend on white / black.');c.requestRenderAll();push()}
+$('#bif').onchange=()=>{$('#bifT').value=$('#bif').value==='black'?25:235;blendIf()};$('#bifT').oninput=blendIf;$('#bifS').oninput=blendIf;
+$('#clipMake').onclick=async()=>{const a=c.getActiveObject();if(!a||a.type!=='activeSelection'||a._objects.length<2)return toast('Select 2+ layers: the shape (lower) and the content to clip (above it).');
+ const objs=a._objects.slice();c.discardActiveObject();const st=c.getObjects();objs.sort((x,y)=>st.indexOf(x)-st.indexOf(y));
+ const base=objs[0];lock=true;
+ for(const o of objs.slice(1)){const m=await new Promise(r=>base.clone(r,PROPS));m.set({absolutePositioned:true});o.clipPath=m;o.maskName=base.name||base.type;o.dirty=true}
+ c.remove(base);lock=false;c.requestRenderAll();push();toast('Clipped. Content now only shows inside the lower shape.')};
+$('#clipRel').onclick=async()=>{let n=0;lock=true;for(const o of tops()){if(!o.clipPath)continue;const m=await new Promise(r=>o.clipPath.clone(r,PROPS));
+ m.set({absolutePositioned:false,name:o.maskName||'Mask'});o.clipPath=null;o.dirty=true;c.insertAt(m,c.getObjects().indexOf(o),false);n++}
+ lock=false;c.requestRenderAll();push();if(!n)toast('Select a clipped layer.')};
+/* path point editing (works on SVG paths) */
+let editing=null;
+function pathEdit(){const o=c.getActiveObject();if(editing)return pathDone();
+ if(!o||o.type!=='path')return toast('Select a path layer (e.g. from an imported SVG) or convert a shape with "To path".');
+ editing=o;o._ctl=o.controls;o._bd=o.hasBorders;const ctl={};
+ o.path.forEach((cmd,i)=>{for(let j=1;j<cmd.length;j+=2){ctl['p'+i+'_'+j]=new fabric.Control({
+  positionHandler:(dim,m,obj)=>fabric.util.transformPoint(new fabric.Point(cmd[j]-obj.pathOffset.x,cmd[j+1]-obj.pathOffset.y),fabric.util.multiplyTransformMatrices(obj.canvas.viewportTransform,obj.calcTransformMatrix())),
+  actionHandler:(e,tr,x,y)=>{const obj=tr.target,p=fabric.util.transformPoint(new fabric.Point(x,y),fabric.util.invertTransform(obj.calcTransformMatrix()));
+   cmd[j]=p.x+obj.pathOffset.x;cmd[j+1]=p.y+obj.pathOffset.y;obj.dirty=true;return true},
+  actionName:'edit-path',cursorStyle:'crosshair',
+  render:(ctx,l,t)=>{ctx.save();ctx.fillStyle=((cmd[0]==='C'&&j<5)||(cmd[0]==='Q'&&j<3))?'#fff':GOLD;ctx.strokeStyle='#000';ctx.beginPath();ctx.arc(l,t,5,0,6.3);ctx.fill();ctx.stroke();ctx.restore()}})}});
+ o.controls=ctl;o.hasBorders=false;o.objectCaching=false;o.lockMovementX=o.lockMovementY=o.lockRotation=o.lockScalingX=o.lockScalingY=true;
+ $('#pEdit').classList.add('on');c.requestRenderAll();toast('Drag the points. Gold = anchors, white = curve handles. Esc or "Edit points" to finish.')}
+function pathDone(){const o=editing;if(!o)return;editing=null;o.controls=o._ctl;o.hasBorders=o._bd;o.lockMovementX=o.lockMovementY=o.lockRotation=o.lockScalingX=o.lockScalingY=false;o.objectCaching=true;
+ try{let b;if(o._calcDimensions){const d=o._calcDimensions();b={l:d.left,t:d.top,w:d.width,h:d.height}}else{const xs=[],ys=[];o.path.forEach(m=>{for(let j=1;j<m.length;j+=2){xs.push(m[j]);ys.push(m[j+1])}});b={l:Math.min(...xs),t:Math.min(...ys),w:Math.max(...xs)-Math.min(...xs),h:Math.max(...ys)-Math.min(...ys)}}
+  const p0=o.pathOffset,p1=new fabric.Point(b.l+b.w/2,b.t+b.h/2),v=fabric.util.transformPoint(new fabric.Point(p1.x-p0.x,p1.y-p0.y),o.calcTransformMatrix(),true),ctr=o.getCenterPoint();
+  o.set({width:b.w,height:b.h,pathOffset:p1});o.setPositionByOrigin(new fabric.Point(ctr.x+v.x,ctr.y+v.y),'center','center')}catch(e){console.warn(e)}
+ o.dirty=true;o.setCoords();$('#pEdit').classList.remove('on');c.requestRenderAll();push()}
+$('#pEdit').onclick=pathEdit;
+$('#toPath').onclick=()=>{const o=c.getActiveObject();if(!o||o.type==='path')return toast(o?'Already a path.':'Select a rectangle, triangle or ellipse.');
+ const w=o.width,h=o.height;let d;
+ if(o.type==='rect')d=`M0 0L${w} 0L${w} ${h}L0 ${h}Z`;else if(o.type==='triangle')d=`M${w/2} 0L${w} ${h}L0 ${h}Z`;
+ else if(o.type==='ellipse'){const rx=o.rx,ry=o.ry,k=.5523;d=`M0 ${ry}C0 ${ry-k*ry} ${rx-k*rx} 0 ${rx} 0C${rx+k*rx} 0 ${2*rx} ${ry-k*ry} ${2*rx} ${ry}C${2*rx} ${ry+k*ry} ${rx+k*rx} ${2*ry} ${rx} ${2*ry}C${rx-k*rx} ${2*ry} 0 ${ry+k*ry} 0 ${ry}Z`}
+ else return toast('To path supports rectangle, triangle and ellipse.');
+ const p=new fabric.Path(d,{fill:o.fill,stroke:o.stroke,strokeWidth:o.strokeWidth,opacity:o.opacity,name:(o.name||o.type)+' path'});
+ p.set({left:o.left,top:o.top,scaleX:o.scaleX,scaleY:o.scaleY,angle:o.angle,originX:o.originX,originY:o.originY});
+ const i=c.getObjects().indexOf(o);c.remove(o);c.insertAt(p,i,false);c.setActiveObject(p);c.requestRenderAll();push()};
+/* SVG code window: view, edit, re-apply and export markup */
+function svgSource(){const a=c.getActiveObject(),z=c.getZoom();
+ if(a&&a.type!=='activeSelection'){c.discardActiveObject();const s=a.toSVG();c.setActiveObject(a);return`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${D.W}" height="${D.H}" viewBox="0 0 ${D.W} ${D.H}">\n${s}\n</svg>`}
+ return svgDoc()}
+function svgDoc(){const bg=c.backgroundColor;c.discardActiveObject();const u=D.unit!=='px'?D.unit:'px',w=u==='px'?D.W:r2(fromPx(D.W,u,D.dpi)),h=u==='px'?D.H:r2(fromPx(D.H,u,D.dpi));
+ const z=c.getZoom(),cw=c.width,ch=c.height;c.setZoom(1);c.setDimensions({width:D.W,height:D.H});
+ const s=c.toSVG({viewBox:{x:0,y:0,width:D.W,height:D.H},width:w+u,height:h+u});c.setZoom(z);c.setDimensions({width:cw,height:ch});c.renderAll();return s}
+let svgSel=null;
+$('#svgCode').onclick=()=>{const a=c.getActiveObject();svgSel=a&&a.type!=='activeSelection'?a:null;$('#svgTa').value=svgSource();$('#dSvg').showModal()};
+$('#svgClose').onclick=()=>$('#dSvg').close();
+$('#svgApply').onclick=async()=>{const s=$('#svgTa').value;$('#dSvg').close();
+ if(svgSel){await importSvg(s,svgSel.name,{asIs:true,replace:[svgSel]})}else{lock=true;c.clear();c.backgroundColor='';lock=false;await importSvg(s,'',{asIs:true,resize:true})}};
+$('#svgDl').onclick=()=>dl(URL.createObjectURL(new Blob([$('#svgTa').value],{type:'image/svg+xml'})),(D.name||'design')+'.svg');
+/* palette, layers, sync */
+[GOLD,INK,'#666666','#FFFFFF','#D32F2F','#1976D2'].forEach(h=>{const b=document.createElement('button');b.className='sw';b.style.background=h;b.title=h;b.setAttribute('aria-label','Apply '+h);
+ b.onclick=()=>{$('#fill').value=h;$('#ftype').value='solid';applyFill(D.cm==='cmyk'?rgb2cmyk(...hex2rgb(h)):null);syncCmykFromFill()};$('#pal').append(b)});
+function sync(){const a=c.getActiveObject();if(!a)return;const f=kids(a)[0]||a;
+ $('#op').value=a.opacity??1;if(f.fontSize){$('#fs').value=Math.round(f.fontSize);$('#ff').value=f.fontFamily;$('#tsp').value=f.charSpacing||0;$('#tlh').value=f.lineHeight||1.16}
+ if(f.fill instanceof fabric.Gradient){const g=f.fill,s=g.colorStops;$('#ftype').value=g.type==='radial'?'radial':'linear';$('#fill').value=hexAny(s[0].color);$('#fill2').value=hexAny(s[s.length-1].color);
+  const cc=g.coords;$('#fang').value=Math.round(((Math.atan2(cc.y2-cc.y1,cc.x2-cc.x1)*180/Math.PI)+360)%360)}
+ else if(typeof f.fill==='string'&&f.fill){$('#ftype').value='solid';$('#fill').value=hexAny(f.fill)}
+ $('#lblB').style.display=$('#lblAng').style.display=$('#ftype').value==='solid'?'none':'';
+ if(f.stroke)$('#stroke').value=hexAny(f.stroke);$('#sw').value=f.strokeWidth||0;
+ if(D.cm==='cmyk')(f.cmyk||rgb2cmyk(...hex2rgb($('#fill').value))).forEach((v,i)=>$('#'+['cc','cm','cy','ck'][i]).value=v);
+ $$('[data-ta]').forEach(b=>b.classList.toggle('on',b.dataset.ta===f.textAlign));
+ $('#blend').value=a.globalCompositeOperation||'source-over';
+ const bi=(f.filters||[]).find(x=>x&&x.type==='BlendIf');$('#bif').value=bi?bi.mode:'off';if(bi){$('#bifT').value=bi.threshold;$('#bifS').value=bi.soft}
+ $('#smartEdit').hidden=!a.smartId}
+function layers(){try{bgBtn()}catch(e){}const L=$('#layers');L.textContent='';const act=c.getActiveObject();
+ c.getObjects().slice().reverse().forEach(o=>{const d=document.createElement('div');d.className='ly'+(act===o?' on':'');
+  const mk=(t,fn,l)=>{const b=document.createElement('button');b.textContent=t;b.setAttribute('aria-label',l);b.onclick=ev=>{ev.stopPropagation();fn()};return b};
+  const n=document.createElement('span');n.textContent=(o.name||o.type)+(o.clipPath?' ◧':'')+(o.smartId?' ◈':'');n.onclick=()=>{c.setActiveObject(o);c.requestRenderAll();layers();sync()};
+  d.append(mk(o.visible===false?'○':'●',()=>{o.visible=o.visible===false;c.requestRenderAll();push()},'Toggle visibility'),n,
+   mk('↑',()=>{c.bringForward(o);push()},'Move up'),mk('↓',()=>{c.sendBackwards(o);push()},'Move down'),mk('✕',()=>{c.remove(o)},'Delete layer'));
+  L.append(d)})}
+
+/* ===== new project / canvas size ===== */
+const PRESETS=[['Social','Instagram Post (4:5)',1080,1350,'px'],['Social','Instagram Square',1080,1080,'px'],['Social','Story / Reel',1080,1920,'px'],['Social','Facebook Post',1200,630,'px'],['Social','Facebook Cover',820,312,'px'],['Social','LinkedIn Post',1200,627,'px'],['Social','X / Twitter Post',1600,900,'px'],['Social','YouTube Thumbnail',1280,720,'px'],['Social','YouTube Video',1920,1080,'px'],['Social','Logo',2000,2000,'px'],
+ ['Print','A3',297,420,'mm'],['Print','A4',210,297,'mm'],['Print','A5',148,210,'mm'],['Print','A6',105,148,'mm'],['Print','US Letter',8.5,11,'in'],['Print','US Legal',8.5,14,'in'],['Print','Poster 18×24',18,24,'in'],['Print','Brochure (Tri-fold)',297,210,'mm'],['Print','T-shirt print 12×16',12,16,'in'],
+ ['Cards','Call / Business card',90,54,'mm'],['Cards','Business card (US)',3.5,2,'in'],['Cards','Postcard 6×4',6,4,'in'],['Cards','Invitation 5×7',5,7,'in'],['Cards','Sticker 3×3',3,3,'in'],['Cards','Barcode label 50×30',50,30,'mm'],
+ ['Web','Desktop 1920×1080',1920,1080,'px'],['Web','Mobile 390×844',390,844,'px'],['Web','Banner 728×90',728,90,'px']];
+let nMode='new',nCat='Social',nuPrev='px';
+function nPxTxt(){const px=toPx(+$('#nw').value,$('#nu').value,+$('#nd').value),py=toPx(+$('#nh').value,$('#nu').value,+$('#nd').value);$('#nPx').textContent=`= ${Math.round(px)} × ${Math.round(py)} px at ${$('#nd').value} DPI`+(px*py>40e6?' (very large: may be slow on phones)':'')}
+function nFill(w,h,u,d){nuPrev=u;$('#nw').value=w;$('#nh').value=h;$('#nu').value=u;if(d)$('#nd').value=d;nPxTxt()}
+function nCats(){$('#dCats').textContent='';[...new Set(PRESETS.map(p=>p[0]))].concat('Custom').forEach(k=>{const b=document.createElement('button');b.textContent=k;b.className=k===nCat?'on':'';b.onclick=()=>{nCat=k;nCats()};$('#dCats').append(b)});
+ $('#dPre').textContent='';if(nCat==='Custom')return;PRESETS.filter(p=>p[0]===nCat).forEach(p=>{const b=document.createElement('button');b.innerHTML=`${p[1]}<small>${p[2]} × ${p[3]} ${p[4]}</small>`;
+  b.onclick=()=>nFill(p[2],p[3],p[4],p[4]==='px'?96:150);$('#dPre').append(b)})}
+function openNew(mode){nMode=mode;$('#dNewT').textContent=mode==='new'?'New project':'Canvas size';$('#nGo').textContent=mode==='new'?'Create':'Apply';$('#nTabL').style.display=mode==='new'?'':'none';
+ if(mode==='size'){nFill(r2(fromPx(D.W,D.unit,D.dpi)),r2(fromPx(D.H,D.unit,D.dpi)),D.unit,D.dpi);$('#ncm').value=D.cm}nCats();nPxTxt();$('#dNew').showModal()}
+$('#nu').onchange=()=>{const d=+$('#nd').value,w=toPx(+$('#nw').value,nuPrev,d),h=toPx(+$('#nh').value,nuPrev,d);nuPrev=$('#nu').value;$('#nw').value=r2(fromPx(w,nuPrev,d));$('#nh').value=r2(fromPx(h,nuPrev,d));nPxTxt()};
+['nw','nh','nd'].forEach(i=>$('#'+i).addEventListener('input',nPxTxt));$('#nCancel').onclick=()=>$('#dNew').close();
+$('#bNew').onclick=()=>{document.body.dataset.ws!=='design'&&MTE.show('design');nuPrev=$('#nu').value;openNew('new')};$('#bSize').onclick=()=>openNew('size');
+$('#nGo').onclick=()=>{const u=$('#nu').value,d=+$('#nd').value,w=Math.round(toPx(+$('#nw').value,u,d)),h=Math.round(toPx(+$('#nh').value,u,d));
+ if(!(w>0&&h>0&&w<=16000&&h<=16000))return toast('Size must be between 1 and 16000 px.');
+ const spec={W:w,H:h,unit:u,dpi:d,cm:$('#ncm').value};$('#dNew').close();
+ if(nMode==='size'){Object.assign(D,spec);D.unit=u;fit();push();return}
+ if($('#nTab').checked){const id=Date.now().toString(36),p=new URLSearchParams({p:id,w,h,u,d,cm:spec.cm,bg:$('#nTrans').checked?'none':$('#nbg').value});
+  const win=window.open(location.pathname+'?'+p,'_blank');if(win)return;toast('Pop-up blocked: created in this tab instead.')}
+ lock=true;c.clear();c.backgroundColor=$('#nTrans').checked?'':$('#nbg').value;Object.assign(D,spec,{name:'Untitled'});lock=false;hist=[];hi=-1;fit();push()};
+$('#cmode').onchange=e=>{D.cm=e.target.value;info();push();toast(D.cm==='cmyk'?'CMYK mode: colours are authored in CMYK; vector colours export as DeviceCMYK. No ICC profile is applied.':'RGB mode.')};
+$('#pname').oninput=e=>{D.name=e.target.value;document.title=(D.name||'Untitled')+' — MTE Productive Studio'};$('#pname').onchange=push;
+
+/* ===== opening files ===== */
 $('#open').onclick=()=>$('#file').click();
 $('#file').onchange=async e=>{for(const f of e.target.files)await openFile(f);e.target.value=''};
 const st=$('#stage');['dragover','dragenter'].forEach(v=>st.addEventListener(v,e=>{e.preventDefault();st.classList.add('drag')}));
 ['dragleave','drop'].forEach(v=>st.addEventListener(v,e=>{e.preventDefault();st.classList.remove('drag')}));
 st.addEventListener('drop',async e=>{for(const f of e.dataTransfer.files)await openFile(f)});
 const rd=f=>new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result);x.readAsDataURL(f)});
+const loadImg=u=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=u});
+const OFFICE=/^(docx|pptx|xlsx|xlsm|xls|ods|csv|odt|odp|doc|ppt|rtf)$/;
 async function openFile(f){const ext=f.name.split('.').pop().toLowerCase();
  try{
-  if(ext==='svg')return svgStr(await f.text(),f.name);
-  if(ext==='psd')return openPsd(f);
-  if(ext==='pdf'||ext==='ai')return openPdf(f);
-  if(ext==='mte'||ext==='json'){hist=[];hi=-1;restore(await f.text());return setTimeout(push,300)}
+  if(OFFICE.test(ext)){const w=MTE.workspaces.office;MTE.show('office');return w.openFile(f)}
+  if(ext==='svg')return importSvg(await f.text(),f.name.replace(/\.svg$/i,''));
+  if(ext==='psd')return openPsd(await f.arrayBuffer(),f.name);
+  if(ext==='pdf'||ext==='ai')return askPdf(await f.arrayBuffer(),f.name);
+  if(ext==='mte'||ext==='json'){fh=null;hist=[];hi=-1;await restore(await f.text());return push()}
   fabric.Image.fromURL(await rd(f),i=>{i.set('name',f.name);place(i)})
  }catch(err){console.error(err);toast('Could not open '+f.name+': '+err.message)}}
-function openPsd(f){if(!need('PSD',window.agPsd))return;
- return f.arrayBuffer().then(b=>{const p=agPsd.readPsd(b);lock=true;c.clear();c.backgroundColor='';W=p.width;H=p.height;
-  const walk=l=>(l||[]).forEach(x=>{if(x.children)return walk(x.children);if(!x.canvas)return;
-   c.add(new fabric.Image(x.canvas,{left:x.left,top:x.top,opacity:x.opacity??1,visible:!x.hidden,name:x.name}))});
-  walk(p.children);lock=false;fit();push();toast('PSD opened: layers are editable as images; text is flattened.')})}
-async function openPdf(f){if(!need('PDF',window.pdfjsLib))return;
- pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
- const d=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise,pg=await d.getPage(1),v=pg.getViewport({scale:2}),cv=document.createElement('canvas');
- cv.width=v.width;cv.height=v.height;await pg.render({canvasContext:cv.getContext('2d'),viewport:v}).promise;
- lock=true;c.clear();c.backgroundColor='#fff';W=v.width/2;H=v.height/2;fit();
- c.add(new fabric.Image(cv,{left:0,top:0,scaleX:.5,scaleY:.5,name:f.name+' (page 1)'}));lock=false;push();
- toast('Page 1 of '+d.numPages+' placed as a flat layer. Add text and shapes on top.')}
+const blendFromPsd=b=>{const m=(b||'normal').replace(/ /g,'-');return m==='normal'||m==='pass-through'?'source-over':['multiply','screen','overlay','darken','lighten','color-dodge','color-burn','hard-light','soft-light','difference','exclusion','hue','saturation','color','luminosity'].includes(m)?m:'source-over'};
+const blendToPsd=g=>g&&g!=='source-over'?g.replace(/-/g,' '):'normal';
+/* PSD: layers, live text and smart objects */
+async function openPsd(buf,fname){await lib('psd');const p=agPsd.readPsd(buf);lock=true;c.clear();c.backgroundColor='';D.W=p.width;D.H=p.height;D.unit='px';D.name=fname.replace(/\.[^.]+$/,'');
+ const files=new Map();(p.linkedFiles||[]).forEach(x=>files.set(x.id,x));let nT=0,nS=0,nR=0;
+ const walk=(ls,pre)=>(ls||[]).forEach(x=>{if(x.children)return walk(x.children,pre+(x.name||'Group')+' / ');
+  const base={opacity:x.opacity??1,visible:!x.hidden,name:pre+(x.name||'Layer'),globalCompositeOperation:blendFromPsd(x.blendMode)};
+  if(x.text&&x.text.text){const st=x.text.style||{},ps=x.text.paragraphStyle||{},tr=x.text.transform||[1,0,0,1,0,0],fs=(st.fontSize||24)*Math.abs(tr[3]||1),col=st.fillColor,fn=(st.font&&st.font.name)||'Arial';
+   const fam=fn.replace(/(MT)?(-?(Bold|Italic|Regular|Oblique|Black|Light|Medium).*)?$/i,'')||'Arial';
+   c.add(new fabric.Textbox(x.text.text.replace(/\r/g,'\n'),Object.assign(base,{left:x.left||0,top:x.top||0,width:Math.max(24,((x.right||0)-(x.left||0))*1.08+6),fontSize:fs,fontFamily:fam,fontWeight:/bold|black/i.test(fn)?'bold':'normal',fontStyle:/italic|oblique/i.test(fn)?'italic':'normal',fill:col&&col.r!==undefined?rgb2hex(col.r,col.g,col.b):'#000',textAlign:ps.justification||'left'})));nT++;return}
+  if(!x.canvas)return;const img=new fabric.Image(x.canvas,Object.assign(base,{left:x.left||0,top:x.top||0}));
+  const lf=x.placedLayer&&files.get(x.placedLayer.id);if(lf&&lf.data){const id='so'+Date.now().toString(36)+(nS++);img.smartId=id;img.name+=' [smart object]';smartMap.set(id,{name:lf.name||'smart',data:lf.data})}
+  c.add(img);nR++});
+ walk(p.children,'');lock=false;fit();push();toast(`PSD opened: ${nT} live text, ${nR} pixel/shape layers, ${nS} smart objects. Shape and mask layers arrive as pixels.`)}
+/* smart object editing: open the embedded content, edit, then write it back */
+$('#smartEdit').onclick=async()=>{const o=c.getActiveObject();if(!o||!o.smartId)return;const e=smartMap.get(o.smartId);
+ if(!e)return toast('Smart object content is not in memory (a reload clears it). Re-open the PSD.');
+ soStack.push({state:snapshot(),id:o.smartId,w:o.getScaledWidth(),h:o.getScaledHeight()});$('#soBar').style.display='flex';
+ const ext=(e.name.split('.').pop()||'').toLowerCase();hist=[];hi=-1;
+ try{if(e.proj)await restore(e.proj);
+  else if(ext==='psd'||ext==='psb')await openPsd(e.data.buffer.slice(e.data.byteOffset,e.data.byteOffset+e.data.byteLength),e.name);
+  else if(ext==='pdf'||ext==='ai')await askPdf(e.data.buffer.slice(e.data.byteOffset,e.data.byteOffset+e.data.byteLength),e.name);
+  else if(ext==='svg')await importSvg(new TextDecoder().decode(e.data),e.name);
+  else{const mime=ext==='jpg'||ext==='jpeg'?'image/jpeg':'image/'+(ext||'png'),url=URL.createObjectURL(new Blob([e.data],{type:mime})),im=await loadImg(url);
+   lock=true;c.clear();c.backgroundColor='';D.W=im.naturalWidth;D.H=im.naturalHeight;lock=false;fit();c.add(new fabric.Image(im,{left:0,top:0,name:e.name}));push()}
+ }catch(err){toast('Could not open smart object: '+err.message);soCancel()}};
+async function soDone(){const fr=soStack.pop();if(!fr)return;c.discardActiveObject();const url=renderURL('png',true),proj=snapshot();$('#soBar').style.display=soStack.length?'flex':'none';
+ await restore(fr.state);hist=[fr.state];hi=0;const o=c.getObjects().find(x=>x.smartId===fr.id);
+ if(o)o.setSrc(url,()=>{o.set({scaleX:fr.w/o.width,scaleY:fr.h/o.height});o.dirty=true;const e=smartMap.get(fr.id);if(e)e.proj=proj;c.requestRenderAll();push();toast('Smart object updated.')})}
+async function soCancel(){const fr=soStack.pop();if(!fr)return;$('#soBar').style.display=soStack.length?'flex':'none';await restore(fr.state);hist=[fr.state];hi=0}
+$('#soDone').onclick=soDone;$('#soCancel').onclick=soCancel;
 
-/* ---------- properties and layers ---------- */
-const kids=o=>o.type==='group'||o.type==='activeSelection'?o._objects.flatMap(kids):[o];
-function setP(p,v){const a=c.getActiveObject();if(!a)return;kids(a).forEach(x=>x.set(p,v));if(p==='opacity')a.set(p,v);c.requestRenderAll();push()}
-$('#fill').oninput=e=>setP('fill',e.target.value);$('#stroke').oninput=e=>setP('stroke',e.target.value);
-$('#sw').oninput=e=>setP('strokeWidth',+e.target.value);$('#op').oninput=e=>setP('opacity',+e.target.value);
-$('#ff').onchange=e=>setP('fontFamily',e.target.value);$('#fs').oninput=e=>setP('fontSize',+e.target.value);
-$('#bold').onclick=()=>{const a=c.getActiveObject();a&&setP('fontWeight',a.fontWeight==='bold'?'normal':'bold')};
-$('#bg').oninput=e=>{c.backgroundColor=e.target.value;c.renderAll();push()};
-$('#preset').onchange=e=>size(...e.target.value.split(',').map(Number));
-[GOLD,INK,'#666666','#FFFFFF'].forEach(h=>{const b=document.createElement('button');b.className='sw';b.style.background=h;b.title=h;b.setAttribute('aria-label','Apply '+h);b.onclick=()=>setP('fill',h);$('#pal').append(b)});
-function sync(){const a=c.getActiveObject();if(!a)return;$('#op').value=a.opacity??1;if(a.fontSize)$('#fs').value=Math.round(a.fontSize);if(typeof a.fill==='string'&&/^#/.test(a.fill))$('#fill').value=a.fill}
-function layers(){const L=$('#layers');L.textContent='';const act=c.getActiveObject();
- c.getObjects().slice().reverse().forEach(o=>{const d=document.createElement('div');d.className='ly'+(act===o?' on':'');
-  const mk=(t,fn,l)=>{const b=document.createElement('button');b.textContent=t;b.setAttribute('aria-label',l);b.onclick=ev=>{ev.stopPropagation();fn()};return b};
-  const n=document.createElement('span');n.textContent=o.name||o.type;n.onclick=()=>{c.setActiveObject(o);c.requestRenderAll();layers()};
-  d.append(mk(o.visible===false?'○':'●',()=>{o.visible=o.visible===false;c.requestRenderAll();push()},'Toggle visibility'),n,
-   mk('↑',()=>{c.bringForward(o);push()},'Move up'),mk('↓',()=>{c.sendBackwards(o);push()},'Move down'),mk('✕',()=>{c.remove(o)},'Delete layer'));
-  L.append(d)})}
+/* PDF / AI import: embedded project > PDF layers (OCG) > vector > flat */
+let pdfPending=null;
+async function askPdf(buf,name){await lib('pdf');pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+ const d=await pdfjsLib.getDocument({data:new Uint8Array(buf.slice(0))}).promise;
+ try{const att=await d.getAttachments(),a=att&&Object.values(att).find(x=>/mte-project\.json$/i.test(x.filename));
+  if(a&&confirm('This PDF contains an editable MTE project. Restore it with all layers and live text?\n(Cancel imports the PDF pages instead.)')){hist=[];hi=-1;await restore(new TextDecoder().decode(a.content));push();return toast('Editable project restored from PDF.')}}catch(e){}
+ pdfPending={d,name};$('#pdfPg').max=d.numPages;$('#pdfPg').value=1;
+ let n=0;try{const o=await d.getOptionalContentConfig();for(const _ of o)n++}catch(e){}
+ $('#pdfInfo').textContent=`${d.numPages} page(s), ${n} PDF layer(s) found.`+(n?'':' No layers: Layers mode will import a flat page.');$('#pdfMode').value=n?'layers':'vector';$('#dPdf').showModal()}
+$('#pdfCancel').onclick=()=>$('#dPdf').close();
+$('#pdfGo').onclick=async()=>{$('#dPdf').close();const {d,name}=pdfPending;toast('Importing PDF…',true);try{await importPdf(d,name,$('#pdfMode').value,clamp(+$('#pdfPg').value||1,1,d.numPages))}catch(e){console.error(e);toast('PDF import failed: '+e.message)}};
+function trimCv(cv){const w=cv.width,h=cv.height,x=cv.getContext('2d'),d=x.getImageData(0,0,w,h).data;let x0=w,y0=h,x1=-1,y1=-1;
+ for(let y=0;y<h;y++)for(let i=0;i<w;i++)if(d[(y*w+i)*4+3]){if(i<x0)x0=i;if(i>x1)x1=i;if(y<y0)y0=y;if(y>y1)y1=y}
+ if(x1<0)return null;const o=document.createElement('canvas');o.width=x1-x0+1;o.height=y1-y0+1;o.getContext('2d').drawImage(cv,-x0,-y0);return{canvas:o,x:x0,y:y0,w:o.width,h:o.height}}
+async function importPdf(d,name,mode,pn){const pg=await d.getPage(pn),Q=2,vp1=pg.getViewport({scale:96/72}),vp=pg.getViewport({scale:96/72*Q});
+ const drawTo=async(occ)=>{const cv=document.createElement('canvas');cv.width=Math.ceil(vp.width);cv.height=Math.ceil(vp.height);
+  await pg.render({canvasContext:cv.getContext('2d'),viewport:vp,background:'rgba(0,0,0,0)',optionalContentConfigPromise:occ?Promise.resolve(occ):undefined}).promise;return cv};
+ const reset=()=>{lock=true;c.clear();c.backgroundColor='';D.W=Math.round(vp1.width);D.H=Math.round(vp1.height);D.unit='px';D.dpi=96;D.name=name.replace(/\.[^.]+$/,'');fit()};
+ const addCv=(cv,x,y,nm)=>c.add(new fabric.Image(cv,{left:x/Q,top:y/Q,scaleX:1/Q,scaleY:1/Q,name:nm}));
+ if(mode==='vector'&&window.pdfjsLib&&pdfjsLib.SVGGraphics){
+  const ops=await pg.getOperatorList(),g=new pdfjsLib.SVGGraphics(pg.commonObjs,pg.objs);g.embedFonts=true;const svg=await g.getSVG(ops,vp1);
+  reset();c.backgroundColor='#fff';lock=false;await importSvg(new XMLSerializer().serializeToString(svg),'',{asIs:true});return toast('Vector import done. Complex text and gradients may need cleanup; use Layers mode for exact looks.')}
+ if(mode==='layers'){let occ=null,ids=[];try{occ=await d.getOptionalContentConfig();ids=[...occ].map(([id,g])=>[id,g.name||id])}catch(e){}
+  if(ids.length){ids.forEach(([id])=>occ.setVisibility(id,false));const base=await drawTo(occ),bd=base.getContext('2d').getImageData(0,0,base.width,base.height);reset();c.backgroundColor='#fff';
+   const bt=trimCv(base);if(bt)addCv(bt.canvas,bt.x,bt.y,'Base (non-layer content)');
+   for(const [id,nm] of ids){ids.forEach(([i])=>occ.setVisibility(i,i===id));const cv=await drawTo(occ),ctx=cv.getContext('2d'),im=ctx.getImageData(0,0,cv.width,cv.height),a=im.data,b=bd.data;
+    for(let i=0;i<a.length;i+=4)if(a[i+3]&&a[i]===b[i]&&a[i+1]===b[i+1]&&a[i+2]===b[i+2]&&a[i+3]===b[i+3])a[i+3]=0;
+    ctx.putImageData(im,0,0);const t=trimCv(cv);if(t)addCv(t.canvas,t.x,t.y,nm)}
+   lock=false;fit();push();return toast(`Imported ${ids.length} PDF layers as editable layers.`)}
+  toast('No PDF layers found: importing as a flat page.')}
+ const cv=await drawTo(null);reset();c.backgroundColor='#fff';addCv(cv,0,0,name+' (page '+pn+')');lock=false;fit();push()}
 
-/* ---------- export ---------- */
-function render(fmt,transparent){const z=c.getZoom(),w=c.width,h=c.height,bg=c.backgroundColor,s=+$('#sc').value;
- c.discardActiveObject();c.setZoom(1);c.setDimensions({width:W,height:H});
- if(transparent)c.backgroundColor='';else if(!bg)c.backgroundColor='#ffffff';
- const out=fmt==='svg'?c.toSVG():c.toDataURL({format:fmt,quality:.92,multiplier:s});
- c.backgroundColor=bg;c.setZoom(z);c.setDimensions({width:w,height:h});c.renderAll();return out}
-const dl=(u,n)=>{const a=document.createElement('a');a.href=u;a.download=n;a.click()};
-$('#export').onclick=()=>{const f=$('#fmt').value,n='mte-design';
- if(f==='png-t')dl(render('png',true),n+'-transparent.png');
- else if(f==='png')dl(render('png'),n+'.png');
- else if(f==='jpg'||f==='jpeg')dl(render('jpeg'),n+'.'+f);
- else if(f==='webp')dl(render('webp'),n+'.webp');
- else if(f==='svg')dl(URL.createObjectURL(new Blob([render('svg')],{type:'image/svg+xml'})),n+'.svg');
- else if(f==='mte')dl(URL.createObjectURL(new Blob([hist[hi]],{type:'application/json'})),n+'.mte');
- else if(f==='pdf'){if(!need('PDF export',window.jspdf))return;const {jsPDF}=window.jspdf;
-  const p=new jsPDF({orientation:W>H?'l':'p',unit:'px',format:[W,H],hotfixes:['px_scaling']});
-  p.addImage(render('png'),'PNG',0,0,W,H);p.save(n+'.pdf')}};
+/* ===== export ===== */
+const dl=(u,n)=>{const a=document.createElement('a');a.href=u;a.download=n;document.body.append(a);a.click();a.remove()};
+function renderURL(fmt,transparent){const z=c.getZoom(),w=c.width,h=c.height,bg=c.backgroundColor,s=+$('#sc').value||1;
+ c.discardActiveObject();c.setZoom(1);c.setDimensions({width:D.W,height:D.H});
+ if(transparent)c.backgroundColor='';else if(!bg&&fmt==='jpeg')c.backgroundColor='#ffffff';
+ const out=c.toDataURL({format:fmt,quality:.92,multiplier:s});c.backgroundColor=bg;c.setZoom(z);c.setDimensions({width:w,height:h});c.renderAll();return out}
+async function layerCv(o,s){const sc=new fabric.StaticCanvas(null,{width:D.W*s,height:D.H*s,enableRetinaScaling:false,renderOnAddRemove:false});sc.setZoom(s);
+ const cl=await new Promise(r=>o.clone(r,PROPS));cl.set({opacity:1,globalCompositeOperation:'source-over',visible:true});sc.add(cl);sc.renderAll();return trimCv(sc.lowerCanvasEl)}
+/* --- layered PDF writer (optional-content layers, live base-14 text, embedded project) --- */
+const TE=new TextEncoder(),n3=v=>String(+(+v).toFixed(3));
+const pdfHex=s=>{let h='FEFF';for(const ch of s){const c=ch.codePointAt(0);if(c>0xFFFF){const x=c-0x10000;h+=(0xD800+(x>>10)).toString(16).padStart(4,'0')+(0xDC00+(x&1023)).toString(16).padStart(4,'0')}else h+=c.toString(16).padStart(4,'0')}return'<'+h+'>'};
+async function flate(u8){if(typeof CompressionStream==='undefined')return null;const cs=new CompressionStream('deflate'),w=cs.writable.getWriter();w.write(u8);w.close();return new Uint8Array(await new Response(cs.readable).arrayBuffer())}
+async function streamObj(dict,bytes){const z=await flate(bytes),b=z||bytes,h=TE.encode(`<< ${dict}${z?' /Filter /FlateDecode':''} /Length ${b.length} >>\nstream\n`),t=TE.encode('\nendstream'),o=new Uint8Array(h.length+b.length+t.length);o.set(h);o.set(b,h.length);o.set(t,h.length+b.length);return o}
+function pdfFile(objs,root,infoN){const parts=[],off=[];let len=0;const put=b=>{if(typeof b==='string')b=TE.encode(b);parts.push(b);len+=b.length};
+ put('%PDF-1.7\n%\u00e2\u00e3\u00cf\u00d3\n');objs.forEach((o,i)=>{off[i]=len;put((i+1)+' 0 obj\n');put(o);put('\nendobj\n')});
+ const x=len;put('xref\n0 '+(objs.length+1)+'\n0000000000 65535 f \n');off.forEach(o=>put(String(o).padStart(10,'0')+' 00000 n \n'));
+ put(`trailer\n<< /Size ${objs.length+1} /Root ${root} 0 R /Info ${infoN} 0 R >>\nstartxref\n${x}\n%%EOF\n`);return new Blob(parts,{type:'application/pdf'})}
+async function rgbaObj(cv,P){const w=cv.width,h=cv.height,d=cv.getContext('2d').getImageData(0,0,w,h).data,rgb=new Uint8Array(w*h*3),a=new Uint8Array(w*h);let ha=false;
+ for(let i=0,p=0,q=0;i<d.length;i+=4,p+=3,q++){rgb[p]=d[i];rgb[p+1]=d[i+1];rgb[p+2]=d[i+2];a[q]=d[i+3];if(a[q]!==255)ha=true}
+ let sm=0;if(ha){P.push(await streamObj(`/Type /XObject /Subtype /Image /Width ${w} /Height ${h} /ColorSpace /DeviceGray /BitsPerComponent 8`,a));sm=P.length}
+ P.push(await streamObj(`/Type /XObject /Subtype /Image /Width ${w} /Height ${h} /ColorSpace /DeviceRGB /BitsPerComponent 8${sm?` /SMask ${sm} 0 R`:''}`,rgb));return P.length}
+const WIN={'\u2018':145,'\u2019':146,'\u201C':147,'\u201D':148,'\u2022':149,'\u2013':150,'\u2014':151,'\u20AC':128,'\u2026':133};
+const pdfTxt=s=>[...s].map(ch=>{const k=ch.charCodeAt(0),v=WIN[ch]||(k<256?k:63);return v===40||v===41||v===92?'\\'+ch:v>=32&&v<127?ch:'\\'+v.toString(8).padStart(3,'0')}).join('');
+function pdfFont(o){const f=(o.fontFamily||'').toLowerCase(),b=o.fontWeight==='bold'||+o.fontWeight>=600,i=o.fontStyle==='italic'||o.fontStyle==='oblique',
+ fam=/courier|mono/.test(f)?'C':/times|georgia|garamond|palatino|serif/.test(f)&&!/sans/.test(f)?'T':'H';
+ return{H:['Helvetica','Helvetica-Bold','Helvetica-Oblique','Helvetica-BoldOblique'],T:['Times-Roman','Times-Bold','Times-Italic','Times-BoldItalic'],C:['Courier','Courier-Bold','Courier-Oblique','Courier-BoldOblique']}[fam][(b?1:0)+(i?2:0)]}
+const colOp=(hex,cm,stroke)=>{if(cm){const k=Math.min(...[0,1,2].map(i=>1-hex2rgb(hex)[i]/255));return(stroke?'':'')+cm.map(v=>n3(v/100)).join(' ')+(stroke?' K':' k')}return hex2rgb(hex).map(v=>n3(v/255)).join(' ')+(stroke?' RG':' rg')};
+function textOps(o,pt,PH,fontRes){const lines=(o._textLines||o.text.split('\n')).map(l=>Array.isArray(l)?l.join(''):l),sx=Math.abs(o.scaleX||1),sy=Math.abs(o.scaleY||1),
+ fs=o.fontSize*sy*pt,a=(o.angle||0)*Math.PI/180,co=Math.cos(a),si=Math.sin(a),tl=o.getPointByOrigin('left','top'),fn=pdfFont(o);
+ if(!fontRes.has(fn))fontRes.set(fn,'F'+(fontRes.size+1));
+ const hex=hexAny(o.fill),cm=(D.cm==='cmyk'||o.cmyk)?(o.cmyk||rgb2cmyk(...hex2rgb(hex))):null;let deco='',top=0,out=`BT\n${colOp(hex,cm)}\n/${fontRes.get(fn)} ${n3(fs)} Tf\n${n3(sx/sy*100)} Tz\n${n3((o.charSpacing||0)/1000*fs)} Tc\n`;
+ lines.forEach((ln,i)=>{const hl=o.getHeightOfLine(i),base=top+hl/o.lineHeight*(1-.222),lw=o.getLineWidth(i),
+  off=o.textAlign==='center'?(o.width-lw)/2:o.textAlign==='right'?o.width-lw:0,lx=off*sx,ly=base*sy,px=tl.x+lx*co-ly*si,py=tl.y+lx*si+ly*co;top+=hl;if(o.underline||o.linethrough||o.overline){const wd=lw*sx*pt;deco+=`q ${n3(co)} ${n3(-si)} ${n3(si)} ${n3(co)} ${n3(px*pt)} ${n3(PH-py*pt)} cm ${colOp(hex,cm)}\n`+(o.underline?`0 ${n3(-.12*fs)} ${n3(wd)} ${n3(fs/18)} re f\n`:'')+(o.linethrough?`0 ${n3(.28*fs)} ${n3(wd)} ${n3(fs/18)} re f\n`:'')+(o.overline?`0 ${n3(.8*fs)} ${n3(wd)} ${n3(fs/18)} re f\n`:'')+'Q\n'}
+  out+=`${n3(co)} ${n3(-si)} ${n3(si)} ${n3(co)} ${n3(px*pt)} ${n3(PH-py*pt)} Tm\n(${pdfTxt(ln)}) Tj\n`});return out+'ET'+(deco?'\n'+deco:'')}
+const PDFBM={multiply:'Multiply',screen:'Screen',overlay:'Overlay',darken:'Darken',lighten:'Lighten','color-dodge':'ColorDodge','color-burn':'ColorBurn','hard-light':'HardLight','soft-light':'SoftLight',difference:'Difference',exclusion:'Exclusion',hue:'Hue',saturation:'Saturation',color:'Color',luminosity:'Luminosity'};
+async function buildPdf({layered,live,embed}){const s=+$('#sc').value||1,pt=72/D.dpi,PW=D.W*pt,PH=D.H*pt;c.discardActiveObject();
+ const P=['','','','',''],ocgs=[],props=[],xo=[],gss=[],ops=[],fontRes=new Map();let nL=0;
+ const layer=name=>{P.push(`<< /Type /OCG /Name ${pdfHex(name)} >>`);ocgs.push(P.length);nL++;props.push(`/L${nL} ${P.length} 0 R`);return nL};
+ const gs=(op,bm)=>{if(op>=1&&!bm)return'';gss.push(`/G${gss.length+1} << /ca ${n3(op)} /CA ${n3(op)}${bm?' /BM /'+bm:''} >>`);return`/G${gss.length} gs `};
+ const bg=c.backgroundColor;
+ if(!layered){const cv=await(async()=>{const im=await loadImg(renderURL('png',false)),k=document.createElement('canvas');k.width=im.naturalWidth;k.height=im.naturalHeight;k.getContext('2d').drawImage(im,0,0);return k})();
+  const n=await rgbaObj(cv,P);xo.push(`/Im1 ${n} 0 R`);ops.push(`q ${n3(PW)} 0 0 ${n3(PH)} 0 0 cm /Im1 Do Q`)}
+ else{
+  if(typeof bg==='string'&&bg){const l=layer('Background'),hex=hexAny(bg);ops.push(`/OC /L${l} BDC q ${colOp(hex,D.cm==='cmyk'?rgb2cmyk(...hex2rgb(hex)):null)} 0 0 ${n3(PW)} ${n3(PH)} re f Q EMC`)}
+  else if(bg){const sc=new fabric.StaticCanvas(null,{width:D.W*s,height:D.H*s,enableRetinaScaling:false});sc.setZoom(s);sc.backgroundColor=bg;sc.renderAll();const n=await rgbaObj(sc.lowerCanvasEl,P),l=layer('Background');xo.push(`/Bg ${n} 0 R`);ops.push(`/OC /L${l} BDC q ${n3(PW)} 0 0 ${n3(PH)} 0 0 cm /Bg Do Q EMC`)}
+  let k=0;for(const o of c.getObjects()){if(o.visible===false)continue;k++;const nm=o.name||o.type,bm=PDFBM[o.globalCompositeOperation]||'',g=gs(o.opacity??1,bm);
+   const isTxt=/text/.test(o.type)&&typeof o.fill==='string'&&o.fill&&!o.stroke&&!o.clipPath&&!o.shadow;
+   if(live&&isTxt){const l=layer(nm);ops.push(`/OC /L${l} BDC q ${g}${textOps(o,pt,PH,fontRes)} Q EMC`);continue}
+   const r=await layerCv(o,s);if(!r)continue;const n=await rgbaObj(r.canvas,P),l=layer(nm);xo.push(`/Im${k} ${n} 0 R`);
+   ops.push(`/OC /L${l} BDC q ${g}${n3(r.w/s*pt)} 0 0 ${n3(r.h/s*pt)} ${n3(r.x/s*pt)} ${n3(PH-(r.y+r.h)/s*pt)} cm /Im${k} Do Q EMC`)}}
+ let names='',af='';
+ if(embed){const pj=await streamObj('/Type /EmbeddedFile /Subtype /application#2Fjson',TE.encode(snapshot()));P.push(pj);const ef=P.length;
+  P.push(`<< /Type /Filespec /F (mte-project.json) /UF (mte-project.json) /EF << /F ${ef} 0 R >> /Desc (Editable MTE Productive Studio project) >>`);names=`/Names << /EmbeddedFiles << /Names [(mte-project.json) ${P.length} 0 R] >> >>`}
+ const fonts=[...fontRes].map(([f,r])=>`/${r} << /Type /Font /Subtype /Type1 /BaseFont /${f} /Encoding /WinAnsiEncoding >>`).join(' ');
+ P[4]=await streamObj('',TE.encode(ops.join('\n')));
+ P[0]=`<< /Type /Catalog /Pages 2 0 R ${names}${ocgs.length?` /OCProperties << /OCGs [${ocgs.map(x=>x+' 0 R').join(' ')}] /D << /Order [${ocgs.slice().reverse().map(x=>x+' 0 R').join(' ')}] /ON [${ocgs.map(x=>x+' 0 R').join(' ')}] >> >>`:''} >>`;
+ P[1]='<< /Type /Pages /Kids [3 0 R] /Count 1 >>';
+ P[2]=`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${n3(PW)} ${n3(PH)}] /Contents 5 0 R /Resources << /XObject << ${xo.join(' ')} >> /Properties << ${props.join(' ')} >> /ExtGState << ${gss.join(' ')} >> /Font << ${fonts} >> >> >>`;
+ const now=new Date().toISOString().replace(/[-:T]/g,'').slice(0,14);
+ P[3]=`<< /Title ${pdfHex(D.name||'Untitled')} /Producer (MTE Productive Studio v${VERSION}) /Creator (MTE Productive Studio) /CreationDate (D:${now}Z) >>`;
+ return pdfFile(P,1,4)}
+/* --- PSD writer (live text layers, blend modes, opacity) --- */
+async function buildPsd(live){await lib('psd');const s=+$('#sc').value||1,ch=[];c.discardActiveObject();
+ const bgc=document.createElement('canvas');bgc.width=D.W*s;bgc.height=D.H*s;const bx=bgc.getContext('2d');
+ if(c.backgroundColor){const sc=new fabric.StaticCanvas(null,{width:D.W*s,height:D.H*s,enableRetinaScaling:false});sc.setZoom(s);sc.backgroundColor=c.backgroundColor;sc.renderAll();bx.drawImage(sc.lowerCanvasEl,0,0);ch.push({name:'Background',canvas:bgc,left:0,top:0})}
+ for(const o of c.getObjects()){const r=await layerCv(o,s);if(!r)continue;
+  const L={name:o.name||o.type,left:r.x,top:r.y,canvas:r.canvas,opacity:o.opacity??1,hidden:o.visible===false,blendMode:blendToPsd(o.globalCompositeOperation)};
+  if(live&&/text/.test(o.type)&&typeof o.fill==='string'){const [R,G,B]=hex2rgb(hexAny(o.fill)),fs=o.fontSize*Math.abs(o.scaleY||1)*s,tl=o.getPointByOrigin('left','top'),b=/bold/i.test(o.fontWeight)||+o.fontWeight>=600;
+   const fam=(o.fontFamily||'Arial').replace(/\s/g,'');L.text={text:o.text.replace(/\n/g,'\r'),transform:[1,0,0,1,tl.x*s,tl.y*s+fs],antiAlias:'smooth',orientation:'horizontal',style:{font:{name:fam+(b&&o.fontStyle==='italic'?'-BoldItalic':b?'-Bold':o.fontStyle==='italic'?'-Italic':'MT')},fontSize:fs,fillColor:{r:R,g:G,b:B},underline:!!o.underline,strikethrough:!!o.linethrough},paragraphStyle:{justification:o.textAlign||'left'}}}
+  ch.push(L)}
+ const buf=agPsd.writePsd({width:D.W*s,height:D.H*s,children:ch},{generateThumbnail:true});return new Blob([buf],{type:'image/vnd.adobe.photoshop'})}
+async function saveProject(as){const data=snapshot(),n=(D.name||'mte-design').replace(/[^\w\- ]+/g,'')||'mte-design';
+ try{if(window.showSaveFilePicker){if(!fh||as)fh=await showSaveFilePicker({suggestedName:n+'.mte',types:[{description:'MTE project',accept:{'application/json':['.mte']}}]});const w=await fh.createWritable();await w.write(data);await w.close()}
+ else dl(URL.createObjectURL(new Blob([data],{type:'application/json'})),n+'.mte');
+ dirty=false;$('#dirty').textContent='';toast('Saved '+n+'.mte')}catch(e){if(e.name!=='AbortError')toast('Save failed: '+e.message)}}
+$('#bSave').onclick=()=>saveProject();$('#bSaveAs').onclick=()=>saveProject(true);
+addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'&&document.body.dataset.ws==='design'){e.preventDefault();saveProject(e.shiftKey)}});
+$('#export').onclick=async()=>{const f=$('#fmt').value,n=D.name||'mte-design';toast('Exporting…',true);
+ try{
+  if(f==='png-t')dl(renderURL('png',true),n+'-transparent.png');
+  else if(f==='png')dl(renderURL('png'),n+'.png');
+  else if(f==='jpg'||f==='jpeg')dl(renderURL('jpeg'),n+'.'+f);
+  else if(f==='webp')dl(renderURL('webp'),n+'.webp');
+  else if(f==='svg')dl(URL.createObjectURL(new Blob([svgDoc()],{type:'image/svg+xml'})),n+'.svg');
+  else if(f==='mte')dl(URL.createObjectURL(new Blob([snapshot()],{type:'application/json'})),n+'.mte');
+  else if(f==='pdf'||f==='pdf-l'||f==='ai'){const b=await buildPdf({layered:f!=='pdf',live:$('#xlive').checked,embed:$('#xproj').checked});dl(URL.createObjectURL(b),n+(f==='ai'?'.ai':f==='pdf'?'.pdf':'-layered.pdf'))}
+  else if(f==='psd')dl(URL.createObjectURL(await buildPsd($('#xlive').checked)),n+'.psd');
+  toast('Exported '+f.toUpperCase());fit()}catch(e){console.error(e);toast('Export failed: '+e.message);fit()}};
 
-/* ---------- boot: restore, offline, updates ---------- */
-try{const s=localStorage.getItem('mte-doc');if(s){restore(s);hist=[s];hi=0}else{fit();push()}}catch(e){fit();push()}
-if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').then(r=>{
- r.addEventListener('updatefound',()=>{const w=r.installing;w.addEventListener('statechange',()=>{
-  if(w.state==='installed'&&navigator.serviceWorker.controller){const t=$('#toast');t.innerHTML='';const b=document.createElement('button');
-   b.textContent='Update ready. Reload';b.className='pri';b.onclick=()=>w.postMessage('skip');t.append(b);t.style.display='block'}})});
- navigator.serviceWorker.addEventListener('controllerchange',()=>location.reload())}));
+/* ===== theme, shapes + lines, fonts, brushes (v0.0.4) ===== */
+const setTheme=t=>{document.documentElement.dataset.theme=t;try{localStorage.setItem('mte-theme',t)}catch(e){}document.querySelector('meta[name=theme-color]').content=t==='light'?'#f4f3ef':'#1A1A1A';$('#bTheme').textContent=t==='light'?'\u263E':'\u2600'};
+$('#bTheme').onclick=()=>setTheme(document.documentElement.dataset.theme==='light'?'dark':'light');setTheme(document.documentElement.dataset.theme||'dark');
+let brushOn=false;
+const ICON=(inner,line)=>`<svg viewBox="0 0 40 24" width="40" height="24" fill="${line?'none':'currentColor'}" stroke="${line?'currentColor':'none'}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${inner}</svg>`;
+const ringPts=(n,R,r,rot)=>[...Array(n*(r?2:1))].map((_,i)=>{const a=rot+i*Math.PI/n*(r?1:2),k=r&&i%2?r:R;return{x:Math.cos(a)*k,y:Math.sin(a)*k}});
+const pstr=(pts,k)=>pts.map(p=>(20+p.x*k).toFixed(1)+','+(12+p.y*k).toFixed(1)).join(' ');
+const poly=(pts,name)=>new fabric.Polygon(pts,{fill:GOLD,name});
+const LN=(d,name,o)=>new fabric.Path(d,Object.assign({fill:'',stroke:INK,strokeWidth:6,strokeLineCap:'round',strokeLineJoin:'round',name},o));
+const zig=()=>{let d='M0 30';for(let i=1;i<=10;i++)d+=` L${i*30} ${i%2?0:30}`;return d};
+const wave=()=>{let d='M0 20';for(let i=0;i<6;i++)d+=` Q${i*50+25} ${i%2?60:-20} ${i*50+50} 20`;return d};
+const SHAPES=[
+ ['Rectangle',ICON('<rect x="6" y="4" width="28" height="16"/>'),()=>new fabric.Rect({width:300,height:200,fill:GOLD,name:'Rectangle'})],
+ ['Rounded',ICON('<rect x="6" y="4" width="28" height="16" rx="6"/>'),()=>new fabric.Rect({width:300,height:200,rx:28,ry:28,fill:GOLD,name:'Rounded rectangle'})],
+ ['Ellipse',ICON('<ellipse cx="20" cy="12" rx="14" ry="9"/>'),()=>new fabric.Ellipse({rx:120,ry:120,fill:GOLD,name:'Ellipse'})],
+ ['Triangle',ICON('<path d="M20 3 L35 21 H5 Z"/>'),()=>new fabric.Triangle({width:240,height:210,fill:GOLD,name:'Triangle'})],
+ ['Star',ICON('<polygon points="'+pstr(ringPts(5,10,4.2,-Math.PI/2),1)+'"/>'),()=>poly(ringPts(5,130,56,-Math.PI/2),'Star')],
+ ['Hexagon',ICON('<polygon points="'+pstr(ringPts(6,10,0,0),1)+'"/>'),()=>poly(ringPts(6,130,0,0),'Hexagon')]];
+const LINES=[
+ ['Straight',ICON('<line x1="4" y1="12" x2="36" y2="12"/>',1),()=>LN('M0 0 L300 0','Line')],
+ ['Dashed',ICON('<line x1="4" y1="12" x2="36" y2="12" stroke-dasharray="6 4"/>',1),()=>LN('M0 0 L300 0','Dashed line',{strokeDashArray:[22,14]})],
+ ['Dotted',ICON('<line x1="4" y1="12" x2="36" y2="12" stroke-dasharray="0.1 5"/>',1),()=>LN('M0 0 L300 0','Dotted line',{strokeDashArray:[0.1,15]})],
+ ['Arrow',ICON('<path d="M4 12 H36 M29 6 L36 12 L29 18"/>',1),()=>LN('M0 0 L300 0 M274 -22 L300 0 L274 22','Arrow')],
+ ['Double arrow',ICON('<path d="M4 12 H36 M11 6 L4 12 L11 18 M29 6 L36 12 L29 18"/>',1),()=>LN('M0 0 L300 0 M26 -22 L0 0 L26 22 M274 -22 L300 0 L274 22','Double arrow')],
+ ['Curve',ICON('<path d="M4 18 Q20 -6 36 18"/>',1),()=>LN('M0 90 Q150 -90 300 90','Curve')],
+ ['Zigzag',ICON('<path d="M3 17 L9 7 L15 17 L21 7 L27 17 L33 7 L37 13"/>',1),()=>LN(zig(),'Zigzag')],
+ ['Wave',ICON('<path d="M3 12 Q9 2 15 12 T27 12 T37 12"/>',1),()=>LN(wave(),'Wave')]];
+const menu=$('#shapeMenu');
+const sec=(t,list)=>{const h=document.createElement('div');h.className='mh';h.textContent=t;menu.append(h);
+ list.forEach(([label,ico,mk])=>{const b=document.createElement('button');b.setAttribute('role','menuitem');b.innerHTML=ico+'<span></span>';b.lastChild.textContent=label;
+  b.onclick=()=>{place(mk(),false);menu.hidden=true;$('#bShapes').setAttribute('aria-expanded','false')};menu.append(b)})};
+sec('Shapes',SHAPES);sec('Lines',LINES);
+$('#bShapes').onclick=e=>{e.stopPropagation();if(brushOn)toggleBrush();menu.hidden=!menu.hidden;$('#bShapes').setAttribute('aria-expanded',String(!menu.hidden));if(menu.hidden)return;
+ const r=e.currentTarget.getBoundingClientRect(),mob=innerWidth<=800;
+ menu.style.left=Math.max(6,Math.min(mob?r.left:r.right+6,innerWidth-menu.offsetWidth-6))+'px';
+ menu.style.top=Math.max(6,Math.min(mob?r.top-menu.offsetHeight-6:r.top,innerHeight-menu.offsetHeight-6))+'px'};
+document.addEventListener('click',e=>{if(!menu.hidden&&!menu.contains(e.target)){menu.hidden=true;$('#bShapes').setAttribute('aria-expanded','false')}});
+/* assets kept on this device: imported fonts and brush tips */
+const IDB=()=>new Promise((res,rej)=>{const r=indexedDB.open('mte-assets',1);r.onupgradeneeded=()=>{r.result.createObjectStore('fonts',{keyPath:'name'});r.result.createObjectStore('tips',{keyPath:'name'})};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+const idbPut=async(st,v)=>{const d=await IDB();return new Promise((res,rej)=>{const t=d.transaction(st,'readwrite');t.objectStore(st).put(v);t.oncomplete=res;t.onerror=()=>rej(t.error)})};
+const idbAll=async st=>{const d=await IDB();return new Promise((res,rej)=>{const q=d.transaction(st).objectStore(st).getAll();q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})};
+async function addFont(name,buf,save){const ff=new FontFace(name,buf.slice(0));await ff.load();document.fonts.add(ff);
+ if(![...$('#ff').options].some(o=>o.value===name))$('#ff').add(new Option(name,name));
+ c.getObjects().forEach(o=>{if(o.fontFamily===name){o.dirty=true;o.initDimensions&&o.initDimensions()}});c.requestRenderAll();if(save)await idbPut('fonts',{name,buf})}
+$('#fontImp').onclick=()=>$('#fontFile').click();
+$('#fontFile').onchange=async e=>{const fs=[...e.target.files];e.target.value='';let last='';
+ for(const f of fs){try{const name=f.name.replace(/\.[^.]+$/,'').replace(/[-_]+/g,' ').trim()||'Custom font';await addFont(name,await f.arrayBuffer(),true);last=name}catch(err){toast('Could not load '+f.name+': '+err.message)}}
+ if(last){$('#ff').value=last;if(c.getActiveObject())setP('fontFamily',last);toast('Font added: '+last+'. It stays on this device.')}};
+idbAll('fonts').then(a=>a.forEach(f=>addFont(f.name,f.buf,false).catch(()=>{}))).catch(()=>{});
+/* brushes: built-in Fabric brushes + a stamp brush with tips (built-in or imported) */
+fabric.StampBrush=fabric.util.createClass(fabric.BaseBrush,{
+ initialize(canvas){this.canvas=canvas;this.pts=[]},configure(o){Object.assign(this,o)},
+ _tint(){const n=this.tip.width||128,t=document.createElement('canvas');t.width=t.height=n;const x=t.getContext('2d');x.drawImage(this.tip,0,0,n,n);x.globalCompositeOperation='source-in';x.fillStyle=this.color;x.fillRect(0,0,n,n);this.tinted=t},
+ _put(ctx,s,top){ctx.save();if(top){const v=this.canvas.viewportTransform;ctx.transform(v[0],v[1],v[2],v[3],v[4],v[5])}ctx.translate(s.x,s.y);ctx.rotate(s.r);ctx.drawImage(this.tinted,-s.s/2,-s.s/2,s.s,s.s);ctx.restore()},
+ _stamp(p,a){const j=this.jitter/100,sc=this.scatter/100*this.size,s={x:p.x+(Math.random()-.5)*2*sc,y:p.y+(Math.random()-.5)*2*sc,s:Math.max(1,this.size*(1-j*Math.random())),r:this.follow?a:0};this.pts.push(s);this._put(this.canvas.contextTop,s,true)},
+ onMouseDown(p){this.pts=[];this.last=p;this._tint();this.canvas.upperCanvasEl.style.opacity=this.alpha;this._stamp(p,0)},
+ onMouseMove(p){const dx=p.x-this.last.x,dy=p.y-this.last.y,d=Math.hypot(dx,dy),st=Math.max(1,this.size*this.spacing/100);if(d<st)return;
+  const a=Math.atan2(dy,dx),n=Math.floor(d/st);for(let i=1;i<=n;i++){const t=i*st/d;this._stamp({x:this.last.x+dx*t,y:this.last.y+dy*t},a)}
+  this.last={x:this.last.x+dx*n*st/d,y:this.last.y+dy*n*st/d}},
+ onMouseUp(){const cv0=this.canvas;cv0.upperCanvasEl.style.opacity='';cv0.clearContext(cv0.contextTop);if(!this.pts.length)return false;
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;this.pts.forEach(s=>{const h=s.s*.75;x0=Math.min(x0,s.x-h);y0=Math.min(y0,s.y-h);x1=Math.max(x1,s.x+h);y1=Math.max(y1,s.y+h)});
+  const cv=document.createElement('canvas');cv.width=Math.max(1,Math.ceil(x1-x0));cv.height=Math.max(1,Math.ceil(y1-y0));const x=cv.getContext('2d');x.translate(-x0,-y0);this.pts.forEach(s=>this._put(x,s,false));
+  cv0.add(new fabric.Image(cv,{left:x0,top:y0,opacity:this.alpha,name:this.label,globalCompositeOperation:this.blend}));cv0.requestRenderAll();this.pts=[];return false}});
+const mkTip=f=>{const cv=document.createElement('canvas');cv.width=cv.height=128;f(cv.getContext('2d'));return cv};
+const TIPS={
+ soft:mkTip(x=>{const g=x.createRadialGradient(64,64,0,64,64,64);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,128,128)}),
+ chalk:mkTip(x=>{for(let i=0;i<1800;i++){const a=Math.random()*6.283,r=Math.sqrt(Math.random())*62;x.fillStyle=`rgba(255,255,255,${.25+Math.random()*.75})`;x.fillRect(64+Math.cos(a)*r,64+Math.sin(a)*r,1+Math.random()*2.2,1+Math.random()*2.2)}}),
+ splat:mkTip(x=>{for(let i=0;i<34;i++){const a=Math.random()*6.283,r=Math.random()*54;x.beginPath();x.arc(64+Math.cos(a)*r,64+Math.sin(a)*r,1+Math.random()*(i<6?14:5),0,7);x.fillStyle='#fff';x.fill()}}),
+ dry:mkTip(x=>{for(let i=0;i<46;i++){const px=8+Math.random()*112;x.strokeStyle=`rgba(255,255,255,${.3+Math.random()*.7})`;x.lineWidth=1+Math.random()*2.5;x.beginPath();x.moveTo(px,12+Math.random()*10);x.lineTo(px+(Math.random()-.5)*6,116-Math.random()*10);x.stroke()}})};
+const userTips={};
+[['hard','Hard round'],['soft','Soft round'],['marker','Marker'],['air','Airbrush'],['dots','Dots'],['tip:soft','Soft stamp'],['tip:chalk','Chalk'],['tip:splat','Splatter'],['tip:dry','Dry bristle']].forEach(([v,t])=>$('#bpre').add(new Option(t,v)));
+function setBrush(){const k=$('#bpre').value,col=$('#bcol').value,sz=+$('#bsz').value,al=+$('#bop').value;let b;
+ if(/^(tip|user):/.test(k)){b=new fabric.StampBrush(c);b.configure({tip:k.startsWith('tip:')?TIPS[k.slice(4)]:userTips[k.slice(5)],color:col,size:sz,alpha:al,spacing:+$('#bsp').value,scatter:+$('#bsc').value,jitter:+$('#bjt').value,follow:$('#bfollow').checked,blend:$('#bblend').value,label:'Brush: '+$('#bpre').selectedOptions[0].text})}
+ else if(k==='air'){b=new fabric.SprayBrush(c);b.width=sz*1.5;b.density=25;b.dotWidth=2;b.dotWidthVariance=1;b.randomOpacity=true;b.color=col}
+ else if(k==='dots'){b=new fabric.CircleBrush(c);b.width=sz;b.color=col}
+ else{b=new fabric.PencilBrush(c);b.width=sz;b.color=col;b.strokeLineCap=k==='marker'?'square':'round';b.shadow=k==='soft'?new fabric.Shadow({blur:sz*.9,color:col,offsetX:0,offsetY:0}):null}
+ c.freeDrawingBrush=b}
+function toggleBrush(){if(!brushOn)try{T6.stop()}catch(e){}brushOn=!brushOn;c.isDrawingMode=brushOn;$('#brushSec').hidden=!brushOn;$('#bBrush').classList.toggle('on',brushOn);
+ if(brushOn){if(selM)setSelM(null);c.discardActiveObject();menu.hidden=true;setBrush();c.requestRenderAll()}}
+add.brush=toggleBrush;
+['bpre','bcol','bsz','bop','bsp','bsc','bjt','bfollow','bblend'].forEach(id=>['input','change'].forEach(ev=>$('#'+id).addEventListener(ev,()=>{if(id==='bpre'&&$('#bpre').value==='tip:dry')$('#bfollow').checked=true;if(brushOn)setBrush()})));
+c.on('path:created',e=>{const o=e.path;if(!o)return;o.set({name:'Brush stroke',opacity:+$('#bop').value,globalCompositeOperation:$('#bblend').value});c.requestRenderAll();push()});
+function toTip(img){const k=Math.min(256/img.width,256/img.height,1),w=Math.max(1,Math.round(img.width*k)),h=Math.max(1,Math.round(img.height*k)),cv=document.createElement('canvas');cv.width=w;cv.height=h;const x=cv.getContext('2d');x.drawImage(img,0,0,w,h);
+ const d=x.getImageData(0,0,w,h),p=d.data;let alpha=false;for(let i=3;i<p.length;i+=4)if(p[i]<250){alpha=true;break}
+ for(let i=0;i<p.length;i+=4){const a=alpha?p[i+3]:(255-(.299*p[i]+.587*p[i+1]+.114*p[i+2]))*(p[i+3]/255);p[i]=p[i+1]=p[i+2]=255;p[i+3]=a}x.putImageData(d,0,0);
+ const sq=document.createElement('canvas');sq.width=sq.height=128;const m=Math.max(w,h),ww=w/m*128,hh=h/m*128;sq.getContext('2d').drawImage(cv,(128-ww)/2,(128-hh)/2,ww,hh);return sq}
+const tipMeta={};
+function addTip(name,cv,save,spacing){userTips[name]=cv;if(spacing)tipMeta[name]={spacing};if(![...$('#bpre').options].some(o=>o.value==='user:'+name))$('#bpre').add(new Option('Tip: '+name,'user:'+name));if(save)idbPut('tips',{name,url:cv.toDataURL('image/png'),spacing}).catch(()=>{})}
+$('#bimp').onclick=()=>$('#bfile').click();
+$('#bfile').onchange=e=>{const fs=[...e.target.files];e.target.value='';fs.forEach(f=>{
+ if(/\.abr$/i.test(f.name))return importAbr(f);
+ const im=new Image();im.onload=()=>{const name=f.name.replace(/\.[^.]+$/,'');addTip(name,toTip(im),true);$('#bpre').value='user:'+name;if(brushOn)setBrush();toast('Brush tip added: '+name)};im.onerror=()=>toast('Could not read '+f.name);im.src=URL.createObjectURL(f)})};
+idbAll('tips').then(a=>a.forEach(t=>{const im=new Image();im.onload=()=>{const sq=document.createElement('canvas'),n=im.width||128;sq.width=sq.height=n;sq.getContext('2d').drawImage(im,0,0,n,n);addTip(t.name,sq,false,t.spacing)};im.src=t.url})).catch(()=>{});
+
+/* ===== Selection, copy / cut / paste (v0.0.5) ===== */
+let SX=null,selM=null,selDrag=false,selOff=0,clipPx=null,clipObj=null,clipLast='';
+const selOv=document.createElement('canvas');selOv.id='selOv';c.wrapperEl.append(selOv);
+const selBox=s=>{if(s.t==='poly'){let a=1e9,b=1e9,c2=-1e9,d=-1e9;s.polys.forEach(P=>P.forEach(p=>{a=Math.min(a,p[0]);b=Math.min(b,p[1]);c2=Math.max(c2,p[0]);d=Math.max(d,p[1])}));return{x0:a,y0:b,x1:c2,y1:d}}if(s.t==='lasso'){const xs=s.pts.map(p=>p.x),ys=s.pts.map(p=>p.y);return{x0:Math.min(...xs),y0:Math.min(...ys),x1:Math.max(...xs),y1:Math.max(...ys)}}return{x0:Math.min(s.x0,s.x1),y0:Math.min(s.y0,s.y1),x1:Math.max(s.x0,s.x1),y1:Math.max(s.y0,s.y1)}};
+function selPath(x,s,k,ox,oy){const X=v=>(v-ox)*k,Y=v=>(v-oy)*k;x.beginPath();
+ if(s.t==='ell'){const b=selBox(s);x.ellipse(X((b.x0+b.x1)/2),Y((b.y0+b.y1)/2),Math.max(.5,(b.x1-b.x0)/2*k),Math.max(.5,(b.y1-b.y0)/2*k),0,0,Math.PI*2)}
+ else if(s.t==='poly'){s.polys.forEach(P=>{P.forEach((p,i)=>i?x.lineTo(X(p[0]),Y(p[1])):x.moveTo(X(p[0]),Y(p[1])));x.closePath()})}else if(s.t==='lasso'){s.pts.forEach((p,i)=>i?x.lineTo(X(p.x),Y(p.y)):x.moveTo(X(p.x),Y(p.y)));x.closePath()}
+ else{const b=selBox(s);x.rect(X(b.x0),Y(b.y0),(b.x1-b.x0)*k,(b.y1-b.y0)*k)}}
+function selOvSize(){const d=devicePixelRatio||1;selOv.width=Math.max(1,Math.round(c.width*d));selOv.height=Math.max(1,Math.round(c.height*d));selOv.style.width=c.width+'px';selOv.style.height=c.height+'px';selDraw()}
+function selDraw(){const x=selOv.getContext('2d'),d=devicePixelRatio||1;x.clearRect(0,0,selOv.width,selOv.height);if(!SX)return;const k=c.getZoom()*d;
+ x.lineWidth=Math.max(1,d);x.setLineDash([6*d,6*d]);selPath(x,SX,k,0,0);x.strokeStyle='#000';x.lineDashOffset=-selOff*d;x.stroke();x.strokeStyle='#fff';x.lineDashOffset=(6-selOff)*d;x.stroke()}
+setInterval(()=>{if(SX){selOff=(selOff+1)%12;selDraw()}},120);
+const selLp=e=>{const r=selOv.getBoundingClientRect(),z=c.getZoom();return{x:(e.clientX-r.left)/z,y:(e.clientY-r.top)/z}};
+selOv.onpointerdown=e=>{if(!selM)return;selOv.setPointerCapture(e.pointerId);const p=selLp(e);selDrag=true;osPrev=SX;SX=selM==='lasso'?{t:'lasso',pts:[p]}:{t:selM,x0:p.x,y0:p.y,x1:p.x,y1:p.y};selDraw()};
+selOv.onpointermove=e=>{if(!selDrag)return;const p=selLp(e);if(SX.t==='lasso')SX.pts.push(p);else{SX.x1=p.x;SX.y1=p.y}selDraw()};
+selOv.onpointerup=()=>{if(!selDrag)return;selDrag=false;const b=SX&&selBox(SX);if(selM==='obj'&&b){objDone(b);return}if(!b||b.x1-b.x0<2||b.y1-b.y0<2)SX=null;selDraw()};
+function setSelM(m){if(m)try{T6.stop()}catch(e){}selM=m;selOv.style.pointerEvents=m?'auto':'none';selOv.style.cursor=m?'crosshair':'default';$('#bSel').classList.toggle('on',!!m);$('#objSec').hidden=m!=='obj';if(m&&brushOn)toggleBrush()}
+const imgMul=o=>o.type==='image'?Math.min(4,Math.max(1,1/Math.min(Math.abs(o.scaleX||1),Math.abs(o.scaleY||1)))):2;
+function layerRaster(o,mul){const keep={opacity:o.opacity,globalCompositeOperation:o.globalCompositeOperation,visible:o.visible,shadow:o.shadow};o.set({opacity:1,globalCompositeOperation:'source-over',visible:true,shadow:null});
+ const r=o.getBoundingRect(true,true);fxNoFx++;let cv;try{cv=o.toCanvasElement({multiplier:mul})}finally{fxNoFx--}o.set(keep);return{cv,r}}
+function fullComposite(){const z=c.getZoom(),w=c.width,h=c.height;c.discardActiveObject();c.setZoom(1);c.setDimensions({width:D.W,height:D.H});const el=c.toCanvasElement(1);c.setZoom(z);c.setDimensions({width:w,height:h});c.renderAll();return el}
+function selCopy(o,merged){if(!SX)return null;const b=selBox(SX);let src,r,mul;
+ if(merged){mul=1;src=fullComposite();r={left:0,top:0,width:D.W,height:D.H}}else{mul=imgMul(o);const lr=layerRaster(o,mul);src=lr.cv;r=lr.r}
+ const x0=Math.max(b.x0,r.left),y0=Math.max(b.y0,r.top),x1=Math.min(b.x1,r.left+r.width),y1=Math.min(b.y1,r.top+r.height);if(x1-x0<1||y1-y0<1)return null;
+ const out=document.createElement('canvas');out.width=Math.ceil((x1-x0)*mul);out.height=Math.ceil((y1-y0)*mul);const x=out.getContext('2d');
+ x.save();selPath(x,SX,mul,x0,y0);x.clip();x.drawImage(src,(r.left-x0)*mul,(r.top-y0)*mul);x.restore();return{cv:out,left:x0,top:y0,mul}}
+function selErase(o){const mul=imgMul(o),{cv,r}=layerRaster(o,mul),x=cv.getContext('2d');x.save();x.globalCompositeOperation='destination-out';selPath(x,SX,mul,r.left,r.top);x.fill();x.restore();
+ const img=new fabric.Image(cv,{left:r.left,top:r.top,scaleX:1/mul,scaleY:1/mul,name:o.name||'Layer',opacity:o.opacity,globalCompositeOperation:o.globalCompositeOperation,shadow:o.shadow,visible:o.visible}),i=c.getObjects().indexOf(o);
+ if(o.fx)img.fx=o.fx;lock=true;c.remove(o);c.insertAt(img,i,false);lock=false;c.setActiveObject(img);c.requestRenderAll();push()}
+function setClip(it){clipPx=it;clipLast='px';try{it.cv.toBlob(b=>b&&navigator.clipboard&&window.ClipboardItem&&navigator.clipboard.write([new ClipboardItem({'image/png':b})]).catch(()=>{}))}catch(e){}}
+function addClipImg(it,inPlace,name){const cv=document.createElement('canvas');cv.width=it.cv.width;cv.height=it.cv.height;cv.getContext('2d').drawImage(it.cv,0,0);
+ const img=new fabric.Image(cv,{left:it.left,top:it.top,scaleX:1/it.mul,scaleY:1/it.mul,name});c.add(img);
+ if(!inPlace){const b=SX?selBox(SX):{x0:0,y0:0,x1:D.W,y1:D.H};img.set({left:(b.x0+b.x1)/2-img.getScaledWidth()/2,top:(b.y0+b.y1)/2-img.getScaledHeight()/2})}
+ img.setCoords();c.setActiveObject(img);c.requestRenderAll();push()}
+function pasteObjs(){if(!clipObj)return;clipObj.clone(cl=>{c.discardActiveObject();cl.set({left:cl.left+24,top:cl.top+24,evented:true});
+ if(cl.type==='activeSelection'){cl.canvas=c;cl.forEachObject(o=>c.add(o));cl.setCoords()}else c.add(cl);clipObj.set({left:clipObj.left+24,top:clipObj.top+24});c.setActiveObject(cl);c.requestRenderAll();push()},PROPS)}
+const needLayer=()=>{const o=c.getActiveObject();if(!o||o.type==='activeSelection'){toast('Pick one layer in the Layers panel first.');return null}return o};
+const SXops={
+ copy(){if(!SX){const a=c.getActiveObject();if(!a)return toast('Nothing selected.');a.clone(cl=>{clipObj=cl;clipLast='obj';toast('Layer copied')},PROPS);return}
+  const o=needLayer();if(!o)return;const r=selCopy(o);r?(setClip(r),toast('Copied')):toast('The selection does not overlap this layer.')},
+ merged(){if(!SX)return toast('Make a selection first.');const r=selCopy(null,true);r?(setClip(r),toast('Copied merged')):toast('Nothing to copy there.')},
+ cut(){if(!SX){const a=c.getActiveObject();if(!a)return toast('Nothing selected.');a.clone(cl=>{clipObj=cl;clipLast='obj';a.type==='activeSelection'?c.getActiveObjects().forEach(o=>c.remove(o)):c.remove(a);c.discardActiveObject();toast('Layer cut')},PROPS);return}
+  const o=needLayer();if(!o)return;const r=selCopy(o);if(!r)return toast('The selection does not overlap this layer.');setClip(r);selErase(o);toast('Cut')},
+ paste(){if(clipLast==='obj')pasteObjs();else if(clipPx)addClipImg(clipPx,false,'Pasted layer');else toast('Nothing to paste.')},
+ pasteIn(){if(clipLast==='obj')pasteObjs();else if(clipPx)addClipImg(clipPx,true,'Pasted layer');else toast('Nothing to paste.')},
+ viaCopy(){if(!SX)return toast('Make a selection first.');const o=needLayer();if(!o)return;const r=selCopy(o);r?addClipImg(r,true,'Layer via copy'):toast('The selection does not overlap this layer.')},
+ viaCut(){if(!SX)return toast('Make a selection first.');const o=needLayer();if(!o)return;const r=selCopy(o);if(!r)return toast('The selection does not overlap this layer.');selErase(o);addClipImg(r,true,'Layer via cut')},
+ clear(){if(!SX)return;const o=needLayer();if(o)selErase(o)},
+ all(){SX={t:'rect',x0:0,y0:0,x1:D.W,y1:D.H};selDraw()},none(){SX=null;selDraw()}};
+addEventListener('paste',e=>{if(document.body.dataset.ws!=='design'||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;const f=[...(e.clipboardData?.files||[])].find(f=>/^image\//.test(f.type));
+ if(f){e.preventDefault();fabric.Image.fromURL(URL.createObjectURL(f),i=>{i.set('name','Pasted image');place(i)})}});
+function popAt(m,btn){m.hidden=false;const r=btn.getBoundingClientRect(),mob=innerWidth<=800;
+ m.style.left=Math.max(6,Math.min(mob?r.left:r.right+6,innerWidth-m.offsetWidth-6))+'px';m.style.top=Math.max(6,Math.min(mob?r.top-m.offsetHeight-6:r.top,innerHeight-m.offsetHeight-6))+'px'}
+const selMenu=$('#selMenu');
+[['Object select (move layers)','',()=>setSelM(null)],['Rectangular marquee','',()=>setSelM('rect')],['Elliptical marquee','',()=>setSelM('ell')],['Lasso (freehand)','',()=>setSelM('lasso')],0,
+ ['Select all','Ctrl+A',()=>SXops.all()],['Deselect','Esc',()=>SXops.none()],0,
+ ['Copy','Ctrl+C',()=>SXops.copy()],['Copy merged','Ctrl+Shift+C',()=>SXops.merged()],['Cut','Ctrl+X',()=>SXops.cut()],['Paste','Ctrl+V',()=>SXops.paste()],['Paste in place','Ctrl+Shift+V',()=>SXops.pasteIn()],0,
+ ['Layer via copy','Ctrl+J',()=>SXops.viaCopy()],['Layer via cut','Ctrl+Shift+J',()=>SXops.viaCut()],['Clear selected pixels','Delete',()=>SXops.clear()]]
+ .forEach(it=>{if(!it){selMenu.append(document.createElement('hr'));return}const b=document.createElement('button');b.setAttribute('role','menuitem');const a=document.createElement('span');a.textContent=it[0];const k=document.createElement('kbd');k.textContent=it[1];b.append(a,k);
+  b.onclick=()=>{selMenu.hidden=true;$('#bSel').setAttribute('aria-expanded','false');it[2]()};selMenu.append(b)});
+$('#bSel').onclick=e=>{e.stopPropagation();if(!selMenu.hidden){selMenu.hidden=true;return}popAt(selMenu,e.currentTarget);$('#bSel').setAttribute('aria-expanded','true')};
+document.addEventListener('click',e=>{if(!selMenu.hidden&&!selMenu.contains(e.target)){selMenu.hidden=true;$('#bSel').setAttribute('aria-expanded','false')}});
+/* ===== transparent background ===== */
+function bgBtn(){const b=$('#bgT');if(!b)return;const t=!c.backgroundColor;b.classList.toggle('on',t);b.textContent=t?'Background is transparent (click for white)':'Make background transparent'}
+$('#bgT').onclick=()=>{c.backgroundColor=c.backgroundColor?'':'#ffffff';c.requestRenderAll();push();bgBtn()};
+/*ABR-START*/
+function abrPix(u8,o,w,h,depth,comp){const bpp=depth>>3,rowB=w*bpp,out=new Uint8Array(w*h);
+ if(!comp){for(let y=0;y<h;y++)for(let x=0;x<w;x++)out[y*w+x]=u8[o+y*rowB+x*bpp];return out}
+ let q=o+2*h;
+ for(let y=0;y<h;y++){const L=(u8[o+2*y]<<8)|u8[o+2*y+1],e=q+L,row=new Uint8Array(rowB);let i=q,r=0;
+  while(i<e&&r<rowB){let n=u8[i++];if(n>127)n-=256;if(n>=0){for(let k=0;k<=n&&r<rowB;k++)row[r++]=u8[i++]}else if(n>-128){const v=u8[i++];for(let k=0;k<1-n&&r<rowB;k++)row[r++]=v}}
+  for(let x=0;x<w;x++)out[y*w+x]=row[x*bpp];q=e}
+ return out}
+function abrMeta(u8,s,e){const str=Array.from(u8.subarray(s,e),ch=>String.fromCharCode(ch)).join(''),dv=new DataView(u8.buffer,u8.byteOffset+s,e-s),meta={},re=/(Nm  |Spcn|pledData)/g;let name='',sp=null,m;
+ while((m=re.exec(str))){const p=m.index+m[1].length,k=m[1];
+  if(k==='Spcn'){if(str.substr(p,4)==='UntF')sp=dv.getFloat64(p+8)}
+  else if(str.substr(p,4)==='TEXT'){const n=dv.getUint32(p+4);let t='';for(let i=0;i<n&&i<256;i++){const ch=dv.getUint16(p+8+i*2);if(ch)t+=String.fromCharCode(ch)}if(k==='Nm  ')name=t;else meta[t]={name,spacing:sp}}}
+ return meta}
+function abrV12(dv,u8,ver){let p=4;const n=dv.getUint16(2),out=[];
+ for(let i=0;i<n&&p+6<=u8.length;i++){const type=dv.getUint16(p),size=dv.getUint32(p+2),s=p+6;p=s+size;if(type!==2)continue;
+  let o=s+4;const spacing=dv.getUint16(o);o+=2;let name='';
+  if(ver===2){const L=dv.getUint32(o);o+=4;for(let k=0;k<L&&k<256;k++){const ch=dv.getUint16(o+k*2);if(ch)name+=String.fromCharCode(ch)}o+=L*2}
+  o+=9;const top=dv.getUint32(o),left=dv.getUint32(o+4),bot=dv.getUint32(o+8),right=dv.getUint32(o+12),depth=dv.getUint16(o+16),comp=u8[o+18];o+=19;
+  const w=right-left,h=bot-top;if(w>0&&h>0&&w<=8000&&h<=8000&&(depth===8||depth===16))out.push({name,spacing,w,h,data:abrPix(u8,o,w,h,depth,comp)})}
+ return out}
+function parseAbr(buf){const u8=new Uint8Array(buf),dv=new DataView(buf),ver=dv.getUint16(0),sub=dv.getUint16(2);
+ if(ver===1||ver===2)return abrV12(dv,u8,ver);
+ if(ver<6)throw new Error('unsupported ABR version '+ver);
+ let p=4,samp=null,meta={};
+ while(p+12<=u8.length&&dv.getUint32(p)===0x3842494D){const tag=String.fromCharCode(u8[p+4],u8[p+5],u8[p+6],u8[p+7]),len=dv.getUint32(p+8),s=p+12;if(tag==='samp')samp=[s,s+len];if(tag==='desc')meta=abrMeta(u8,s,s+len);p=s+len;p+=(4-len%4)%4}
+ const out=[];if(!samp)return out;
+ for(let q=samp[0];q+4<samp[1];){const size=dv.getUint32(q),s=q+4;let e=s+size;e+=(4-e%4)%4;
+  const kl=u8[s],id=String.fromCharCode(...u8.subarray(s+1,s+1+kl));let o=s+37+(sub===1?10:264);
+  const top=dv.getUint32(o),left=dv.getUint32(o+4),bot=dv.getUint32(o+8),right=dv.getUint32(o+12),depth=dv.getUint16(o+16),comp=u8[o+18];o+=19;
+  const w=right-left,h=bot-top;
+  if(w>0&&h>0&&w<=8000&&h<=8000&&(depth===8||depth===16)){const m=meta[id]||{};out.push({id,name:m.name||'',spacing:m.spacing,w,h,data:abrPix(u8,o,w,h,depth,comp)})}
+  q=e}
+ return out}
+/*ABR-END*/
+function abrTip(b){const t=document.createElement('canvas');t.width=b.w;t.height=b.h;const x=t.getContext('2d'),id=x.createImageData(b.w,b.h);
+ for(let i=0;i<b.data.length;i++){const j=i*4;id.data[j]=id.data[j+1]=id.data[j+2]=255;id.data[j+3]=b.data[i]}x.putImageData(id,0,0);
+ const S=256,sq=document.createElement('canvas');sq.width=sq.height=S;const m=Math.max(b.w,b.h),ww=b.w/m*S,hh=b.h/m*S,y=sq.getContext('2d');y.imageSmoothingQuality='high';y.drawImage(t,(S-ww)/2,(S-hh)/2,ww,hh);return sq}
+async function importAbr(f){let list;try{list=parseAbr(await f.arrayBuffer())}catch(e){return toast('Could not read '+f.name+': '+e.message)}
+ if(!list.length)return toast('No brush tips found in '+f.name+'. This kind of .abr may not be supported yet.');
+ const base=f.name.replace(/\.[^.]+$/,'');let first='';
+ list.forEach((b,i)=>{let n=(b.name||base+' '+(i+1)).trim(),k=2;while(userTips[n])n=(b.name||base)+' '+k++;addTip(n,abrTip(b),true,b.spacing);if(!first)first=n});
+ $('#bpre').value='user:'+first;$('#bpre').dispatchEvent(new Event('change'));toast('Imported '+list.length+' brush tips from '+f.name+'.')}
+$('#bpre').addEventListener('change',()=>{const v=$('#bpre').value;if(v.startsWith('user:')){const m=tipMeta[v.slice(5)];if(m&&m.spacing){$('#bsp').value=Math.min(200,Math.max(2,Math.round(m.spacing)));if(brushOn)setBrush()}}});
+/* ===== external modules: Video and Office are separate HTML files ===== */
+const MODKEY='mte-modules',modCfg=()=>{try{return JSON.parse(localStorage.getItem(MODKEY))||{}}catch(e){return{}}};
+function repoBase(l){l=(l||'').trim();if(!l)return'';const m=/github\.com\/([^\/\s#?]+)\/([^\/\s#?]+)/i.exec(l);
+ if(m){const u=m[1],r=m[2].replace(/\.git$/i,'');return r.toLowerCase()===u.toLowerCase()+'.github.io'?`https://${u}.github.io/`:`https://${u}.github.io/${r}/`}
+ return /^https?:\/\//i.test(l)?l.replace(/[#?].*$/,'').replace(/[^\/]*\.html?$/i,'').replace(/\/?$/,'/'):''}
+function modUrl(id,cfg){cfg=cfg||modCfg();const own=(cfg[id]||'').trim()||id+'.html';if(/^https?:\/\//i.test(own))return own;const b=repoBase(cfg.repo);return b?b+own.replace(/^\/+/,''):own}
+function addModule(id,label){MTE.addWorkspace({id,label,mount(el){el.style.cssText+=';padding:0;gap:0;overflow:hidden';
+  const bar=document.createElement('div');bar.className='row';bar.style.cssText='padding:8px 10px;margin:0;border-bottom:1px solid var(--l)';
+  bar.innerHTML='<small class="m" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></small><button data-a="reload">Reload</button><button data-a="cfg">Source&hellip;</button>';
+  const f=document.createElement('iframe');f.title=label;f.style.cssText='flex:1;border:0;width:100%;min-height:60vh;background:var(--p)';el.append(bar,f);
+  const w=MTE.workspaces[id];let pend=null,ready=false;w.load=()=>{ready=false;const u=modUrl(id);bar.querySelector('small').textContent=u;f.src=u};
+  const flush=()=>{if(pend&&ready&&f.contentWindow){f.contentWindow.postMessage({mte:'open',name:pend.name,bytes:pend.bytes},'*');pend=null}};
+  addEventListener('message',e=>{if(e.source===f.contentWindow&&e.data&&e.data.mte==='ready'){ready=true;flush()}});
+  w.openFile=async file=>{pend={name:file.name,bytes:await file.arrayBuffer()};if(!w.loaded){w.loaded=true;w.load()}else flush();
+   setTimeout(()=>{if(pend){pend=null;toast('The '+label+' module did not say it is ready, so the file was not delivered.')}},5000)};
+  bar.onclick=e=>{const a=e.target.dataset.a;if(a==='reload')w.load();if(a==='cfg')openMods()}}})}
+addModule('video','Video');addModule('office','Office');
+$('#wsTabs').addEventListener('click',e=>{const w=MTE.workspaces[e.target.dataset.ws];if(w&&w.load&&!w.loaded){w.loaded=true;w.load()}});
+function modPrev(){const c0={repo:$('#modRepo').value,video:$('#modVideo').value,office:$('#modOffice').value};$('#modPrev').textContent='Video: '+modUrl('video',c0)+'  |  Office: '+modUrl('office',c0)}
+function openMods(){const c0=modCfg();$('#modRepo').value=c0.repo||'';$('#modVideo').value=c0.video||'';$('#modOffice').value=c0.office||'';modPrev();$('#dMod').showModal()}
+['modRepo','modVideo','modOffice'].forEach(i=>$('#'+i).addEventListener('input',modPrev));
+$('#bMods').onclick=openMods;$('#modClose').onclick=()=>$('#dMod').close();
+$('#modSave').onclick=()=>{try{localStorage.setItem(MODKEY,JSON.stringify({repo:$('#modRepo').value.trim(),video:$('#modVideo').value.trim(),office:$('#modOffice').value.trim()}))}catch(e){}
+ $('#dMod').close();['video','office'].forEach(id=>{const w=MTE.workspaces[id];if(w&&w.loaded&&w.load)w.load()});toast('Module sources saved.')};
+$('#modTest').onclick=()=>{window.open(modUrl('office'),'_blank')};
+
+/* ===== v0.0.6: Layer Styles (FX), Curves adjustment layer, Curvature Pen, Blur tool, Layer masks ===== */
+PROPS.push('fx','maskData','maskOff');
+var fxOff=0,fxNoFx=0,T6={t:null},pen=null;
+const mk6=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt)e.textContent=txt;return e};
+const cn6=(w,h)=>{const e=document.createElement('canvas');e.width=Math.max(1,Math.ceil(w));e.height=Math.max(1,Math.ceil(h));return e};
+const idOf=(()=>{const m=new WeakMap();let n=0;return x=>x?(m.get(x)||(m.set(x,++n),n)):0})();
+const act6=()=>{const o=c.getActiveObject();return o&&o.type!=='activeSelection'?o:null};
+/* --- blur helpers (native canvas filter when available, JS box blur otherwise) --- */
+let filtOK=null;
+function hasFilt(){if(filtOK===null){try{const a=cn6(5,5);a.getContext('2d').fillRect(2,2,1,1);const b=cn6(5,5),y=b.getContext('2d');y.filter='blur(1px)';y.drawImage(a,0,0);filtOK=y.getImageData(1,2,1,1).data[3]>0}catch(e){filtOK=false}}return filtOK}
+function jsBlur(cv,r){r=Math.round(r);if(r<1)return cv;const x=cv.getContext('2d'),w=cv.width,h=cv.height,id=x.getImageData(0,0,w,h),d=id.data,n=w*h,ch=[0,1,2,3].map(()=>new Float32Array(n)),t=new Float32Array(Math.max(w,h));
+ for(let i=0;i<n;i++){const a=d[i*4+3]/255;ch[0][i]=d[i*4]*a;ch[1][i]=d[i*4+1]*a;ch[2][i]=d[i*4+2]*a;ch[3][i]=a}
+ const pass=(a,len,stride,cnt,step)=>{for(let l=0;l<cnt;l++){const o=l*step;let s=0;for(let i=-r;i<=r;i++)s+=a[o+clamp(i,0,len-1)*stride];
+  for(let i=0;i<len;i++){t[i]=s/(2*r+1);s+=a[o+Math.min(len-1,i+r+1)*stride]-a[o+Math.max(0,i-r)*stride]}for(let i=0;i<len;i++)a[o+i*stride]=t[i]}};
+ ch.forEach(a=>{for(let k=0;k<3;k++){pass(a,w,1,h,w);pass(a,h,w,w,1)}});
+ for(let i=0;i<n;i++){const a=ch[3][i],u=a>0?1/a:0;d[i*4+3]=a*255;d[i*4]=ch[0][i]*u;d[i*4+1]=ch[1][i]*u;d[i*4+2]=ch[2][i]*u}x.putImageData(id,0,0);return cv}
+function blurCv(cv,r){const o=cn6(cv.width,cv.height),x=o.getContext('2d');if(r<.5){x.drawImage(cv,0,0);return o}
+ if(hasFilt()){x.filter='blur('+r+'px)';x.drawImage(cv,0,0)}else{x.drawImage(cv,0,0);jsBlur(o,r)}return o}
+
+/* ===== Layer Styles (FX): non-destructive, stored on the layer as o.fx ===== */
+const BLN=[['source-over','Normal'],['multiply','Multiply'],['screen','Screen'],['overlay','Overlay'],['soft-light','Soft light']];
+const FXD={ds:{c:'#000000',o:.75,a:120,d:8,s:10,p:0},og:{c:'#ffff99',o:.75,s:14,p:0},is:{c:'#000000',o:.75,a:120,d:6,s:8},ig:{c:'#ffffbe',o:.75,s:10},
+ st:{c:'#C9932E',o:1,s:4,pos:'outside'},co:{c:'#ff0000',o:1,m:'source-over'},go:{t:'linear',c:'#C9932E',c2:'#1A1A1A',a:90,o:1,m:'source-over'},
+ po:{pat:'dots',c:'#000000',sc:1,o:1,m:'source-over'},be:{st:'inner',dp:100,s:8,a:120,up:true,hc:'#ffffff',ho:.75,sc:'#000000',so:.75}};
+const FXN={be:'Bevel & Emboss',st:'Stroke',is:'Inner Shadow',ig:'Inner Glow',co:'Color Overlay',go:'Gradient Overlay',po:'Pattern Overlay',og:'Outer Glow',ds:'Drop Shadow'};
+const O1=['c','Colour','c'],OP=['o','Opacity','n',[0,1,.05]],BM=['m','Blend','s',BLN],AN=['a','Angle','n',[0,360,1]];
+const FXS={be:[['st','Style','s',['inner','outer','emboss']],['dp','Depth %','n',[1,300,1]],['s','Size','n',[1,40,1]],AN,['up','Raised','b'],['hc','Highlight','c'],['ho','Highlight opacity','n',[0,1,.05]],['sc','Shadow','c'],['so','Shadow opacity','n',[0,1,.05]]],
+ st:[O1,['s','Size','n',[1,60,1]],['pos','Position','s',['outside','inside','center']],OP],is:[O1,OP,AN,['d','Distance','n',[0,60,1]],['s','Size','n',[0,60,1]]],ig:[O1,OP,['s','Size','n',[0,60,1]]],
+ co:[O1,OP,BM],go:[['t','Style','s',['linear','radial']],['c','From','c'],['c2','To','c'],AN,OP,BM],po:[['pat','Pattern','s',['dots','stripes','checker','grid']],O1,['sc','Scale','n',[.3,4,.1]],OP,BM],
+ og:[O1,OP,['s','Size','n',[1,80,1]],['p','Spread','n',[0,.9,.05]]],ds:[O1,OP,AN,['d','Distance','n',[0,80,1]],['s','Size','n',[0,80,1]],['p','Spread','n',[0,.9,.05]]]};
+const fxOn=o=>{const f=o.fx;return !!f&&f.v!==false&&Object.keys(FXN).some(k=>f[k]&&f[k].on)};
+function fxPat(n,col,sc){const s=Math.max(3,Math.round(12*sc)),p=cn6(s,s),x=p.getContext('2d');x.fillStyle=col;
+ if(n==='dots'){x.beginPath();x.arc(s/2,s/2,s/4,0,7);x.fill()}else if(n==='stripes')x.fillRect(0,0,s,s/2);else if(n==='checker'){x.fillRect(0,0,s/2,s/2);x.fillRect(s/2,s/2,s/2,s/2)}else{x.fillRect(0,0,s,Math.max(1,s/8));x.fillRect(0,0,Math.max(1,s/8),s)}return p}
+function fxPaint(o,k,bb,useFx,useMk){
+ const f=useFx?o.fx:{},E=q=>f[q]&&f[q].on?f[q]:null,ds=E('ds'),og=E('og'),st=E('st'),be=E('be'),
+  P=Math.min(500,Math.ceil((Math.max(ds?ds.s*1.5+ds.d:0,og?og.s*1.5:0,st?st.s:0,be?be.s*1.5:0)+4)*k)),W=Math.ceil(bb.width*k)+2*P,H=Math.ceil(bb.height*k)+2*P;
+ if(W*H>3e7)return null;
+ const ox=bb.left-P/k,oy=bb.top-P/k,src=cn6(W,H),sx=src.getContext('2d'),keep=[o.opacity,o.globalCompositeOperation,o.shadow];
+ sx.setTransform(k,0,0,k,-ox*k,-oy*k);fxOff++;o.opacity=1;o.globalCompositeOperation='source-over';o.shadow=null;
+ try{rOrig.call(o,sx)}finally{o.opacity=keep[0];o.globalCompositeOperation=keep[1];o.shadow=keep[2];fxOff--}
+ sx.setTransform(1,0,0,1,0,0);
+ if(useMk&&o._mcv){const t=cn6(W,H),y=t.getContext('2d');y.fillStyle='#000';y.fillRect(0,0,W,H);y.setTransform(k,0,0,k,-ox*k,-oy*k);y.transform(...o.calcTransformMatrix());
+  y.clearRect(-o.width/2,-o.height/2,o.width,o.height);y.drawImage(o._mcv,-o.width/2,-o.height/2,o.width,o.height);sx.globalCompositeOperation='destination-in';sx.drawImage(t,0,0);sx.globalCompositeOperation='source-over'}
+ const res={dx:ox-bb.left,dy:oy-bb.top};if(!Object.keys(f).some(q=>f[q]&&f[q].on)){res.cv=src;return res}
+ const out=cn6(W,H),ox2=out.getContext('2d'),A=(cv,al,mo)=>{ox2.globalAlpha=al==null?1:al;ox2.globalCompositeOperation=mo||'source-over';ox2.drawImage(cv,0,0);ox2.globalAlpha=1;ox2.globalCompositeOperation='source-over'},
+  col=(cv,cl)=>{const t=cn6(W,H),x=t.getContext('2d');x.drawImage(cv,0,0);x.globalCompositeOperation='source-in';x.fillStyle=cl;x.fillRect(0,0,W,H);return t},
+  shift=(cv,dx,dy)=>{const t=cn6(W,H);t.getContext('2d').drawImage(cv,dx,dy);return t},
+  inv=()=>{const t=cn6(W,H),x=t.getContext('2d');x.fillStyle='#000';x.fillRect(0,0,W,H);x.globalCompositeOperation='destination-out';x.drawImage(src,0,0);return t},
+  gain=(cv,p)=>{if(!p)return cv;const x=cv.getContext('2d'),id=x.getImageData(0,0,W,H),d=id.data,g=1/(1-Math.min(.95,p));for(let i=3;i<d.length;i+=4)d[i]=Math.min(255,d[i]*g);x.putImageData(id,0,0);return cv},
+  dil=(cv,r)=>{const t=cn6(W,H),x=t.getContext('2d');x.drawImage(cv,0,0);for(const q of[1,.66,.33]){const n=Math.max(8,Math.min(40,Math.ceil(6.3*r*q)));for(let i=0;i<n;i++){const a=i/n*6.2832;x.drawImage(cv,Math.cos(a)*r*q,Math.sin(a)*r*q)}}return t},
+  clipTo=t=>{const x=t.getContext('2d');x.globalCompositeOperation='destination-in';x.drawImage(src,0,0);return t},
+  sh=(cl,op,a,d,s,p)=>{const r=a*Math.PI/180;A(shift(gain(blurCv(col(src,cl),s*k/2),p),-Math.cos(r)*d*k,Math.sin(r)*d*k),op)};
+ if(ds)sh(ds.c,ds.o,ds.a,ds.d,ds.s,ds.p);if(og)sh(og.c,og.o,0,0,og.s,og.p);A(src);
+ const po=E('po'),go=E('go'),co=E('co'),ig=E('ig'),is=E('is');
+ if(po){const t=cn6(W,H),x=t.getContext('2d');x.fillStyle=x.createPattern(fxPat(po.pat,po.c,po.sc*k),'repeat');x.fillRect(0,0,W,H);A(clipTo(t),po.o,po.m)}
+ if(go){const t=cn6(W,H),x=t.getContext('2d'),r=go.a*Math.PI/180,cx=W/2,cy=H/2,bw=W-2*P,bh=H-2*P,L=Math.abs(Math.cos(r))*bw/2+Math.abs(Math.sin(r))*bh/2,
+   g=go.t==='radial'?x.createRadialGradient(cx,cy,0,cx,cy,Math.max(bw,bh)/2):x.createLinearGradient(cx-Math.cos(r)*L,cy-Math.sin(r)*L,cx+Math.cos(r)*L,cy+Math.sin(r)*L);
+  g.addColorStop(0,go.c);g.addColorStop(1,go.c2);x.fillStyle=g;x.fillRect(0,0,W,H);A(clipTo(t),go.o,go.m)}
+ if(co){const t=cn6(W,H),x=t.getContext('2d');x.fillStyle=co.c;x.fillRect(0,0,W,H);A(clipTo(t),co.o,co.m)}
+ if(ig)A(clipTo(col(blurCv(inv(),ig.s*k/2),ig.c)),ig.o);
+ if(is){const r=is.a*Math.PI/180;A(clipTo(col(blurCv(shift(inv(),-Math.cos(r)*is.d*k,Math.sin(r)*is.d*k),is.s*k/2),is.c)),is.o)}
+ if(be){const r=Math.max(1,be.s*k/2),hd=blurCv(col(src,'#fff'),r).getContext('2d').getImageData(0,0,W,H).data,sd=sx.getImageData(0,0,W,H).data,l=be.a*Math.PI/180,lx=Math.cos(l),ly=-Math.sin(l),stp=Math.max(1,Math.round(r/2)),
+   dp=be.dp/100*(be.up?1:-1)*1.5,hc=hex2rgb(be.hc),sc=hex2rgb(be.sc),t=cn6(W,H),tx=t.getContext('2d'),id=tx.createImageData(W,H),q=id.data;
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){const i=y*W+x,a1=hd[(clamp(Math.round(y+ly*stp),0,H-1)*W+clamp(Math.round(x+lx*stp),0,W-1))*4+3],a2=hd[(clamp(Math.round(y-ly*stp),0,H-1)*W+clamp(Math.round(x-lx*stp),0,W-1))*4+3],
+    s=-(a1-a2)/255*dp,w=be.st==='inner'?sd[i*4+3]/255:be.st==='outer'?1-sd[i*4+3]/255:1;if(!w||!s)continue;const z=s>0?hc:sc;q[i*4]=z[0];q[i*4+1]=z[1];q[i*4+2]=z[2];q[i*4+3]=Math.min(1,Math.abs(s))*(s>0?be.ho:be.so)*w*255}
+  tx.putImageData(id,0,0);A(t)}
+ if(st){const s=st.s*k;let ring;
+  if(st.pos==='outside'){ring=dil(src,s);const x=ring.getContext('2d');x.globalCompositeOperation='destination-out';x.drawImage(src,0,0)}
+  else if(st.pos==='inside'){ring=cn6(W,H);const x=ring.getContext('2d');x.drawImage(src,0,0);x.globalCompositeOperation='destination-in';x.drawImage(dil(inv(),s),0,0)}
+  else{ring=dil(src,s/2);const x=ring.getContext('2d');x.globalCompositeOperation='destination-in';x.drawImage(dil(inv(),s/2),0,0)}
+  A(col(ring,st.c),st.o)}
+ res.cv=out;return res}
+/* One render hook draws any layer that has effects and/or a mask (effects live in document px, so they survive moving and scaling) */
+const rOrig=fabric.Object.prototype.render;
+fabric.Object.prototype.render=function(ctx){
+ const useFx=!fxNoFx&&fxOn(this),useMk=!!this.maskData&&!this.maskOff;
+ if(fxOff||this.group||this.type==='curves'||!(useFx||useMk)||this.isNotVisible())return rOrig.call(this,ctx);
+ if(useMk&&!this._mcv&&!this._mLoad){this._mLoad=1;loadImg(this.maskData).then(im=>{const m=cn6(im.width,im.height);m.getContext('2d').drawImage(im,0,0);this._mcv=m;this._mLoad=0;this.dirty=true;c.requestRenderAll()}).catch(()=>{this._mLoad=0})}
+ const m=ctx.getTransform(),k=Math.hypot(m.a,m.b)||1,bb=this.getBoundingRect(true,true),
+  key=[k.toFixed(2),useFx?JSON.stringify(this.fx):'',this.calcTransformMatrix().slice(0,4).map(v=>v.toFixed(3)).join(),this.width,this.height,this._mv|0,useMk&&this._mcv?1:0,this.strokeWidth,idOf(this._filteredEl||this._element)].join('|');
+ let C=this._fxC;if(!C||C.key!==key||this.dirty){C=fxPaint(this,k,bb,useFx,useMk);if(!C)return rOrig.call(this,ctx);C.key=key;this._fxC=C}
+ ctx.save();this._setupCompositeOperation(ctx);this._setOpacity(ctx);ctx.drawImage(C.cv,bb.left+C.dx,bb.top+C.dy,C.cv.width/k,C.cv.height/k);ctx.restore()};
+/* FX dialog */
+let fxTgt=null,fxBak='null',fxSel='ds';
+const fxTouch=()=>{fxTgt.dirty=true;c.requestRenderAll()};
+function fxOpen(){const o=act6();if(!o||o.type==='curves')return toast('Select one layer first.');fxTgt=o;fxBak=JSON.stringify(o.fx||null);o.fx=o.fx||{v:true};fxList();fxPane();$('#dFx').showModal()}
+function fxList(){const L=$('#fxList');L.textContent='';['bl',...Object.keys(FXN)].forEach(k=>{const r=mk6('div','fxr'+(k===fxSel?' on':''));
+ if(k!=='bl'){const i=document.createElement('input');i.type='checkbox';i.checked=!!(fxTgt.fx[k]&&fxTgt.fx[k].on);i.onchange=()=>{const f=fxTgt.fx;f[k]=f[k]||Object.assign({},FXD[k]);f[k].on=i.checked;if(i.checked)fxSel=k;fxTouch();fxList();fxPane()};r.append(i)}
+ const s=mk6('span','',k==='bl'?'Blending Options':FXN[k]);s.onclick=()=>{fxSel=k;fxList();fxPane()};r.append(s);L.append(r)})}
+function fxPane(){const P=$('#fxPane');P.textContent='';const f=fxTgt.fx;$('#fxVis').checked=f.v!==false;
+ const row=(lab,el)=>{const r=mk6('div','row'),l=document.createElement('label');l.append(lab+' ',el);r.append(l);P.append(r)};
+ if(fxSel==='bl'){const s=document.createElement('select');BLN.forEach(([v,t])=>s.add(new Option(t,v)));s.value=fxTgt.globalCompositeOperation||'source-over';s.onchange=()=>{fxTgt.globalCompositeOperation=s.value;fxTouch()};row('Blend mode',s);
+  const r=document.createElement('input');r.type='range';r.min=0;r.max=1;r.step=.05;r.value=fxTgt.opacity;r.oninput=()=>{fxTgt.opacity=+r.value;fxTouch()};row('Opacity',r);return}
+ const e=f[fxSel]||FXD[fxSel];
+ FXS[fxSel].forEach(([p,lab,ty,op])=>{let el;
+  if(ty==='s'){el=document.createElement('select');op.forEach(v=>el.add(new Option(Array.isArray(v)?v[1]:v,Array.isArray(v)?v[0]:v)));el.value=e[p]}
+  else{el=document.createElement('input');if(ty==='c'){el.type='color';el.value=e[p]}else if(ty==='b'){el.type='checkbox';el.checked=!!e[p]}else{el.type='range';el.min=op[0];el.max=op[1];el.step=op[2];el.value=e[p]}}
+  el.oninput=el.onchange=()=>{const t=f[fxSel]||(f[fxSel]=Object.assign({},FXD[fxSel]));t[p]=ty==='b'?el.checked:ty==='n'?+el.value:el.value;if(!t.on){t.on=true;fxList()}fxTouch()};row(lab,el)})}
+$('#fxOk').onclick=()=>{const f=fxTgt.fx;if(f&&!Object.keys(FXN).some(k=>f[k]&&f[k].on))delete fxTgt.fx;$('#dFx').close();fxTouch();push()};
+$('#fxCancel').onclick=()=>{const b=JSON.parse(fxBak);if(b)fxTgt.fx=b;else delete fxTgt.fx;fxTouch();if($('#dFx').open)$('#dFx').close();layers()};
+$('#dFx').addEventListener('cancel',e=>{e.preventDefault();$('#fxCancel').click()});
+$('#fxClear').onclick=()=>{delete fxTgt.fx;fxTouch();$('#dFx').close();push()};
+$('#fxVis').onchange=()=>{fxTgt.fx.v=$('#fxVis').checked;fxTouch()};
+add.fx=fxOpen;
+
+/* ===== Layer masks: a painted alpha canvas in the layer's own space (moves, scales and rotates with it) ===== */
+const MSZ=2048;let lmTgt=null;
+function fxSync(){c.getObjects().forEach(o=>{if(o._mdirty&&o._mcv){o.maskData=o._mcv.toDataURL();o._mdirty=false}})}
+const mTouch=o=>{o._mv=(o._mv|0)+1;o._mdirty=true;o.dirty=true;c.requestRenderAll()};
+function mskNew(o,mode){if(!o||o.type==='curves')return toast('Select one layer first.');if(o.maskData&&!confirm('Replace the existing mask?'))return;
+ if(mode==='sel'&&!SX)return toast('Make a selection first (Select menu).');
+ const w=Math.max(1,o.width),h=Math.max(1,o.height),ms=Math.min(1,MSZ/Math.max(w,h)),m=cn6(w*ms,h*ms),x=m.getContext('2d');x.fillStyle='#000';
+ if(mode==='show')x.fillRect(0,0,m.width,m.height);
+ else if(mode==='sel'){x.setTransform(ms,0,0,ms,w*ms/2,h*ms/2);x.transform(...fabric.util.invertTransform(o.calcTransformMatrix()));selPath(x,SX,1,0,0);x.fill()}
+ o._mcv=m;o.maskOff=false;o.maskData='x';mTouch(o);fxSync();push();if(mode!=='sel')mskPaint(o);else toast('Mask added from the selection.')}
+function mskInv(o){if(!o||!o._mcv)return toast('This layer has no mask.');const m=o._mcv,x=m.getContext('2d'),id=x.getImageData(0,0,m.width,m.height),d=id.data;for(let i=3;i<d.length;i+=4){d[i]=255-d[i];d[i-3]=d[i-2]=d[i-1]=0}x.putImageData(id,0,0);mTouch(o);push()}
+function mskToggle(o){if(!o||!o.maskData)return toast('This layer has no mask.');o.maskOff=!o.maskOff;o.dirty=true;c.requestRenderAll();push();toast(o.maskOff?'Mask switched off.':'Mask switched on.')}
+function mskDel(o){if(!o||!o.maskData)return toast('This layer has no mask.');if(lmTgt===o)T6.stop();o.maskData=null;o._mcv=null;o.maskOff=false;o._mdirty=false;o.dirty=true;c.requestRenderAll();push()}
+function mskPaint(o){if(!o||!o.maskData)return toast('Add a mask first (Mask menu).');if(!o._mcv)return toast('Mask is still loading, try again.');lmTgt=o;c.setActiveObject(o);T6.start('mask');toast('Painting the mask: hide or reveal parts of the layer. Tap Done when finished.')}
+const maskMenu=mk6('div','pop');maskMenu.hidden=true;maskMenu.setAttribute('role','menu');document.body.append(maskMenu);
+[['Add mask: reveal all',()=>mskNew(act6(),'show')],['Add mask: hide all',()=>mskNew(act6(),'hide')],['Add mask from selection',()=>mskNew(act6(),'sel')],0,['Paint on mask',()=>mskPaint(act6())],['Invert mask',()=>mskInv(act6())],['Switch mask off / on',()=>mskToggle(act6())],['Delete mask',()=>mskDel(act6())]]
+ .forEach(it=>{if(!it){maskMenu.append(document.createElement('hr'));return}const b=document.createElement('button');b.setAttribute('role','menuitem');b.textContent=it[0];b.onclick=()=>{maskMenu.hidden=true;it[1]()};maskMenu.append(b)});
+add.mask=()=>{if(!maskMenu.hidden){maskMenu.hidden=true;return}popAt(maskMenu,$('#bMask'))};
+document.addEventListener('click',e=>{if(!maskMenu.hidden&&!maskMenu.contains(e.target)&&e.target.id!=='bMask')maskMenu.hidden=true});
+$('#lmDone').onclick=()=>T6.stop();
+
+/* ===== Curves adjustment layer ===== */
+const defCrv=()=>({rgb:[[0,0],[255,255]],r:[[0,0],[255,255]],g:[[0,0],[255,255]],b:[[0,0],[255,255]]});
+function spline(pts){const p=pts.slice().sort((a,b)=>a[0]-b[0]),n=p.length,dx=[],m=[],t=[];
+ for(let i=0;i<n-1;i++){dx[i]=p[i+1][0]-p[i][0]||1e-6;m[i]=(p[i+1][1]-p[i][1])/dx[i]}
+ t[0]=m[0];t[n-1]=m[n-2];for(let i=1;i<n-1;i++)t[i]=m[i-1]*m[i]<=0?0:(m[i-1]+m[i])/2;
+ for(let i=0;i<n-1;i++){if(m[i]===0){t[i]=t[i+1]=0}else{const a=t[i]/m[i],b=t[i+1]/m[i],s=a*a+b*b;if(s>9){const q=3/Math.sqrt(s);t[i]=q*a*m[i];t[i+1]=q*b*m[i]}}}
+ const L=new Uint8Array(256);let j=0;for(let x=0;x<256;x++){while(j<n-2&&x>p[j+1][0])j++;const h=dx[j],u=clamp((x-p[j][0])/h,0,1),u2=u*u,u3=u2*u;
+  L[x]=clamp(Math.round((2*u3-3*u2+1)*p[j][1]+(u3-2*u2+u)*h*t[j]+(-2*u3+3*u2)*p[j+1][1]+(u3-u2)*h*t[j+1]),0,255)}return L}
+const curvesLUT=v=>{const M=spline(v.rgb);return['r','g','b'].map(ch=>{const L=spline(v[ch]),o=new Uint8Array(256);for(let i=0;i<256;i++)o[i]=M[L[i]];return o})};
+fabric.Curves=fabric.util.createClass(fabric.Rect,{type:'curves',objectCaching:false,fill:'',stroke:'',strokeWidth:0,evented:false,hasControls:false,lockMovementX:true,lockMovementY:true,
+ initialize(o){this.callSuper('initialize',o);this.crv=this.crv||defCrv()},
+ toObject(a){return fabric.util.object.extend(this.callSuper('toObject',a),{crv:this.crv})},
+ _render(ctx){const L=this._lut||(this._lut=curvesLUT(this.crv)),m=ctx.getTransform(),cw=ctx.canvas.width,ch=ctx.canvas.height,w=this.width/2,h=this.height/2,
+  X=[-w,w,w,-w],Y=[-h,-h,h,h],xs=X.map((x,i)=>m.a*x+m.c*Y[i]+m.e),ys=X.map((x,i)=>m.b*x+m.d*Y[i]+m.f),
+  x0=clamp(Math.floor(Math.min(...xs)),0,cw),y0=clamp(Math.floor(Math.min(...ys)),0,ch),x1=clamp(Math.ceil(Math.max(...xs)),0,cw),y1=clamp(Math.ceil(Math.max(...ys)),0,ch);
+  if(x1-x0<1||y1-y0<1)return;const s=this.opacity;ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
+  const id=ctx.getImageData(x0,y0,x1-x0,y1-y0),d=id.data,R=L[0],G=L[1],B=L[2];
+  for(let i=0;i<d.length;i+=4){d[i]+=(R[d[i]]-d[i])*s;d[i+1]+=(G[d[i+1]]-d[i+1])*s;d[i+2]+=(B[d[i+2]]-d[i+2])*s}
+  ctx.putImageData(id,x0,y0);ctx.restore()}});
+fabric.Curves.fromObject=(o,cb)=>fabric.Object._fromObject('Curves',o,cb);
+add.curves=()=>{const a=new fabric.Curves({left:0,top:0,width:D.W,height:D.H,name:'Curves'});c.add(a);c.setActiveObject(a);c.requestRenderAll();toast('Curves layer added. It adjusts everything below it. Drag the curve in the Curves panel.')};
+const CRP={'Default':[[0,0],[255,255]],'Strong contrast':[[0,0],[64,40],[192,224],[255,255]],'Medium contrast':[[0,0],[64,54],[192,202],[255,255]],'Lighter':[[0,0],[128,160],[255,255]],'Darker':[[0,0],[128,95],[255,255]],'Lighten shadows':[[0,0],[64,100],[255,255]],'Negative':[[0,255],[255,0]]},CHC={rgb:'#fff',r:'#f66',g:'#6d6',b:'#69f'};
+Object.keys(CRP).forEach(k=>$('#crPre').add(new Option(k,k)));$('#crPre').add(new Option('Custom','_'),0);$('#crPre').value='_';
+let cA=null,cSel=-1,cDrag=false,cH=null;const cCv=$('#crCv'),cX=cCv.getContext('2d'),CHN=()=>$('#crCh').value;
+function curvesHist(a){const i=c.getObjects().indexOf(a),keep=c.getObjects().map(o=>o.visible);c.getObjects().forEach((o,j)=>{if(j>=i)o.visible=false});
+ const z=c.getZoom(),w=c.width,h=c.height,s=Math.min(1,300/Math.max(D.W,D.H));let el;
+ try{c.setZoom(1);c.setDimensions({width:D.W,height:D.H});el=c.toCanvasElement(s)}finally{c.setZoom(z);c.setDimensions({width:w,height:h});c.getObjects().forEach((o,j)=>o.visible=keep[j]);c.requestRenderAll()}
+ const d=el.getContext('2d').getImageData(0,0,el.width,el.height).data,H={rgb:Array(256).fill(0),r:Array(256).fill(0),g:Array(256).fill(0),b:Array(256).fill(0)};
+ for(let q=0;q<d.length;q+=4){if(d[q+3]<8)continue;H.r[d[q]]++;H.g[d[q+1]]++;H.b[d[q+2]]++;H.rgb[Math.round(.299*d[q]+.587*d[q+1]+.114*d[q+2])]++}return H}
+function crvBind(a){if(cA===a)return;cA=a;cSel=-1;$('#crS').value=a.opacity;try{cH=curvesHist(a)}catch(e){cH=null}crvDraw()}
+function crvDraw(){if(!cA)return;const x=cX,S=256,ch=CHN(),pts=cA.crv[ch];x.clearRect(0,0,S,S);x.fillStyle='#2b2b2b';x.fillRect(0,0,S,S);
+ if(cH){const hh=cH[ch],mx=Math.max(1,...hh.slice(1,255));x.fillStyle='#777';hh.forEach((v,i)=>{const t=Math.min(1,v/mx)*S;x.fillRect(i,S-t,1,t)})}
+ x.strokeStyle='#444';x.beginPath();for(let i=1;i<4;i++){x.moveTo(i*64,0);x.lineTo(i*64,S);x.moveTo(0,i*64);x.lineTo(S,i*64)}x.stroke();x.strokeStyle='#666';x.beginPath();x.moveTo(0,S);x.lineTo(S,0);x.stroke();
+ x.strokeStyle=CHC[ch];x.lineWidth=2;x.beginPath();spline(pts).forEach((v,i)=>i?x.lineTo(i,255-v):x.moveTo(i,255-v));x.stroke();x.lineWidth=1;
+ pts.forEach((q,i)=>{x.fillStyle=i===cSel?GOLD:'#fff';x.strokeStyle='#000';x.fillRect(q[0]-4,251-q[1],8,8);x.strokeRect(q[0]-4,251-q[1],8,8)});
+ const q=pts[cSel];$('#crI').value=q?q[0]:'';$('#crO').value=q?q[1]:''}
+const crvSet=()=>{cA._lut=null;cA.dirty=true;c.requestRenderAll();crvDraw()};
+const cPt=e=>{const r=cCv.getBoundingClientRect();return[clamp(Math.round((e.clientX-r.left)/r.width*255),0,255),clamp(Math.round(255-(e.clientY-r.top)/r.height*255),0,255)]};
+const cHit=(pts,p)=>{const s=cCv.getBoundingClientRect().width/256;return pts.findIndex(q=>Math.hypot(q[0]-p[0],q[1]-p[1])*s<10)};
+cCv.onpointerdown=e=>{if(!cA)return;cCv.setPointerCapture(e.pointerId);const pts=cA.crv[CHN()],p=cPt(e);let i=cHit(pts,p);
+ if(i<0){p[0]=clamp(p[0],1,254);i=pts.findIndex(q=>q[0]===p[0]);if(i<0){pts.push(p);pts.sort((a,b)=>a[0]-b[0]);i=pts.indexOf(p)}}cSel=i;cDrag=true;$('#crPre').value='_';crvSet()};
+cCv.onpointermove=e=>{if(!cDrag)return;const pts=cA.crv[CHN()],p=cPt(e),q=pts[cSel];q[1]=p[1];if(cSel>0&&cSel<pts.length-1)q[0]=clamp(p[0],pts[cSel-1][0]+1,pts[cSel+1][0]-1);crvSet()};
+cCv.onpointerup=()=>{if(cDrag){cDrag=false;push()}};
+cCv.ondblclick=e=>{if(!cA)return;const pts=cA.crv[CHN()],i=cHit(pts,cPt(e));if(i>0&&i<pts.length-1){pts.splice(i,1);cSel=-1;crvSet();push()}};
+$('#crCh').onchange=()=>{cSel=-1;crvDraw()};
+$('#crPre').onchange=()=>{const v=$('#crPre').value;if(!cA||v==='_')return;cA.crv=defCrv();cA.crv.rgb=JSON.parse(JSON.stringify(CRP[v]));cSel=-1;crvSet();push()};
+$('#crRes').onclick=()=>{if(!cA)return;cA.crv=defCrv();cSel=-1;$('#crPre').value='Default';crvSet();push()};
+$('#crAuto').onclick=()=>{if(!cA||!cH)return;const h=cH.rgb,t=h.reduce((a,b)=>a+b,0)*.005;let lo=0,hi=255,s=0;for(;lo<255&&(s+=h[lo])<t;lo++);s=0;for(;hi>0&&(s+=h[hi])<t;hi--);
+ if(hi-lo<8)return toast('Nothing to stretch here.');const p=[[0,0]];if(lo>0)p.push([lo,0]);if(hi<255)p.push([hi,255]);p.push([255,255]);cA.crv=defCrv();cA.crv.rgb=p;$('#crCh').value='rgb';$('#crPre').value='_';cSel=-1;crvSet();push()};
+[['crI',0],['crO',1]].forEach(([id,ix])=>$('#'+id).onchange=()=>{if(!cA||cSel<0)return;const pts=cA.crv[CHN()],q=pts[cSel],v=clamp(+$('#'+id).value||0,0,255);
+ if(ix===1)q[1]=v;else if(cSel>0&&cSel<pts.length-1)q[0]=clamp(v,pts[cSel-1][0]+1,pts[cSel+1][0]-1);crvSet();push()});
+$('#crS').oninput=()=>{if(cA){cA.opacity=+$('#crS').value;c.requestRenderAll()}};$('#crS').onchange=()=>push();
+function secs(){const a=c.getActiveObject();const on=!!a&&a.type==='curves';$('#curvesSec').hidden=!on;if(on)crvBind(a);else cA=null}
+['created','updated','cleared'].forEach(e=>c.on('selection:'+e,secs));
+
+/* ===== Overlay for the Blur tool, mask painting and the Curvature Pen ===== */
+const ovT=document.createElement('canvas');ovT.id='ovT';ovT.style.cssText='position:absolute;left:0;top:0;z-index:6;pointer-events:none;touch-action:none';c.wrapperEl.append(ovT);
+let cur6=null,stroke=null;
+function ovSize(){const d=devicePixelRatio||1;ovT.width=Math.max(1,Math.round(c.width*d));ovT.height=Math.max(1,Math.round(c.height*d));ovT.style.width=c.width+'px';ovT.style.height=c.height+'px';ovDraw()}
+function ovDraw(){const x=ovT.getContext('2d'),d=devicePixelRatio||1,k=c.getZoom()*d;x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,ovT.width,ovT.height);
+ if(T6.t==='manual'&&mnP){x.save();x.globalAlpha=.55;x.drawImage(mnP,0,0,D.W*k,D.H*k);x.restore()}
+ if(T6.t==='pen'&&pen){const dd=penD(pen.pts,pen.closed,pen.cur&&!pen.closed?pen.cur:null);if(dd){x.save();x.scale(k,k);x.lineWidth=2/k;x.strokeStyle=GOLD;x.stroke(new Path2D(dd));x.restore()}
+  pen.pts.forEach((q,i)=>{x.fillStyle=i===pen.sel?GOLD:'#fff';x.strokeStyle='#000';x.beginPath();if(q.k)x.rect(q.x*k-4,q.y*k-4,8,8);else x.arc(q.x*k,q.y*k,5,0,6.3);x.fill();x.stroke()})}
+ else if(cur6&&(T6.t==='blur'||T6.t==='mask'||T6.t==='erase'||T6.t==='manual')){const r=$({blur:'#blSz',mask:'#lmSz',erase:'#erSz',manual:'#mnSz'}[T6.t]).value/2*k;x.lineWidth=d;[['#000',0],['#fff',d]].forEach(([s,o])=>{x.strokeStyle=s;x.beginPath();x.arc(cur6.x*k,cur6.y*k,Math.max(2,r-o),0,6.3);x.stroke()})}}
+T6.start=function(t){if(brushOn)toggleBrush();if(selM)setSelM(null);T6.stop();T6.t=t;ovT.style.pointerEvents='auto';ovT.style.cursor='crosshair';
+ $('#penSec').hidden=t!=='pen';$('#blurSec').hidden=t!=='blur';$('#maskSec').hidden=t!=='mask';['pen','blur','mask'].forEach(k=>{const b=$('#tools [data-t='+k+']');b&&b.classList.toggle('on',t===k)});
+ if(t==='pen')c.discardActiveObject();c.requestRenderAll();if(innerWidth<=800)$('#side').classList.add('open')};
+T6.stop=function(){if(pen)penFinish();T6.t=null;stroke=null;ovT.style.pointerEvents='none';['penSec','blurSec','maskSec'].forEach(i=>$('#'+i).hidden=true);['pen','blur','mask'].forEach(k=>{const b=$('#tools [data-t='+k+']');b&&b.classList.remove('on')});ovDraw()};
+add.pen=()=>T6.t==='pen'?T6.stop():T6.start('pen');add.blur=()=>T6.t==='blur'?T6.stop():T6.start('blur');
+const lp6=e=>{const r=ovT.getBoundingClientRect(),z=c.getZoom();return{x:(e.clientX-r.left)/z,y:(e.clientY-r.top)/z}};
+function strokeTo(p){const s=stroke,sp=Math.max(1,s.R*.25),a=s.last||p,n=s.last?Math.max(1,Math.floor(Math.hypot(p.x-a.x,p.y-a.y)/sp)):1;
+ for(let i=1;i<=n;i++)s.dab(s.last?{x:a.x+(p.x-a.x)*i/n,y:a.y+(p.y-a.y)*i/n}:p);s.last=p}
+ovT.onpointerdown=e=>{const t=T6.t;if(!t)return;ovT.setPointerCapture(e.pointerId);const p=lp6(e);if(t==='pen')return penDown(p);stroke=t==='blur'?blurBegin():t==='erase'?eraseBegin():t==='manual'?manualBegin():lmBegin();if(stroke){stroke.last=null;strokeTo(p)}};
+ovT.onpointermove=e=>{const p=lp6(e);cur6=p;if(T6.t==='pen')penMove(p);else if(stroke&&e.buttons)strokeTo(p);ovDraw()};
+ovT.onpointerup=()=>{if(T6.t==='pen'){if(pen)pen.drag=-1}else if(stroke){stroke=null;if(T6.t==='manual')manualDone();else push()}};
+ovT.onpointerleave=()=>{cur6=null;ovDraw()};
+
+/* ===== Blur tool ===== */
+function rep(o,cv,left,top,mul){const img=new fabric.Image(cv,{left,top,scaleX:1/mul,scaleY:1/mul,name:o.name||'Layer',opacity:o.opacity,globalCompositeOperation:o.globalCompositeOperation,visible:o.visible});
+ if(o.fx)img.fx=o.fx;const i=c.getObjects().indexOf(o);lock=true;c.remove(o);c.insertAt(img,i,false);lock=false;c.setActiveObject(img);return img}
+function blurDab(cv,x,y,R,hd,st,rad,sA){const b=Math.max(1,Math.round(rad)),p=b+2,x0=Math.max(0,Math.floor(x-R-p)),y0=Math.max(0,Math.floor(y-R-p)),x1=Math.min(cv.width,Math.ceil(x+R+p)),y1=Math.min(cv.height,Math.ceil(y+R+p));if(x1<=x0||y1<=y0)return;
+ const w=x1-x0,h=y1-y0,t=cn6(w,h);t.getContext('2d').drawImage(cv,-x0,-y0);const old=t.getContext('2d').getImageData(0,0,w,h),bl=blurCv(t,b).getContext('2d').getImageData(0,0,w,h),o=old.data,q=bl.data;
+ for(let j=0;j<h;j++)for(let i=0;i<w;i++){const d=Math.hypot(i+x0+.5-x,j+y0+.5-y);if(d>=R)continue;let m=(d<=R*hd?1:1-(d-R*hd)/(R*(1-hd)||1))*st;if(sA)m*=sA[((j+y0)*cv.width+i+x0)*4+3]/255;if(m<=0)continue;
+  const k=(j*w+i)*4,a0=o[k+3]/255,a1=q[k+3]/255,a=a0+(a1-a0)*m;for(let z=0;z<3;z++){const v=o[k+z]*a0+(q[k+z]*a1-o[k+z]*a0)*m;o[k+z]=a>0?v/a:0}o[k+3]=a*255}
+ cv.getContext('2d').putImageData(old,x0,y0)}
+function blurBegin(){const o0=act6();if(!o0||o0.type==='curves'){toast('Pick one layer in the Layers panel first.');return null}
+ const mul=imgMul(o0),{cv,r}=layerRaster(o0,mul),img=rep(o0,cv,r.left,r.top,mul),R=+$('#blSz').value/2,hd=Math.min(.98,$('#blHd').value/100),st=$('#blSt').value/100,rad=+$('#blRad').value*mul;
+ let sA=null;if(SX){const t=cn6(cv.width,cv.height),x=t.getContext('2d');x.fillStyle='#000';selPath(x,SX,mul,r.left,r.top);x.fill();sA=x.getImageData(0,0,t.width,t.height).data}
+ return{R,dab:q=>{blurDab(cv,(q.x-r.left)*mul,(q.y-r.top)*mul,R*mul,hd,st,rad,sA);img.dirty=true;c.requestRenderAll()}}}
+$('#blGo').onclick=()=>{const m=$('#blMode').value;if(m==='brush')return toast('Brush mode: paint on the canvas. Choose Whole layer or Selected area to blur in one go.');
+ if(m==='sel'&&!SX)return toast('Make a selection first (Select menu).');const o=act6();if(!o||o.type==='curves')return toast('Pick one layer in the Layers panel first.');
+ const rad=+$('#blRad').value,mul=imgMul(o),{cv,r}=layerRaster(o,mul),pad=Math.ceil(rad*mul*3),big=cn6(cv.width+2*pad,cv.height+2*pad);big.getContext('2d').drawImage(cv,pad,pad);
+ let res=blurCv(big,rad*mul);if(m==='sel'){const out=cn6(big.width,big.height),x=out.getContext('2d');x.drawImage(big,0,0);x.save();selPath(x,SX,mul,r.left-pad/mul,r.top-pad/mul);x.clip();x.globalCompositeOperation='copy';x.drawImage(res,0,0);x.restore();res=out}
+ rep(o,res,r.left-pad/mul,r.top-pad/mul,mul);c.requestRenderAll();push()};
+
+/* ===== Mask brush ===== */
+function lmBegin(){const o=lmTgt;if(!o||!o._mcv||c.getObjects().indexOf(o)<0){toast('Add a mask first (Mask menu).');return null}
+ const R=+$('#lmSz').value/2,hd=Math.min(.98,$('#lmHd').value/100),al=$('#lmOp').value/100,hide=$('#lmMode').value==='hide';
+ return{R,dab:q=>{const l=fabric.util.transformPoint(new fabric.Point(q.x,q.y),fabric.util.invertTransform(o.calcTransformMatrix())),m=o._mcv,ms=m.width/Math.max(1,o.width),x=m.getContext('2d'),
+  cx=(l.x+o.width/2)*ms,cy=(l.y+o.height/2)*ms,r=R/((Math.abs(o.scaleX)+Math.abs(o.scaleY))/2)*ms,g=x.createRadialGradient(cx,cy,r*hd,cx,cy,r);
+  g.addColorStop(0,'rgba(0,0,0,'+al+')');g.addColorStop(1,'rgba(0,0,0,0)');x.save();x.globalCompositeOperation=hide?'destination-out':'source-over';x.fillStyle=g;x.beginPath();x.arc(cx,cy,r,0,6.3);x.fill();x.restore();mTouch(o)}}}
+
+/* ===== Curvature Pen: click to add points, the path curves through them ===== */
+function penD(pts,closed,cur){const P=cur?pts.concat([cur]):pts,n=P.length;if(n<2)return'';const g=i=>closed?P[(i+n)%n]:P[clamp(i,0,n-1)],T=i=>P[i].k?[0,0]:[(g(i+1).x-g(i-1).x)/6,(g(i+1).y-g(i-1).y)/6];
+ let d='M'+P[0].x+' '+P[0].y;const m=closed?n:n-1;for(let i=0;i<m;i++){const a=P[i],b=g(i+1),ta=T(i),tb=T((i+1)%n);d+='C'+(a.x+ta[0])+' '+(a.y+ta[1])+' '+(b.x-tb[0])+' '+(b.y-tb[1])+' '+b.x+' '+b.y}return d+(closed?'Z':'')}
+const penSt6=()=>pen||(pen={pts:[],closed:false,sel:-1,drag:-1,cur:null});
+const penHit=p=>penSt6().pts.findIndex(q=>Math.hypot(q.x-p.x,q.y-p.y)*c.getZoom()<11);
+function penDown(p){const P=penSt6(),h=penHit(p);if(h===0&&P.pts.length>2&&!P.closed){P.closed=true;return penFinish()}
+ if(h>=0)P.sel=P.drag=h;else{P.pts.push({x:p.x,y:p.y,k:false});P.sel=P.drag=P.pts.length-1}ovDraw()}
+function penMove(p){const P=penSt6();P.cur=p;if(P.drag>=0&&P.pts[P.drag]){P.pts[P.drag].x=p.x;P.pts[P.drag].y=p.y}}
+function penFinish(cancel){const P=pen;pen=null;if(P&&!cancel&&P.pts.length>=2){const shape=$('#penMode').value==='shape',p=new fabric.Path(penD(P.pts,P.closed),{fill:shape?$('#penFi').value:'',stroke:$('#penSt').value,strokeWidth:+$('#penW').value||0,strokeLineCap:'round',strokeLineJoin:'round',name:shape?'Curvature shape':'Curvature path'});c.add(p);c.setActiveObject(p)}
+ else if(P&&!cancel&&P.pts.length===1)toast('Add at least two points.');ovDraw()}
+ovT.ondblclick=e=>{if(T6.t!=='pen'||!pen)return;const i=penHit(lp6(e));if(i>=0)pen.pts[i].k=!pen.pts[i].k;ovDraw()};
+$('#penDone').onclick=()=>penFinish();$('#penClose').onclick=()=>{if(pen&&pen.pts.length>2)pen.closed=true;penFinish()};$('#penCancel').onclick=()=>penFinish(true);
+addEventListener('keydown',e=>{if(T6.t!=='pen'||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;
+ if(e.key==='Enter'){e.preventDefault();penFinish()}else if(e.key==='Escape')penFinish(true);else if((e.key==='Delete'||e.key==='Backspace')&&pen&&pen.pts.length){e.preventDefault();pen.pts.splice(pen.sel>=0?pen.sel:pen.pts.length-1,1);pen.sel=pen.pts.length-1;ovDraw()}});
+
+/* ===== Layers panel: fx / mask / adjustment markers ===== */
+const layers0=layers;
+layers=function(){layers0();const objs=c.getObjects().slice().reverse();[...$('#layers').children].forEach((row,i)=>{const o=objs[i];if(!o)return;const at=row.children[2],sp=row.querySelector('span');
+ if(o.type==='curves')sp.textContent='◐ '+(o.name||'Curves');
+ if(o.maskData){const b=mk6('button','',o.maskOff?'▢':'▣');b.title='Layer mask: tap to paint it. Shift+tap switches it on/off';b.setAttribute('aria-label','Layer mask');b.onclick=ev=>{ev.stopPropagation();ev.shiftKey?mskToggle(o):mskPaint(o)};row.insertBefore(b,at)}
+ if(o.fx&&Object.keys(FXN).some(k=>o.fx[k]&&o.fx[k].on)){const e=mk6('button','',o.fx.v===false?'○':'●');e.title='Show / hide effects';e.setAttribute('aria-label','Show or hide effects');e.onclick=ev=>{ev.stopPropagation();o.fx.v=o.fx.v===false;o.dirty=true;c.requestRenderAll();push()};
+  const b=mk6('button','','fx');b.title='Edit layer styles';b.style.color='var(--gt)';b.onclick=ev=>{ev.stopPropagation();c.setActiveObject(o);fxOpen()};row.insertBefore(e,at);row.insertBefore(b,at)}})};
+
+/* ===== v0.0.7: rename layers, eraser, object selection + invert selection, shape borders and corner rounding ===== */
+PROPS.push('shapePts','shapeCr');if(!PROPS.includes('name'))PROPS.push('name');
+var osPrev=null;
+const mkItem7=(txt,fn,at)=>{const b=document.createElement('button');b.setAttribute('role','menuitem');b.textContent=txt;b.onclick=()=>{selMenu.hidden=true;$('#bSel').setAttribute('aria-expanded','false');fn()};selMenu.insertBefore(b,selMenu.children[at]||null)};
+/* --- rename layers: double-click the name (or tap the pencil) --- */
+function rn7(o,sp){const i=document.createElement('input');i.value=o.name||sp.textContent;i.style.cssText='flex:1;min-width:60px';sp.replaceWith(i);i.focus();i.select();let done=0;
+ const fin=ok=>{if(done)return;done=1;if(ok&&i.value.trim()){o.name=i.value.trim();push()}else layers()};i.onkeydown=e=>{e.stopPropagation();if(e.key==='Enter')fin(1);if(e.key==='Escape')fin(0)};i.onblur=()=>fin(1);i.onclick=e=>e.stopPropagation()}
+const layers1=layers;
+layers=function(){layers1();const objs=c.getObjects().slice().reverse();[...$('#layers').children].forEach((row,i)=>{const o=objs[i],sp=row.querySelector('span');if(!o||!sp)return;sp.title='Double-click to rename';sp.ondblclick=ev=>{ev.stopPropagation();rn7(o,sp)};
+ const b=mk6('button','','✎');b.title='Rename layer';b.setAttribute('aria-label','Rename layer');b.onclick=ev=>{ev.stopPropagation();rn7(o,row.querySelector('span'))};row.append(b)})};
+/* --- eraser: removes pixels (transparent), respects a selection --- */
+add.erase=()=>T6.t==='erase'?T6.stop():T6.start('erase');
+function eraseBegin(){const o0=act6();if(!o0||o0.type==='curves'){toast('Pick one layer in the Layers panel first.');return null}
+ const mul=imgMul(o0),{cv,r}=layerRaster(o0,mul),img=rep(o0,cv,r.left,r.top,mul),R=+$('#erSz').value/2,hd=Math.min(.98,$('#erHd').value/100),al=$('#erOp').value/100,x=cv.getContext('2d');
+ return{R,dab:q=>{const cx=(q.x-r.left)*mul,cy=(q.y-r.top)*mul,rr=R*mul,g=x.createRadialGradient(cx,cy,rr*hd,cx,cy,rr);g.addColorStop(0,'rgba(0,0,0,'+al+')');g.addColorStop(1,'rgba(0,0,0,0)');
+  x.save();if(SX){selPath(x,SX,mul,r.left,r.top);x.clip()}x.globalCompositeOperation='destination-out';x.fillStyle=g;x.beginPath();x.arc(cx,cy,rr,0,6.3);x.fill();x.restore();img.dirty=true;c.requestRenderAll()}}}
+const tStart7=T6.start,tStop7=T6.stop;
+T6.start=function(t){tStart7(t);$('#erSec').hidden=t!=='erase';const b=$('#tools [data-t=erase]');b&&b.classList.toggle('on',t==='erase')};
+T6.stop=function(){tStop7();$('#erSec').hidden=true;const b=$('#tools [data-t=erase]');b&&b.classList.remove('on')};
+/* --- object selection: box = isolate an object from its background, click = pick a similar-coloured area; Add / Subtract refine --- */
+const osDims=()=>{const s=Math.min(1,1000/Math.max(D.W,D.H));return{s,W:Math.max(1,Math.round(D.W*s)),H:Math.max(1,Math.round(D.H*s))}};
+function osSrc(){const S=osDims(),cv=cn6(S.W,S.H),x=cv.getContext('2d'),o=act6();
+ if(o&&o.type==='image'){const{cv:rc,r}=layerRaster(o,1);x.drawImage(rc,r.left*S.s,r.top*S.s,r.width*S.s,r.height*S.s)}else x.drawImage(fullComposite(),0,0,S.W,S.H);S.cv=cv;S.d=x.getImageData(0,0,S.W,S.H).data;return S}
+const cd7=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2],a[3]-b[3]),minD7=(p,C)=>{let d=1e9;for(const q of C){const v=cd7(p,q);if(v<d)d=v}return d},sub7=(a,n)=>{const s=Math.ceil(a.length/n);return s>1?a.filter((_,i)=>i%s===0):a};
+function kmeans7(S,k){if(!S.length)return[[0,0,0,0]];const C=[];for(let i=0;i<k;i++)C.push(S[Math.floor(i*S.length/k)].slice());
+ for(let it=0;it<6;it++){const A=C.map(()=>[0,0,0,0,0]);S.forEach(p=>{let b=0,bd=1e9;C.forEach((q,i)=>{const d=cd7(p,q);if(d<bd){bd=d;b=i}});const a=A[b];a[0]+=p[0];a[1]+=p[1];a[2]+=p[2];a[3]+=p[3];a[4]++});A.forEach((a,i)=>{if(a[4])C[i]=[a[0]/a[4],a[1]/a[4],a[2]/a[4],a[3]/a[4]]})}return C}
+function osBox(S,b){const{W,d}=S,px=i=>[d[i*4],d[i*4+1],d[i*4+2],255-d[i*4+3]],bw=Math.max(2,Math.round(Math.min(b.x1-b.x0,b.y1-b.y0)*.08)),mx=Math.round((b.x1-b.x0)*.25),my=Math.round((b.y1-b.y0)*.25);
+ let bg=[],fg=[];for(let y=Math.max(0,b.y0-bw);y<Math.min(S.H,b.y1+bw);y++)for(let x=Math.max(0,b.x0-bw);x<Math.min(W,b.x1+bw);x++){const ins=x>=b.x0&&x<b.x1&&y>=b.y0&&y<b.y1;
+  if(!ins||x<b.x0+bw||x>=b.x1-bw||y<b.y0+bw||y>=b.y1-bw)bg.push(px(y*W+x));else if(x>=b.x0+mx&&x<b.x1-mx&&y>=b.y0+my&&y<b.y1-my)fg.push(px(y*W+x))}
+ const m=new Uint8Array(W*S.H);for(let it=0;it<3&&fg.length&&bg.length;it++){const F=kmeans7(sub7(fg,1500),5),B=kmeans7(sub7(bg,1500),5),nb=[];fg=[];
+  for(let y=b.y0;y<b.y1;y++)for(let x=b.x0;x<b.x1;x++){const p=px(y*W+x),f=minD7(p,F)<minD7(p,B)*.9;m[y*W+x]=f?1:0;(f?fg:nb).push(p)}bg=bg.concat(sub7(nb,600))}return m}
+function osClick(S,x,y,tol){const{W,H,d}=S,px=i=>[d[i*4],d[i*4+1],d[i*4+2],255-d[i*4+3]];let sm=[0,0,0,0],n=0;
+ for(let v=-2;v<=2;v++)for(let u=-2;u<=2;u++){const X=x+u,Y=y+v;if(X>=0&&Y>=0&&X<W&&Y<H){const p=px(Y*W+X);for(let k=0;k<4;k++)sm[k]+=p[k];n++}}sm=sm.map(v=>v/n);
+ const m=new Uint8Array(W*H),q=[y*W+x];m[q[0]]=1;
+ while(q.length){const j=q.pop(),X=j%W,Y=(j-X)/W,pj=px(j);[[X-1,Y],[X+1,Y],[X,Y-1],[X,Y+1]].forEach(([u,v])=>{if(u<0||v<0||u>=W||v>=H)return;const k=v*W+u;if(m[k])return;const pk=px(k);if(cd7(pk,sm)<=tol*2&&cd7(pk,pj)<=tol*.8){m[k]=1;q.push(k)}})}return m}
+function osClean(m,W,H,cx,cy,fill){const lab=new Int32Array(W*H),cnt=[0];let n=0;
+ for(let i=0;i<W*H;i++)if(m[i]&&!lab[i]){n++;const q=[i];let c0=0;lab[i]=n;while(q.length){const j=q.pop(),x=j%W,y=(j-x)/W;c0++;[[x-1,y],[x+1,y],[x,y-1],[x,y+1]].forEach(([u,v])=>{if(u>=0&&v>=0&&u<W&&v<H){const k=v*W+u;if(m[k]&&!lab[k]){lab[k]=n;q.push(k)}}})}cnt[n]=c0}
+ let best=lab[cy*W+cx];if(!best){best=1;for(let i=2;i<=n;i++)if(cnt[i]>cnt[best])best=i}
+ const o=new Uint8Array(W*H);for(let i=0;i<W*H;i++)o[i]=lab[i]===best?1:0;
+ if(fill){const R=new Uint8Array(W*H),q=[],sd=(x,y)=>{const k=y*W+x;if(!o[k]&&!R[k]){R[k]=1;q.push(k)}};for(let x=0;x<W;x++){sd(x,0);sd(x,H-1)}for(let y=0;y<H;y++){sd(0,y);sd(W-1,y)}
+  while(q.length){const j=q.pop(),x=j%W,y=(j-x)/W;if(x>0)sd(x-1,y);if(x<W-1)sd(x+1,y);if(y>0)sd(x,y-1);if(y<H-1)sd(x,y+1)}for(let i=0;i<W*H;i++)o[i]=R[i]?0:1}
+ for(let p=0;p<2;p++){const t=o.slice();for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++){let s=0;for(let v=-1;v<2;v++)for(let u=-1;u<2;u++)s+=t[(y+v)*W+x+u];o[y*W+x]=s>4?1:0}}return o}
+function osGrid(S,sel){const c2=cn6(S.W,S.H),x=c2.getContext('2d');x.fillStyle='#000';selPath(x,sel,S.s,0,0);x.fill();const d=x.getImageData(0,0,S.W,S.H).data,m=new Uint8Array(S.W*S.H);for(let i=0;i<m.length;i++)m[i]=d[i*4+3]>127?1:0;return m}
+function polyOf(m,W,H,s){const E=new Map(),K=(x,y)=>y*(W+1)+x,add=(a,b,c2,d)=>{const k=K(a,b);let l=E.get(k);if(!l)E.set(k,l=[]);l.push([c2,d])};
+ for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(m[y*W+x]){if(!y||!m[(y-1)*W+x])add(x,y,x+1,y);if(x===W-1||!m[y*W+x+1])add(x+1,y,x+1,y+1);if(y===H-1||!m[(y+1)*W+x])add(x+1,y+1,x,y+1);if(!x||!m[y*W+x-1])add(x,y+1,x,y)}
+ const polys=[];for(const[k0,l]of E){const sx=k0%(W+1),sy=(k0-sx)/(W+1);while(l.length){let cur=l.pop();const P=[[sx,sy]];while(cur[0]!==sx||cur[1]!==sy){P.push(cur);const L=E.get(K(cur[0],cur[1]));if(!L||!L.length)break;cur=L.pop()}
+  const Q=P.filter((p,i)=>{const a=P[(i+P.length-1)%P.length],b=P[(i+1)%P.length];return(p[0]-a[0])*(b[1]-p[1])!==(p[1]-a[1])*(b[0]-p[0])});
+  if(Q.length>3){const C=[];Q.forEach((p,i)=>{const q=Q[(i+1)%Q.length],L=Math.hypot(q[0]-p[0],q[1]-p[1])||1,t=Math.min(.25,1.2/L);C.push([p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t],[q[0]-(q[0]-p[0])*t,q[1]-(q[1]-p[1])*t])});polys.push(C.map(p=>[p[0]/s,p[1]/s]))}}}
+ return{t:'poly',polys}}
+function osSet(m,S,mode,prev){if(mode!=='new'&&prev){const old=osGrid(S,prev);for(let i=0;i<m.length;i++)m[i]=mode==='add'?(m[i]|old[i]):(old[i]&&!m[i]?1:0)}
+ const r=polyOf(m,S.W,S.H,S.s);SX=r.polys.length?r:(mode==='sub'?null:prev);if(!r.polys.length)toast('Nothing found there. Try a bigger box or a higher tolerance.');selDraw()}
+function objDone(b){if(/^(sam|det)$/.test($('#osMeth').value))return aiDone(b);const S=osSrc(),prev=osPrev,mode=$('#osMode').value,s=S.s,z=c.getZoom();SX=prev;selDraw();
+ const bx={x0:clamp(Math.round(b.x0*s),0,S.W-1),y0:clamp(Math.round(b.y0*s),0,S.H-1),x1:clamp(Math.round(b.x1*s),1,S.W),y1:clamp(Math.round(b.y1*s),1,S.H)};let m;
+ if((b.x1-b.x0)*z<8&&(b.y1-b.y0)*z<8){m=osClean(osClick(S,bx.x0,bx.y0,+$('#osTol').value),S.W,S.H,bx.x0,bx.y0,false)}
+ else{if(bx.x1-bx.x0<6||bx.y1-bx.y0<6)return;m=osClean(osBox(S,bx),S.W,S.H,(bx.x0+bx.x1)>>1,(bx.y0+bx.y1)>>1,true)}osSet(m,S,mode,prev)}
+SXops.invert=()=>{if(!SX)return toast('Make a selection first.');const S=osDims(),m=osGrid(S,SX);for(let i=0;i<m.length;i++)m[i]=m[i]?0:1;const r=polyOf(m,S.W,S.H,S.s);SX=r.polys.length?r:null;selDraw()};
+add.objsel=()=>setSelM(selM==='obj'?null:'obj');
+mkItem7('Object selection (box / click)',()=>setSelM('obj'),3);mkItem7('Invert selection  Ctrl+Shift+I',()=>SXops.invert(),1);
+addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key.toLowerCase()==='i'&&!/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)){e.preventDefault();SXops.invert()}});
+$('#osInv').onclick=()=>SXops.invert();$('#osCopy').onclick=()=>SXops.viaCopy();$('#osMask').onclick=()=>mskNew(act6(),'sel');$('#osNone').onclick=()=>SXops.none();
+/* --- shape borders: colour, width, solid/dashed/dotted, join style, corner rounding --- */
+const SHP=o=>!!o&&['rect','ellipse','circle','triangle','polygon','path'].includes(o.type)&&!o.maskData_x;
+function roundShape(o,r){const M=o.calcTransformMatrix(),T=p=>{const q=fabric.util.transformPoint(new fabric.Point(p.x,p.y),M);return{x:q.x,y:q.y}};let pts;
+ if(o.shapePts)pts=o.shapePts.map(p=>T({x:p[0]-o.pathOffset.x,y:p[1]-o.pathOffset.y}));else if(o.type==='polygon')pts=o.points.map(p=>T({x:p.x-o.pathOffset.x,y:p.y-o.pathOffset.y}));
+ else if(o.type==='triangle'){const w=o.width,h=o.height;pts=[{x:-w/2,y:h/2},{x:0,y:-h/2},{x:w/2,y:h/2}].map(T)}else return o;
+ const n=pts.length;let d='';pts.forEach((p,i)=>{const a=pts[(i+n-1)%n],b=pts[(i+1)%n],la=Math.hypot(a.x-p.x,a.y-p.y)||1,lb=Math.hypot(b.x-p.x,b.y-p.y)||1,t=Math.min(r,la/2,lb/2);
+  d+=(i?'L':'M')+(p.x+(a.x-p.x)/la*t)+' '+(p.y+(a.y-p.y)/la*t)+'Q'+p.x+' '+p.y+' '+(p.x+(b.x-p.x)/lb*t)+' '+(p.y+(b.y-p.y)/lb*t)});
+ const np=new fabric.Path(d+'Z',{fill:o.fill,stroke:o.stroke,strokeWidth:o.strokeWidth,strokeUniform:true,strokeDashArray:o.strokeDashArray,strokeLineJoin:o.strokeLineJoin,strokeLineCap:o.strokeLineCap,opacity:o.opacity,globalCompositeOperation:o.globalCompositeOperation,name:o.name||'Shape'});
+ np.shapePts=pts.map(p=>[p.x,p.y]);np.shapeCr=r;if(o.fx)np.fx=o.fx;const i=c.getObjects().indexOf(o);lock=true;c.remove(o);c.insertAt(np,i,false);lock=false;c.setActiveObject(np);return np}
+function shpSync(){const o=act6(),on=SHP(o);$('#shpSec').hidden=!on;if(!on)return;$('#spCol').value=/^#[0-9a-f]{6}$/i.test(o.stroke||'')?o.stroke:'#1A1A1A';$('#spW').value=o.strokeWidth||0;$('#spNo').checked=!o.stroke||!o.strokeWidth;
+ const da=o.strokeDashArray;$('#spSt').value=!da||!da.length?'solid':da[0]<1?'dotted':'dashed';$('#spJoin').value=o.strokeLineJoin||'miter';$('#spR').value=o.shapeCr||o.rx||0;$('#spR').disabled=o.type==='ellipse'||o.type==='circle'}
+function shpApply(){const w=Math.max(0,+$('#spW').value||0),st=$('#spSt').value,none=$('#spNo').checked;c.getActiveObjects().filter(SHP).forEach(o=>{
+ o.set({stroke:none||!w?'':$('#spCol').value,strokeWidth:none?0:w,strokeUniform:true,strokeLineJoin:$('#spJoin').value,strokeLineCap:st==='dotted'?'round':'butt',strokeDashArray:st==='solid'?null:st==='dashed'?[w*3,w*2]:[.1,w*2]});o.dirty=true});c.requestRenderAll()}
+function shpRound(){const o=act6();if(!SHP(o))return;const r=+$('#spR').value;if(o.type==='rect'){const m=Math.min(r,o.width/2,o.height/2);o.set({rx:m,ry:m});o.dirty=true;c.requestRenderAll()}else if(o.type==='triangle'||o.type==='polygon'||o.shapePts)roundShape(o,r)}
+['spCol','spW','spSt','spJoin','spNo'].forEach(i=>{$('#'+i).oninput=shpApply;$('#'+i).onchange=()=>{shpApply();push()}});$('#spR').oninput=shpRound;$('#spR').onchange=()=>push();
+['created','updated','cleared'].forEach(e=>c.on('selection:'+e,shpSync));
+add.shpopt=()=>SHP(act6())?toast('Set the border in the Shape borders panel.'):toast('Select a shape first (Shapes menu), then set its border.');
+
+/* ===== v0.0.8: layer opacity panel, AI selection (SAM + detectors), manual selection brush ===== */
+/* --- layer opacity / fill transparency --- */
+function opSync(){const os=c.getActiveObjects(),o=os[0];$('#lyOpSec').style.opacity=o?1:.5;if(!o)return;const v=Math.round((o.opacity??1)*100);$('#lyOp').value=v;$('#lyOpN').value=v;
+ const ok=os.every(x=>typeof x.fill==='string'&&x.fill);$('#lyFiRow').hidden=!ok;if(ok){try{$('#lyFi').value=Math.round(new fabric.Color(o.fill).getAlpha()*100)}catch(e){}}}
+function opSet(v,fin){const os=c.getActiveObjects();if(!os.length)return toast('Select a layer first.');v=clamp(+v||0,0,100);os.forEach(o=>{o.set('opacity',v/100);o.dirty=true});$('#lyOp').value=v;$('#lyOpN').value=v;if($('#op'))$('#op').value=v/100;c.requestRenderAll();if(fin)push()}
+function fiSet(v,fin){const os=c.getActiveObjects().filter(x=>typeof x.fill==='string'&&x.fill);os.forEach(o=>{const k=new fabric.Color(o.fill);k.setAlpha(clamp(+v,0,100)/100);o.set('fill',k.toRgba());o.dirty=true});c.requestRenderAll();if(fin)push()}
+$('#lyOp').oninput=e=>opSet(e.target.value,false);$('#lyOp').onchange=e=>opSet(e.target.value,true);$('#lyOpN').onchange=e=>opSet(e.target.value,true);
+$('#lyFi').oninput=e=>fiSet(e.target.value,false);$('#lyFi').onchange=e=>fiSet(e.target.value,true);
+$$('#lyOpSec [data-op]').forEach(b=>b.onclick=()=>opSet(b.dataset.op,true));
+['created','updated','cleared'].forEach(e=>c.on('selection:'+e,opSync));c.on('object:modified',opSync);
+/* --- AI selection: SlimSAM (click / box) and detectors (objects, people parts), run in the browser via transformers.js --- */
+let TF=null,sam0=null,sam=null,aiSegs=null;const pipes={};
+const aiMsg=t=>{const e=$('#aiMsg');if(e)e.textContent=t||''};
+const aiProg=p=>{if(p&&p.status==='progress')aiMsg('Downloading AI model: '+(p.file||'').split('/').pop()+' '+Math.round(p.progress||0)+'%')};
+async function aiLib(){if(!TF){aiMsg('Loading AI library…');TF=await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.1');TF.env.allowLocalModels=false}return TF}
+const srcKey=S=>{let h=S.W*31+S.H;for(let i=0;i<S.d.length;i+=997)h=(h*31+S.d[i])|0;return h};
+async function samPrep(S){const k=srcKey(S);if(sam&&sam.key===k)return;const T=await aiLib();
+ if(!sam0){aiMsg('Loading AI model (about 40 MB the first time)…');sam0={model:await T.SamModel.from_pretrained('Xenova/slimsam-77-uniform',{progress_callback:aiProg}),proc:await T.AutoProcessor.from_pretrained('Xenova/slimsam-77-uniform')}}
+ aiMsg('Analysing the image (a few seconds)…');const img=await T.RawImage.fromURL(S.cv.toDataURL('image/png')),inp=await sam0.proc(img),emb=await sam0.model.get_image_embeddings(inp);sam={key:k,inp,emb}}
+async function samMask(S,pts,labels){const T=TF,rs=sam.inp.reshaped_input_sizes[0],P=new T.Tensor('float32',pts.flatMap(p=>[p[0]*rs[1],p[1]*rs[0]]),[1,1,pts.length,2]),L=new T.Tensor('int64',BigInt64Array.from(labels.map(BigInt)),[1,1,labels.length]);
+ const out=await sam0.model({...sam.emb,input_points:P,input_labels:L}),ms=await sam0.proc.post_process_masks(out.pred_masks,sam.inp.original_sizes,sam.inp.reshaped_input_sizes),sc=out.iou_scores.data;let b=0;for(let i=1;i<sc.length;i++)if(sc[i]>sc[b])b=i;
+ const t=ms[0],H=t.dims[2],W=t.dims[3],m=new Uint8Array(S.W*S.H);for(let y=0;y<S.H;y++)for(let x=0;x<S.W;x++){const sx=Math.min(W-1,Math.floor(x*W/S.W)),sy=Math.min(H-1,Math.floor(y*H/S.H));m[y*S.W+x]=t.data[b*H*W+sy*W+sx]?1:0}return m}
+async function detRun(S){const T=await aiLib(),kind=$('#aiKind').value,mid=kind==='pan'?'Xenova/detr-resnet-50-panoptic':'Xenova/segformer_b2_clothes';
+ if(!pipes[mid]){aiMsg('Loading AI model (first time only)…');pipes[mid]=await T.pipeline('image-segmentation',mid,{progress_callback:aiProg})}
+ aiMsg('Looking for people and objects…');const res=await pipes[mid](S.cv.toDataURL('image/png'));
+ aiSegs=res.filter(r=>r.label!=='Background').map(r=>{const m=new Uint8Array(S.W*S.H),k=r.mask,W=k.width,H=k.height,ch=k.channels||1;let n=0;
+  for(let y=0;y<S.H;y++)for(let x=0;x<S.W;x++){if(k.data[(Math.min(H-1,Math.floor(y*H/S.H))*W+Math.min(W-1,Math.floor(x*W/S.W)))*ch]>127){m[y*S.W+x]=1;n++}}return{label:r.label,score:r.score,m,n}}).filter(g=>g.n>20);
+ aiSegs.key=srcKey(S)+kind;const C=$('#aiChips');C.textContent='';aiSegs.forEach(g=>{const b=mk6('button','',g.label+(g.score?' '+Math.round(g.score*100)+'%':''));b.onclick=()=>osSet(g.m.slice(),S,$('#osMode').value,SX);C.append(b)});
+ aiMsg(aiSegs.length?'Tap a name to select it, or click the object in the image.':'Nothing found. Try the click / box method.')}
+async function aiDone(b){const prev=osPrev,mode=$('#osMode').value,z=c.getZoom(),meth=$('#osMeth').value;SX=prev;selDraw();const tiny=(b.x1-b.x0)*z<8&&(b.y1-b.y0)*z<8;
+ try{const S=osSrc(),s=S.s,gx=v=>v*s/S.W,gy=v=>v*s/S.H;let m;
+  if(meth==='sam'){await samPrep(S);let pts=[[gx(b.x0),gy(b.y0)]];if(!tiny){const cx=(b.x0+b.x1)/2,cy=(b.y0+b.y1)/2,w=b.x1-b.x0,h=b.y1-b.y0;pts=[[cx,cy],[cx-w/4,cy],[cx+w/4,cy],[cx,cy-h/4],[cx,cy+h/4]].map(p=>[gx(p[0]),gy(p[1])])}
+   aiMsg('Selecting…');m=await samMask(S,pts,pts.map(()=>1));
+   if(!tiny){const px=(b.x1-b.x0)*s*.1,py=(b.y1-b.y0)*s*.1;for(let y=0;y<S.H;y++)for(let x=0;x<S.W;x++)if(x<b.x0*s-px||x>b.x1*s+px||y<b.y0*s-py||y>b.y1*s+py)m[y*S.W+x]=0}}
+  else{if(!aiSegs||aiSegs.key!==srcKey(S)+$('#aiKind').value)await detRun(S);const i=Math.round((b.x0+b.x1)/2*s),j=Math.round((b.y0+b.y1)/2*s),hit=aiSegs.filter(g=>g.m[clamp(j,0,S.H-1)*S.W+clamp(i,0,S.W-1)]).sort((a,c2)=>a.n-c2.n)[0];
+   if(!hit){aiMsg('Nothing detected there. Pick a name from the list or use the click / box method.');return}m=hit.m.slice()}
+  osSet(m,S,mode,prev);aiMsg('')}catch(e){aiMsg('AI step failed: '+(e&&e.message||e)+'. The colour method still works offline.')}}
+$('#aiDet').onclick=async()=>{try{await detRun(osSrc())}catch(e){aiMsg('AI step failed: '+(e&&e.message||e))}};
+const osUi=()=>{const m=$('#osMeth').value;$('#aiDetRow').hidden=m!=='det';$('#osTolRow').hidden=m!=='col'};$('#osMeth').onchange=osUi;osUi();
+/* --- manual selection brush: paint the part to select (Add), or paint over it to remove it from the selection (Subtract) --- */
+add.manual=()=>T6.t==='manual'?T6.stop():T6.start('manual');
+var mnP=null;
+function manualBegin(){const S=osDims();mnP=cn6(S.W,S.H);const R=+$('#mnSz').value/2;return{R,dab:q=>{const x=mnP.getContext('2d');x.fillStyle='#000';x.beginPath();x.arc(q.x*S.s,q.y*S.s,Math.max(1,R*S.s),0,6.3);x.fill();ovDraw()}}}
+function manualDone(){if(!mnP)return;const S=osDims(),d=mnP.getContext('2d').getImageData(0,0,S.W,S.H).data,m=new Uint8Array(S.W*S.H);mnP=null;for(let i=0;i<m.length;i++)m[i]=d[i*4+3]>127?1:0;
+ if($('#mnSnap').checked){const Z=osSrc(),px=i=>[Z.d[i*4],Z.d[i*4+1],Z.d[i*4+2],255-Z.d[i*4+3]];let mean=[0,0,0,0],n=0;for(let i=0;i<m.length;i++)if(m[i]){const p=px(i);for(let k=0;k<4;k++)mean[k]+=p[k];n++}
+  if(n){mean=mean.map(v=>v/n);const tol=+$('#mnTol').value*2.5;for(let i=0;i<m.length;i++)if(m[i]&&cd7(px(i),mean)>tol)m[i]=0}}
+ osSet(m,S,$('#mnMode').value,SX);ovDraw()}
+const tStart8=T6.start,tStop8=T6.stop;
+T6.start=function(t){tStart8(t);$('#mnSec').hidden=t!=='manual';const b=$('#tools [data-t=manual]');b&&b.classList.toggle('on',t==='manual')};
+T6.stop=function(){tStop8();mnP=null;$('#mnSec').hidden=true;const b=$('#tools [data-t=manual]');b&&b.classList.remove('on')};
+$('#mnInv').onclick=()=>SXops.invert();$('#mnDel').onclick=()=>SXops.clear();$('#mnCopy').onclick=()=>SXops.viaCopy();$('#mnNone').onclick=()=>SXops.none();
+opSync();
+
+/* ===== boot ===== */
+(function boot(){
+ let s=null;try{s=localStorage.getItem(KEY)||(PID==='main'?localStorage.getItem('mte-doc'):null)}catch(e){}
+ if(qs.has('w')&&!s){D=Object.assign(D,{W:+qs.get('w')||1080,H:+qs.get('h')||1080,unit:qs.get('u')||'px',dpi:+qs.get('d')||96,cm:qs.get('cm')||'rgb'});c.backgroundColor=qs.has('bg')?(qs.get('bg')==='none'?'':qs.get('bg')):'#ffffff';
+  history.replaceState(null,'',location.pathname+'?p='+PID);fit();push()}
+ else if(s){restore(s).then(()=>{hist=[s];hi=0})}
+ else{fit();push()}
+ if(qs.get('new')==='1'&&!qs.has('w'))setTimeout(()=>{nuPrev=$('#nu').value;openNew('new')},200);
+ syncCmykFromFill();applyFill&&($('#lblB').style.display=$('#lblAng').style.display='none');
+ $('#bMore').onclick=()=>{const h=$('#hmore'),m=matchMedia('(max-width:800px)').matches;h.classList.toggle(m?'show':'hide');$('#bMore').setAttribute('aria-expanded',m?h.classList.contains('show'):!h.classList.contains('hide'));if(!m)setTimeout(fit,30)};$('#fab').onclick=()=>$('#side').classList.toggle('open');
+ if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').then(r=>{
+  r.addEventListener('updatefound',()=>{const w=r.installing;w.addEventListener('statechange',()=>{
+   if(w.state==='installed'&&navigator.serviceWorker.controller){const t=$('#toast');t.innerHTML='';const b=document.createElement('button');
+    b.textContent='Update ready. Reload';b.className='pri';b.onclick=()=>w.postMessage('skip');t.append(b);t.style.display='block'}})});
+  navigator.serviceWorker.addEventListener('controllerchange',()=>location.reload())}))})();
 </script></body></html>
