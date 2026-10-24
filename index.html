@@ -41,7 +41,6 @@ h3{margin:0 0 6px;font-size:12px;color:var(--gt)}.row{display:flex;gap:6px;align
 #soBar{position:fixed;top:0;left:0;right:0;z-index:50;background:var(--g);color:var(--ink);padding:6px 10px;gap:8px;align-items:center;font-weight:700}
 .wsp{grid-column:1/-1;grid-row:2/-1;display:none;flex-direction:column;overflow:auto;padding:10px;gap:8px}
 body:not([data-ws=design]) :is(#tools,#stage,#side,#hmore,#fab){display:none!important}
-body[data-ws=office] #ws-office{display:flex}
 dialog{background:var(--d);color:var(--t);border:2px solid var(--g);border-radius:10px;padding:14px;max-width:min(720px,96vw);width:96vw;max-height:92dvh;overflow:auto}
 dialog::backdrop{background:#000a}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
@@ -237,11 +236,11 @@ html.land #nudgeBtn{right:calc(max(10px,env(safe-area-inset-right)) + 92px);bott
   <button id="bNew" class="pri">+ New</button><button id="open">Open</button><button class="pri" id="bSave" title="Save project (Ctrl+S)">Save</button><button id="bSaveAs" title="Save as (Ctrl+Shift+S)">Save as</button><span id="dirty" title="Unsaved changes" style="color:var(--gt)"></span>
   <button id="undo" title="Ctrl+Z" aria-label="Undo">&#8630;</button><button id="redo" title="Ctrl+Y" aria-label="Redo">&#8631;</button>
   <button class="pri" id="export">Export</button><button id="bTheme" aria-label="Switch light or dark mode" title="Light / dark mode">&#9728;</button><button id="bMore" aria-label="Project options" aria-expanded="true" title="Show or hide the project options row: name, canvas size, colour mode, scale and export format">&#9776;</button>
-  <input id="file" type="file" multiple hidden accept=".svg,.psd,.pdf,.ai,.png,.jpg,.jpeg,.webp,.gif,.mte,.json,.docx,.pptx,.xlsx,.xls,.ods,.csv,.odt,.odp">
+  <input id="file" type="file" multiple hidden accept=".svg,.psd,.pdf,.ai,.png,.jpg,.jpeg,.webp,.gif,.mte,.json">
  </div>
  <div id="hmore">
   <input id="pname" placeholder="Project name" style="width:140px" aria-label="Project name">
-  <button id="bSize" title="Canvas size"><span id="info"></span></button><button id="bMods" title="Where the Video and Office modules load from (file or GitHub repo link)">Modules&hellip;</button>
+  <button id="bSize" title="Canvas size"><span id="info"></span></button>
   <label>Colour <select id="cmode"><option value="rgb">RGB</option><option value="cmyk">CMYK</option></select></label>
   <label>Scale <select id="sc"><option>1</option><option>2</option><option>3</option><option value="3.125">300 dpi</option><option>4</option></select></label>
   <select id="fmt" aria-label="Export format"><option value="png-t">PNG (transparent)</option><option value="png">PNG</option><option value="jpg">JPG</option><option value="jpeg">JPEG</option><option value="webp">WEBP</option><option value="svg">SVG (editable)</option><option value="pdf-l">PDF (layered)</option><option value="pdf">PDF (flat)</option><option value="psd">PSD (layers, live text)</option><option value="ai">AI (PDF-compatible, layered)</option><option value="mte">MTE project</option></select>
@@ -368,9 +367,8 @@ html.land #nudgeBtn{right:calc(max(10px,env(safe-area-inset-right)) + 92px);bott
   <div class="row" id="alRow"></div>
  </section>
 </div></div>
- <div class="foot"><small class="m">Opens SVG, PSD, PDF, AI, images, .mte and Office files (DOCX, PPTX, XLSX). Drop files onto the canvas. Arrow keys nudge (Shift = 10px).</small></div>
+ <div class="foot"><small class="m">Opens SVG, PSD, PDF, AI, images and .mte projects. Drop files onto the canvas. Arrow keys nudge (Shift = 10px).</small></div>
 </aside>
-<section class="wsp" id="ws-office" aria-label="Office"></section>
 <div id="toast" role="status"></div>
 
 <dialog id="dNew"><h3 id="dNewT">New project</h3>
@@ -387,12 +385,6 @@ html.land #nudgeBtn{right:calc(max(10px,env(safe-area-inset-right)) + 92px);bott
  <div class="fxg"><div id="fxList"></div><div id="fxPane"></div></div>
  <div class="row" style="margin-top:10px"><button class="pri" id="fxOk">OK</button><button id="fxCancel">Cancel</button><button id="fxClear">Remove all effects</button><label class="chk"><input type="checkbox" id="fxVis" checked>Effects visible</label></div>
  <small class="m">Effects are non-destructive: untick one to hide it, change it any time, or remove all. They follow the layer when you move or scale it. Not available on layers inside a group.</small></dialog>
-<dialog id="dMod"><h3>Video and Office modules</h3>
- <small class="m">Each module is its own HTML file. Enter your GitHub repo link and the files load from the repo's GitHub Pages site (https://you.github.io/repo/office.html), so Pages must be enabled for that repo. Leave it blank to load video.html and office.html from the same folder as this app. A full https:// address in a file box overrides everything.</small>
- <div class="row" style="margin-top:8px"><label style="flex:1">GitHub repo link <input id="modRepo" type="url" placeholder="https://github.com/you/your-repo" style="width:100%"></label></div>
- <div class="row"><label>Video file or URL <input id="modVideo" placeholder="video.html"></label><label>Office file or URL <input id="modOffice" placeholder="office.html"></label></div>
- <small class="m" id="modPrev"></small>
- <div class="row" style="margin-top:8px"><button class="pri" id="modSave">Save</button><button id="modTest">Open Office in a new tab</button><button id="modClose">Close</button></div></dialog>
 <dialog id="dSvg"><h3>SVG code</h3><textarea id="svgTa" class="pp" style="min-height:44dvh;font-family:monospace;font-size:12px" spellcheck="false"></textarea>
  <div class="row" style="margin-top:8px"><button class="pri" id="svgApply">Apply</button><button id="svgDl">Download .svg</button><button id="svgClose">Close</button></div></dialog>
 <dialog id="dPdf"><h3>Import PDF / AI</h3>
@@ -403,10 +395,10 @@ html.land #nudgeBtn{right:calc(max(10px,env(safe-area-inset-right)) + 92px);bott
 <script>
 /* ===== MTE Productive Studio — keep VERSION in sync with sw.js (V) ===== */
 const LAND=()=>document.documentElement.classList.contains('land'),COMPACT=()=>innerWidth<=800||LAND();
-const VERSION='0.2.2';let dirty=false,fh=null;
+const VERSION='0.3.0';let dirty=false,fh=null;
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],GOLD='#C9932E',INK='#1A1A1A';
 const PROPS=['name','smartId','maskName','cmyk'];
-const LIBS={pdf:['https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js','pdfjsLib'],psd:['https://cdn.jsdelivr.net/npm/ag-psd@28.2.0/dist/bundle.js','agPsd'],zip:['https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js','JSZip'],xlsx:['https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js','XLSX']};
+const LIBS={pdf:['https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js','pdfjsLib'],psd:['https://cdn.jsdelivr.net/npm/ag-psd@28.2.0/dist/bundle.js','agPsd']};
 const lib=k=>window[LIBS[k][1]]?Promise.resolve():new Promise((ok,no)=>{const s=document.createElement('script');s.src=LIBS[k][0];s.onload=ok;s.onerror=()=>no(new Error(k+' library failed to load. Connect once to cache it.'));document.head.append(s)});
 let tm;const toast=(m,keep)=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(tm);if(!keep)tm=setTimeout(()=>t.style.display='none',4200)};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -459,12 +451,16 @@ function fit(){const s=$('#stage');if(!s.clientWidth)return;const pad=COMPACT()?
  z=Math.min((s.clientWidth-pad)/D.W,(s.clientHeight-pad)/D.H,1)*zf;
  c.setZoom(z);c.setDimensions({width:Math.max(1,D.W*z),height:Math.max(1,D.H*z)});c.renderAll();info();try{selOvSize()}catch(e){}try{ovSize()}catch(e){}}
 const snapshot=()=>{try{fxSync()}catch(e){}return JSON.stringify({v:VERSION,D,j:c.toJSON(PROPS)})};
+/* v0.3.0: projects saved to disk (.mte, embedded PDF project) also carry the custom fonts they use; undo history and autosave stay lean */
+async function projectData(){const s=snapshot();let fonts=[];try{const used=new Set();c.getObjects().forEach(o=>textFams(o,used));const all=await idbAll('fonts');fonts=all.filter(f=>used.has(f.name)).map(f=>({name:f.name,b64:fb64(f.buf)}))}catch(e){}
+ return fonts.length?s.slice(0,-1)+',"fonts":'+JSON.stringify(fonts)+'}':s}
 function push(){if(lock)return;const s=snapshot();hist=hist.slice(0,hi+1);hist.push(s);if(hist.length>40)hist.shift();hi=hist.length-1;
  try{localStorage.setItem(KEY,s)}catch(e){}dirty=true;const dd=$('#dirty');if(dd)dd.textContent='●';layers()}
-function restore(s){return new Promise(res=>{const d=JSON.parse(s);lock=true;
+function restore(s,warn){return new Promise(async res=>{const d=JSON.parse(s);lock=true;
  D=Object.assign({W:1080,H:1080,unit:'px',dpi:96,cm:'rgb',name:'Untitled'},d.D||{W:d.W,H:d.H});
  if(d.bg&&!d.j.background)d.j.background=d.bg;
- c.loadFromJSON(d.j,()=>{lock=false;fit();layers();res()})})}
+ try{await fontsIn(d.fonts)}catch(e){}
+ c.loadFromJSON(d.j,async()=>{lock=false;fit();layers();try{await fontsSettle(warn)}catch(e){}res()})})}
 $('#undo').onclick=()=>{if(hi>0)restore(hist[--hi])};$('#redo').onclick=()=>{if(hi<hist.length-1)restore(hist[++hi])};
 ['added','modified','removed'].forEach(e=>c.on('object:'+e,push));
 ['created','updated','cleared'].forEach(e=>c.on('selection:'+e,()=>{if(editing&&e==='cleared')pathDone();layers();sync()}));
@@ -698,14 +694,14 @@ const st=$('#stage');['dragover','dragenter'].forEach(v=>st.addEventListener(v,e
 st.addEventListener('drop',async e=>{for(const f of e.dataTransfer.files)await openFile(f)});
 const rd=f=>new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result);x.readAsDataURL(f)});
 const loadImg=u=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=u});
-const OFFICE=/^(docx|pptx|xlsx|xlsm|xls|ods|csv|odt|odp|doc|ppt|rtf)$/;
+const OFFICE=/^(docx|pptx|xlsx|xlsm|xls|ods|csv|odt|odp|doc|ppt|rtf)$/;/* Office files are not part of the Studio any more */
 async function openFile(f){const ext=f.name.split('.').pop().toLowerCase();
  try{
-  if(OFFICE.test(ext)){const w=MTE.workspaces.office;MTE.show('office');return w.openFile(f)}
+  if(OFFICE.test(ext))return toast('Office documents (.'+ext+') cannot be opened in the Studio.')
   if(ext==='svg')return importSvg(await f.text(),f.name.replace(/\.svg$/i,''));
   if(ext==='psd')return openPsd(await f.arrayBuffer(),f.name);
   if(ext==='pdf'||ext==='ai')return askPdf(await f.arrayBuffer(),f.name);
-  if(ext==='mte'||ext==='json'){fh=null;hist=[];hi=-1;await restore(await f.text());return push()}
+  if(ext==='mte'||ext==='json'){fh=null;hist=[];hi=-1;await restore(await f.text(),true);return push()}
   fabric.Image.fromURL(await rd(f),i=>{i.set('name',f.name);place(i)})
  }catch(err){console.error(err);toast('Could not open '+f.name+': '+err.message)}}
 const blendFromPsd=b=>{const m=(b||'normal').replace(/ /g,'-');return m==='normal'||m==='pass-through'?'source-over':['multiply','screen','overlay','darken','lighten','color-dodge','color-burn','hard-light','soft-light','difference','exclusion','hue','saturation','color','luminosity'].includes(m)?m:'source-over'};
@@ -823,7 +819,7 @@ async function buildPdf({layered,live,embed}){const s=+$('#sc').value||1,pt=72/D
    const r=await layerCv(o,s);if(!r)continue;const n=await rgbaObj(r.canvas,P),l=layer(nm);xo.push(`/Im${k} ${n} 0 R`);
    ops.push(`/OC /L${l} BDC q ${g}${n3(r.w/s*pt)} 0 0 ${n3(r.h/s*pt)} ${n3(r.x/s*pt)} ${n3(PH-(r.y+r.h)/s*pt)} cm /Im${k} Do Q EMC`)}}
  let names='',af='';
- if(embed){const pj=await streamObj('/Type /EmbeddedFile /Subtype /application#2Fjson',TE.encode(snapshot()));P.push(pj);const ef=P.length;
+ if(embed){const pj=await streamObj('/Type /EmbeddedFile /Subtype /application#2Fjson',TE.encode(await projectData()));P.push(pj);const ef=P.length;
   P.push(`<< /Type /Filespec /F (mte-project.json) /UF (mte-project.json) /EF << /F ${ef} 0 R >> /Desc (Editable MTE Productive Studio project) >>`);names=`/Names << /EmbeddedFiles << /Names [(mte-project.json) ${P.length} 0 R] >> >>`}
  const fonts=[...fontRes].map(([f,r])=>`/${r} << /Type /Font /Subtype /Type1 /BaseFont /${f} /Encoding /WinAnsiEncoding >>`).join(' ');
  P[4]=await streamObj('',TE.encode(ops.join('\n')));
@@ -843,7 +839,7 @@ async function buildPsd(live){await lib('psd');const s=+$('#sc').value||1,ch=[];
    const fam=(o.fontFamily||'Arial').replace(/\s/g,'');L.text={text:o.text.replace(/\n/g,'\r'),transform:[1,0,0,1,tl.x*s,tl.y*s+fs],antiAlias:'smooth',orientation:'horizontal',style:{font:{name:fam+(b&&o.fontStyle==='italic'?'-BoldItalic':b?'-Bold':o.fontStyle==='italic'?'-Italic':'MT')},fontSize:fs,fillColor:{r:R,g:G,b:B},underline:!!o.underline,strikethrough:!!o.linethrough},paragraphStyle:{justification:o.textAlign||'left'}}}
   ch.push(L)}
  const buf=agPsd.writePsd({width:D.W*s,height:D.H*s,children:ch},{generateThumbnail:true});return new Blob([buf],{type:'image/vnd.adobe.photoshop'})}
-async function saveProject(as){const data=snapshot(),n=(D.name||'mte-design').replace(/[^\w\- ]+/g,'')||'mte-design';
+async function saveProject(as){const data=await projectData(),n=(D.name||'mte-design').replace(/[^\w\- ]+/g,'')||'mte-design';
  try{if(window.showSaveFilePicker){if(!fh||as)fh=await showSaveFilePicker({suggestedName:n+'.mte',types:[{description:'MTE project',accept:{'application/json':['.mte']}}]});const w=await fh.createWritable();await w.write(data);await w.close()}
  else dl(URL.createObjectURL(new Blob([data],{type:'application/json'})),n+'.mte');
  dirty=false;$('#dirty').textContent='';toast('Saved '+n+'.mte')}catch(e){if(e.name!=='AbortError')toast('Save failed: '+e.message)}}
@@ -856,7 +852,7 @@ $('#export').onclick=async()=>{const f=$('#fmt').value,n=D.name||'mte-design';to
   else if(f==='jpg'||f==='jpeg')dl(renderURL('jpeg'),n+'.'+f);
   else if(f==='webp')dl(renderURL('webp'),n+'.webp');
   else if(f==='svg')dl(URL.createObjectURL(new Blob([svgDoc()],{type:'image/svg+xml'})),n+'.svg');
-  else if(f==='mte')dl(URL.createObjectURL(new Blob([snapshot()],{type:'application/json'})),n+'.mte');
+  else if(f==='mte')dl(URL.createObjectURL(new Blob([await projectData()],{type:'application/json'})),n+'.mte');
   else if(f==='pdf'||f==='pdf-l'||f==='ai'){const b=await buildPdf({layered:f!=='pdf',live:$('#xlive').checked,embed:$('#xproj').checked});dl(URL.createObjectURL(b),n+(f==='ai'?'.ai':f==='pdf'?'.pdf':'-layered.pdf'))}
   else if(f==='psd')dl(URL.createObjectURL(await buildPsd($('#xlive').checked)),n+'.psd');
   toast('Exported '+f.toUpperCase());fit()}catch(e){console.error(e);toast('Export failed: '+e.message);fit()}};
@@ -904,12 +900,24 @@ const idbPut=async(st,v)=>{const d=await IDB();return new Promise((res,rej)=>{co
 const idbAll=async st=>{const d=await IDB();return new Promise((res,rej)=>{const q=d.transaction(st).objectStore(st).getAll();q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})};
 async function addFont(name,buf,save){const ff=new FontFace(name,buf.slice(0));await ff.load();document.fonts.add(ff);
  if(![...$('#ff').options].some(o=>o.value===name))$('#ff').add(new Option(name,name));
- c.getObjects().forEach(o=>{if(o.fontFamily===name){o.dirty=true;o.initDimensions&&o.initDimensions()}});c.requestRenderAll();if(save)await idbPut('fonts',{name,buf})}
+ fontRefresh([name]);if(save)await idbPut('fonts',{name,buf})}
+const fb64=buf=>{const u=new Uint8Array(buf);let t='';for(let i=0;i<u.length;i+=0x8000)t+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(t)},fun64=x=>Uint8Array.from(atob(x),q=>q.charCodeAt(0)).buffer;
+const fam1=f=>String(f||'').split(',')[0].replace(/["']/g,'').trim();
+function textFams(o,s){s=s||new Set();if(!o)return s;if(o.fontFamily)s.add(fam1(o.fontFamily));if(o.styles)Object.values(o.styles).forEach(l=>l&&Object.values(l).forEach(st=>st&&st.fontFamily&&s.add(fam1(st.fontFamily))));(o._objects||[]).forEach(k=>textFams(k,s));return s}
+function fontOK(n){if(!n||/^(sans-serif|serif|monospace|cursive|fantasy|system-ui)$/i.test(n))return true;try{if([...document.fonts].some(f=>fam1(f.family)===n&&f.status==='loaded'))return true}catch(e){}
+ const x=cn6(400,50).getContext('2d'),t='mmmmmmmmmmlliWWWW 0123',w=f=>{x.font='32px '+f;return x.measureText(t).width},q='"'+n+'"';return w(q+',monospace')!==w('monospace')||w(q+',serif')!==w('serif')}
+/* text is measured with a cache per font name: after a font arrives, clear it and re-measure every layer that uses it (otherwise boxes keep the substitute font's widths) */
+function fontRefresh(names){const set=new Set(names.map(n=>n.toLowerCase()));names.forEach(n=>{try{fabric.util.clearFabricFontCache(n)}catch(e){}try{delete fabric.charWidthsCache[n.toLowerCase()]}catch(e){}});
+ const go=o=>{if([...textFams(o)].some(f=>set.has(f.toLowerCase()))&&o.initDimensions){o.dirty=true;o.initDimensions();o.setCoords&&o.setCoords()}};c.getObjects().forEach(o=>{go(o);(o._objects||[]).forEach(go)});c.requestRenderAll()}
+async function fontsIn(list){await fontsReady;for(const f of list||[]){if(!f||!f.name||!f.b64||fontOK(f.name))continue;try{await addFont(f.name,fun64(f.b64),true)}catch(e){}}}
+async function fontsSettle(warn){await fontsReady;const used=new Set();c.getObjects().forEach(o=>textFams(o,used));const names=[...used];
+ await Promise.all(names.map(n=>document.fonts.load('32px "'+n+'"').catch(()=>{})));fontRefresh(names);
+ if(warn){const miss=names.filter(n=>!fontOK(n));if(miss.length)toast('Missing font'+(miss.length>1?'s':'')+': '+miss.join(', ')+'. A substitute is shown until you add it with + Font.')}}
 $('#fontImp').onclick=()=>$('#fontFile').click();
 $('#fontFile').onchange=async e=>{const fs=[...e.target.files];e.target.value='';let last='';
  for(const f of fs){try{const name=f.name.replace(/\.[^.]+$/,'').replace(/[-_]+/g,' ').trim()||'Custom font';await addFont(name,await f.arrayBuffer(),true);last=name}catch(err){toast('Could not load '+f.name+': '+err.message)}}
  if(last){$('#ff').value=last;if(c.getActiveObject())setP('fontFamily',last);toast('Font added: '+last+'. It stays on this device.')}};
-idbAll('fonts').then(a=>a.forEach(f=>addFont(f.name,f.buf,false).catch(()=>{}))).catch(()=>{});
+const fontsReady=idbAll('fonts').then(a=>Promise.all(a.map(f=>addFont(f.name,f.buf,false).catch(()=>{})))).catch(()=>{});
 /* brushes: built-in Fabric brushes + a stamp brush with tips (built-in or imported) */
 fabric.StampBrush=fabric.util.createClass(fabric.BaseBrush,{
  initialize(canvas){this.canvas=canvas;this.pts=[]},configure(o){Object.assign(this,o)},
@@ -1064,31 +1072,6 @@ async function importAbr(f){let list;try{list=parseAbr(await f.arrayBuffer())}ca
  list.forEach((b,i)=>{let n=(b.name||base+' '+(i+1)).trim(),k=2;while(userTips[n])n=(b.name||base)+' '+k++;addTip(n,abrTip(b),true,b.spacing);if(!first)first=n});
  $('#bpre').value='user:'+first;$('#bpre').dispatchEvent(new Event('change'));toast('Imported '+list.length+' brush tips from '+f.name+'.')}
 $('#bpre').addEventListener('change',()=>{const v=$('#bpre').value;if(v.startsWith('user:')){const m=tipMeta[v.slice(5)];if(m&&m.spacing){$('#bsp').value=Math.min(200,Math.max(2,Math.round(m.spacing)));if(brushOn)setBrush()}}});
-/* ===== external modules: Video and Office are separate HTML files ===== */
-const MODKEY='mte-modules',modCfg=()=>{try{return JSON.parse(localStorage.getItem(MODKEY))||{}}catch(e){return{}}};
-function repoBase(l){l=(l||'').trim();if(!l)return'';const m=/github\.com\/([^\/\s#?]+)\/([^\/\s#?]+)/i.exec(l);
- if(m){const u=m[1],r=m[2].replace(/\.git$/i,'');return r.toLowerCase()===u.toLowerCase()+'.github.io'?`https://${u}.github.io/`:`https://${u}.github.io/${r}/`}
- return /^https?:\/\//i.test(l)?l.replace(/[#?].*$/,'').replace(/[^\/]*\.html?$/i,'').replace(/\/?$/,'/'):''}
-function modUrl(id,cfg){cfg=cfg||modCfg();const own=(cfg[id]||'').trim()||id+'.html';if(/^https?:\/\//i.test(own))return own;const b=repoBase(cfg.repo);return b?b+own.replace(/^\/+/,''):own}
-function addModule(id,label){MTE.addWorkspace({id,label,mount(el){el.style.cssText+=';padding:0;gap:0;overflow:hidden';
-  const bar=document.createElement('div');bar.className='row';bar.style.cssText='padding:8px 10px;margin:0;border-bottom:1px solid var(--l)';
-  bar.innerHTML='<small class="m" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></small><button data-a="reload">Reload</button><button data-a="cfg">Source&hellip;</button>';
-  const f=document.createElement('iframe');f.title=label;f.style.cssText='flex:1;border:0;width:100%;min-height:60vh;background:var(--p)';el.append(bar,f);
-  const w=MTE.workspaces[id];let pend=null,ready=false;w.load=()=>{ready=false;const u=modUrl(id);bar.querySelector('small').textContent=u;f.src=u};
-  const flush=()=>{if(pend&&ready&&f.contentWindow){f.contentWindow.postMessage({mte:'open',name:pend.name,bytes:pend.bytes},'*');pend=null}};
-  addEventListener('message',e=>{if(e.source===f.contentWindow&&e.data&&e.data.mte==='ready'){ready=true;flush()}});
-  w.openFile=async file=>{pend={name:file.name,bytes:await file.arrayBuffer()};if(!w.loaded){w.loaded=true;w.load()}else flush();
-   setTimeout(()=>{if(pend){pend=null;toast('The '+label+' module did not say it is ready, so the file was not delivered.')}},5000)};
-  bar.onclick=e=>{const a=e.target.dataset.a;if(a==='reload')w.load();if(a==='cfg')openMods()}}})}
-addModule('video','Video');addModule('office','Office');
-$('#wsTabs').addEventListener('click',e=>{const w=MTE.workspaces[e.target.dataset.ws];if(w&&w.load&&!w.loaded){w.loaded=true;w.load()}});
-function modPrev(){const c0={repo:$('#modRepo').value,video:$('#modVideo').value,office:$('#modOffice').value};$('#modPrev').textContent='Video: '+modUrl('video',c0)+'  |  Office: '+modUrl('office',c0)}
-function openMods(){const c0=modCfg();$('#modRepo').value=c0.repo||'';$('#modVideo').value=c0.video||'';$('#modOffice').value=c0.office||'';modPrev();$('#dMod').showModal()}
-['modRepo','modVideo','modOffice'].forEach(i=>$('#'+i).addEventListener('input',modPrev));
-$('#bMods').onclick=openMods;$('#modClose').onclick=()=>$('#dMod').close();
-$('#modSave').onclick=()=>{try{localStorage.setItem(MODKEY,JSON.stringify({repo:$('#modRepo').value.trim(),video:$('#modVideo').value.trim(),office:$('#modOffice').value.trim()}))}catch(e){}
- $('#dMod').close();['video','office'].forEach(id=>{const w=MTE.workspaces[id];if(w&&w.loaded&&w.load)w.load()});toast('Module sources saved.')};
-$('#modTest').onclick=()=>{window.open(modUrl('office'),'_blank')};
 
 /* ===== v0.0.6: Layer Styles (FX), Curves adjustment layer, Curvature Pen, Blur tool, Layer masks ===== */
 PROPS.push('fx','maskData','maskOff');
@@ -1544,6 +1527,13 @@ layers=function(){lkAll();layers3();const objs=c.getObjects().slice().reverse();
   const dl=row.querySelector('button[aria-label="Delete layer"]');if(dl)dl.onclick=ev=>{ev.stopPropagation();isLk(o)?toast(LKMSG):c.remove(o)}});
  const sel=c.getActiveObjects(),lc=$('#lyCount');if(lc&&sel.some(isLk)&&sel.length>1)lc.textContent=lc.textContent+' (includes locked)'};
 
+/* ===== v0.3.0: a locked layer cannot be changed from the side panels either (Fill, Opacity, Effects, Filters, Text, shape borders, Curves, mask) ===== */
+{const OK=new Set(['layers','align','brushSec','bkSec','mnSec','objSec','erSec','penSec','blurSec']);let tt=0;
+ ['input','change','click'].forEach(ev=>$('#side').addEventListener(ev,e=>{const sec=e.target.closest&&e.target.closest('section[data-k]');if(!sec||OK.has(sec.dataset.k))return;
+  if(!c.getActiveObjects().some(isLk))return;
+  if(ev==='click'&&!(e.target.closest&&e.target.closest('button,input,select,label')))return;
+  e.stopImmediatePropagation();e.preventDefault();const n=Date.now();if(n-tt>1500){tt=n;toast(LKMSG)}try{sync()}catch(_){}},true))}
+
 /* ===== v0.2.2: duplicate layers (row button, Duplicate button, Ctrl+D, Arrange > Duplicate) ===== */
 let dpBusy=false;
 const dpName=(n,taken)=>{const b=String(n||'Layer').replace(/ copy( \d+)?$/,'');let r=b+' copy',i=2;while(taken.has(r))r=b+' copy '+(i++);taken.add(r);return r};
@@ -1718,7 +1708,7 @@ const UI=(()=>{
  let s=null;try{s=localStorage.getItem(KEY)||(PID==='main'?localStorage.getItem('mte-doc'):null)}catch(e){}
  if(qs.has('w')&&!s){D=Object.assign(D,{W:+qs.get('w')||1080,H:+qs.get('h')||1080,unit:qs.get('u')||'px',dpi:+qs.get('d')||96,cm:qs.get('cm')||'rgb'});c.backgroundColor=qs.has('bg')?(qs.get('bg')==='none'?'':qs.get('bg')):'#ffffff';
   history.replaceState(null,'',location.pathname+'?p='+PID);fit();push()}
- else if(s){restore(s).then(()=>{hist=[s];hi=0})}
+ else if(s){restore(s,true).then(()=>{hist=[s];hi=0})}
  else{fit();push()}
  if(qs.get('new')==='1'&&!qs.has('w'))setTimeout(()=>{nuPrev=$('#nu').value;openNew('new')},200);
  syncCmykFromFill();applyFill&&($('#lblB').style.display=$('#lblAng').style.display='none');
