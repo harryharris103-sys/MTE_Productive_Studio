@@ -1,5 +1,5 @@
 // Release rule: bump V together with VERSION in index.html. Installed users then get the update prompt automatically.
-const V='mte-studio-v0.2.1';
+const V='mte-studio-v0.2.2';
 const CORE=['./','index.html','manifest.webmanifest','icon.svg','icon-180.png','icon-192.png','icon-512.png','icon-maskable-512.png','video.html','office.html','lo.html','lo-thread.js','zeta.js'];
 const LIBS=['https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js','https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js','https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js','https://cdn.jsdelivr.net/npm/ag-psd@28.2.0/dist/bundle.js','https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js','https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(V).then(c=>Promise.allSettled([...CORE,...LIBS].map(u=>c.add(u))))));

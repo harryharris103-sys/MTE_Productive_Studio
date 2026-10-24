@@ -324,7 +324,7 @@ html.land #nudgeBtn{right:calc(max(10px,env(safe-area-inset-right)) + 92px);bott
  <div class="sg" data-g="layers"><div class="sgh" role="button" tabindex="0" aria-expanded="true">Layers</div><div class="sgb">
 <section data-k="layers"><h3>Layers</h3>
   <div class="row"><button id="lyAll" title="Select every layer (Ctrl+A)">All</button><button id="lyInv" title="Swap selected and unselected layers">Invert</button><button id="lyNone">None</button><button id="lyMulti" title="Tap layers to add or remove them (for touch screens)">Multi-select</button><small class="m" id="lyCount"></small></div>
-  <div class="row" id="lyOps"><button id="lyLock" title="Lock the selected layers (Ctrl+/)">🔒 Lock</button><button id="lyUnlock" title="Unlock the selected layers">🔓 Unlock</button><button id="lyMDown" title="Merge the selected layer into the layer below it (Ctrl+E)">Merge down</button><button id="lyMSel" title="Merge all selected layers into one (Ctrl+E)">Merge selected</button><button id="lyMVis" title="Merge every visible layer into one (Ctrl+Shift+E)">Merge visible</button></div>
+  <div class="row" id="lyOps"><button id="lyDup" title="Duplicate the selected layers (Ctrl+D)">⧉ Duplicate</button><button id="lyLock" title="Lock the selected layers (Ctrl+/)">🔒 Lock</button><button id="lyUnlock" title="Unlock the selected layers">🔓 Unlock</button><button id="lyMDown" title="Merge the selected layer into the layer below it (Ctrl+E)">Merge down</button><button id="lyMSel" title="Merge all selected layers into one (Ctrl+E)">Merge selected</button><button id="lyMVis" title="Merge every visible layer into one (Ctrl+Shift+E)">Merge visible</button></div>
   <div id="layers"></div>
   <small class="m">Drag the ≡ handle to reorder layers. Ctrl, Cmd or Alt + click adds or removes a layer. Shift + click selects from one layer to another. Ctrl+A selects all layers.</small></section>
 </div></div>
@@ -403,7 +403,7 @@ html.land #nudgeBtn{right:calc(max(10px,env(safe-area-inset-right)) + 92px);bott
 <script>
 /* ===== MTE Productive Studio — keep VERSION in sync with sw.js (V) ===== */
 const LAND=()=>document.documentElement.classList.contains('land'),COMPACT=()=>innerWidth<=800||LAND();
-const VERSION='0.2.1';let dirty=false,fh=null;
+const VERSION='0.2.2';let dirty=false,fh=null;
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],GOLD='#C9932E',INK='#1A1A1A';
 const PROPS=['name','smartId','maskName','cmyk'];
 const LIBS={pdf:['https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js','pdfjsLib'],psd:['https://cdn.jsdelivr.net/npm/ag-psd@28.2.0/dist/bundle.js','agPsd'],zip:['https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js','JSZip'],xlsx:['https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js','XLSX']};
@@ -1126,11 +1126,12 @@ function fxPat(n,col,sc){const s=Math.max(3,Math.round(12*sc)),p=cn6(s,s),x=p.ge
  if(n==='dots'){x.beginPath();x.arc(s/2,s/2,s/4,0,7);x.fill()}else if(n==='stripes')x.fillRect(0,0,s,s/2);else if(n==='checker'){x.fillRect(0,0,s/2,s/2);x.fillRect(s/2,s/2,s/2,s/2)}else{x.fillRect(0,0,s,Math.max(1,s/8));x.fillRect(0,0,Math.max(1,s/8),s)}return p}
 function fxPaint(o,k,bb,useFx,useMk,useLk){
  const f=useFx?o.fx:{},E=q=>f[q]&&f[q].on?f[q]:null,ds=E('ds'),og=E('og'),st=E('st'),be=E('be'),
-  P=Math.min(500,Math.ceil((Math.max(ds?ds.s*1.5+ds.d:0,og?og.s*1.5:0,st?st.s:0,be?be.s*1.5:0)+4)*k)),W=Math.ceil(bb.width*k)+2*P,H=Math.ceil(bb.height*k)+2*P;
+  tp=(o.type==='textbox'||o.type==='i-text'||o.type==='text')?(o.fontSize||0)*Math.max(Math.abs(o.scaleX||1),Math.abs(o.scaleY||1)):0,
+  P=Math.min(1200,Math.ceil((Math.max(ds?ds.s*1.5+ds.d:0,og?og.s*1.5:0,st?st.s:0,be?be.s*1.5:0,tp)+4)*k)),W=Math.ceil(bb.width*k)+2*P,H=Math.ceil(bb.height*k)+2*P;
  if(W*H>3e7)return null;
- const ox=bb.left-P/k,oy=bb.top-P/k,src=cn6(W,H),sx=src.getContext('2d'),keep=[o.opacity,o.globalCompositeOperation,o.shadow];
- sx.setTransform(k,0,0,k,-ox*k,-oy*k);fxOff++;o.opacity=1;o.globalCompositeOperation='source-over';o.shadow=null;
- try{rOrig.call(o,sx)}finally{o.opacity=keep[0];o.globalCompositeOperation=keep[1];o.shadow=keep[2];fxOff--}
+ const ox=bb.left-P/k,oy=bb.top-P/k,src=cn6(W,H),sx=src.getContext('2d'),keep=[o.opacity,o.globalCompositeOperation,o.shadow,o.objectCaching];
+ sx.setTransform(k,0,0,k,-ox*k,-oy*k);fxOff++;o.opacity=1;o.globalCompositeOperation='source-over';o.shadow=null;if(tp)o.objectCaching=false;
+ try{rOrig.call(o,sx)}finally{o.opacity=keep[0];o.globalCompositeOperation=keep[1];o.shadow=keep[2];o.objectCaching=keep[3];fxOff--}
  sx.setTransform(1,0,0,1,0,0);
  if(useMk&&o._mcv){const t=cn6(W,H),y=t.getContext('2d');y.fillStyle='#000';y.fillRect(0,0,W,H);y.setTransform(k,0,0,k,-ox*k,-oy*k);y.transform(...o.calcTransformMatrix());
   y.clearRect(-o.width/2,-o.height/2,o.width,o.height);y.drawImage(o._mcv,-o.width/2,-o.height/2,o.width,o.height);sx.globalCompositeOperation='destination-in';sx.drawImage(t,0,0);sx.globalCompositeOperation='source-over'}
@@ -1171,7 +1172,7 @@ fabric.Object.prototype.render=function(ctx){
  if(fxOff||this.group||this.type==='curves'||!(useFx||useMk||useLk)||this.isNotVisible())return rOrig.call(this,ctx);
  if(useMk&&!this._mcv&&!this._mLoad){this._mLoad=1;loadImg(this.maskData).then(im=>{const m=cn6(im.width,im.height);m.getContext('2d').drawImage(im,0,0);this._mcv=m;this._mLoad=0;this.dirty=true;c.requestRenderAll()}).catch(()=>{this._mLoad=0})}
  const m=ctx.getTransform(),k=Math.hypot(m.a,m.b)||1,bb=this.getBoundingRect(true,true),
-  key=[k.toFixed(2),useFx?JSON.stringify(this.fx):'',this.calcTransformMatrix().slice(0,4).map(v=>v.toFixed(3)).join(),this.width,this.height,this._mv|0,useMk&&this._mcv?1:0,useLk?JSON.stringify(this.look):'',this.strokeWidth,idOf(this._filteredEl||this._element)].join('|');
+  key=[k.toFixed(2),useFx?JSON.stringify(this.fx):'',this.calcTransformMatrix().slice(0,4).map(v=>v.toFixed(3)).join(),this.width,this.height,this._mv|0,useMk&&this._mcv?1:0,useLk?JSON.stringify(this.look):'',this.strokeWidth,this.fontFamily,this.fontSize,idOf(this._filteredEl||this._element)].join('|');
  let C=this._fxC;if(!C||C.key!==key||this.dirty){C=fxPaint(this,k,bb,useFx,useMk,useLk);if(!C)return rOrig.call(this,ctx);C.key=key;this._fxC=C}
  ctx.save();this._setupCompositeOperation(ctx);this._setOpacity(ctx);ctx.drawImage(C.cv,bb.left+C.dx,bb.top+C.dy,C.cv.width/k,C.cv.height/k);ctx.restore()};
 /* FX dialog */
@@ -1476,7 +1477,7 @@ function lkApply(o){if(!o||o.type==='curves'||o===editing||!!o._lkA===!!o.locked
  o.set({lockMovementX:v,lockMovementY:v,lockRotation:v,lockScalingX:v,lockScalingY:v,lockSkewingX:v,lockSkewingY:v,hasControls:!v,hoverCursor:v?'not-allowed':null});
  if(o.type==='textbox'||o.type==='i-text')o.editable=!v;o._lkA=v;o.setCoords&&o.setCoords()}
 const lkAll=()=>c.getObjects().forEach(lkApply);
-function lkSet(list,v){list=[...new Set(list)].filter(Boolean);if(!list.length)return toast('Select a layer first.');let n=0;list.forEach(o=>{if(!!o.lockedLayer!==v){o.lockedLayer=v;n++}});
+function lyLockSet(list,v){list=[...new Set(list)].filter(Boolean);if(!list.length)return toast('Select a layer first.');let n=0;list.forEach(o=>{if(!!o.lockedLayer!==v){o.lockedLayer=v;n++}});
  if(!n)return toast(v?'Already locked.':'Already unlocked.');lkAll();c.requestRenderAll();push();toast((v?'Locked ':'Unlocked ')+n+(n>1?' layers':' layer')+'.')}
 function lkDel(){const L=c.getActiveObjects(),ok=L.filter(o=>!isLk(o));if(!L.length)return;if(!ok.length)return toast(LKMSG);
  if(ok.length<L.length)toast((L.length-ok.length)+' locked layer(s) were kept.');ok.forEach(o=>c.remove(o));c.discardActiveObject()}
@@ -1509,11 +1510,11 @@ function lyMergeDown(){const a=c.getActiveObjects();if(a.length!==1)return toast
 function lyMergeSel(){const a=c.getActiveObjects();if(a.length<2)return toast('Select two or more layers first (Multi-select, or Ctrl/Shift + click).');mergeLayers(a)}
 const lyMergeVis=()=>mergeLayers(c.getObjects().slice());
 const lyMergeAuto=()=>c.getActiveObjects().length>1?lyMergeSel():lyMergeDown();
-$('#lyLock').onclick=()=>lkSet(c.getActiveObjects(),true);$('#lyUnlock').onclick=()=>lkSet(c.getActiveObjects(),false);
+$('#lyLock').onclick=()=>lyLockSet(c.getActiveObjects(),true);$('#lyUnlock').onclick=()=>lyLockSet(c.getActiveObjects(),false);
 $('#lyMDown').onclick=lyMergeDown;$('#lyMSel').onclick=lyMergeSel;$('#lyMVis').onclick=lyMergeVis;
 addEventListener('keydown',e=>{if(!(e.ctrlKey||e.metaKey)||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)||document.body.dataset.ws!=='design')return;const a=c.getActiveObject();if(a&&a.isEditing)return;
  if(e.key.toLowerCase()==='e'){e.preventDefault();e.shiftKey?lyMergeVis():lyMergeAuto()}
- else if(e.key==='/'){e.preventDefault();const s=c.getActiveObjects();lkSet(s,!s.every(isLk))}});
+ else if(e.key==='/'){e.preventDefault();const s=c.getActiveObjects();lyLockSet(s,!s.every(isLk))}});
 
 /* --- drag to reorder (pointer events: works with mouse, pen and touch; drag the ≡ handle) --- */
 /* order: layers bottom to top; moving: layers being dragged; disp: layers in panel order (top first); slot: drop position 0..n (0 = above the first row) */
@@ -1538,10 +1539,40 @@ const layers3=layers;
 layers=function(){lkAll();layers3();const objs=c.getObjects().slice().reverse();
  [...$('#layers').children].forEach((row,i)=>{const o=objs[i];if(!o)return;const k=isLk(o);row.classList.toggle('lk',k);
   const lb=mk6('button','lkb'+(k?'':' off'),k?'🔒':'🔓');lb.title=k?'Locked: tap to unlock':'Tap to lock this layer';lb.setAttribute('aria-label',k?'Unlock layer':'Lock layer');lb.setAttribute('aria-pressed',String(k));
-  lb.onclick=ev=>{ev.stopPropagation();lkSet([o],!isLk(o))};row.insertBefore(lb,row.children[1]||null);
+  lb.onclick=ev=>{ev.stopPropagation();lyLockSet([o],!isLk(o))};row.insertBefore(lb,row.children[1]||null);
   const h=mk6('div','lyh','≡');h.title='Drag to reorder';h.setAttribute('role','button');h.setAttribute('aria-label','Drag to reorder layer');h.onpointerdown=ev=>lyDragStart(ev,row,o);row.insertBefore(h,row.firstChild);
   const dl=row.querySelector('button[aria-label="Delete layer"]');if(dl)dl.onclick=ev=>{ev.stopPropagation();isLk(o)?toast(LKMSG):c.remove(o)}});
  const sel=c.getActiveObjects(),lc=$('#lyCount');if(lc&&sel.some(isLk)&&sel.length>1)lc.textContent=lc.textContent+' (includes locked)'};
+
+/* ===== v0.2.2: duplicate layers (row button, Duplicate button, Ctrl+D, Arrange > Duplicate) ===== */
+let dpBusy=false;
+const dpName=(n,taken)=>{const b=String(n||'Layer').replace(/ copy( \d+)?$/,'');let r=b+' copy',i=2;while(taken.has(r))r=b+' copy '+(i++);taken.add(r);return r};
+async function dupLayers(list){
+ const objs=c.getObjects();list=[...new Set(list&&list.length?list:c.getActiveObjects())].filter(o=>objs.includes(o)).sort((a,b)=>objs.indexOf(a)-objs.indexOf(b));
+ if(!list.length)return toast('Select a layer first.');if(dpBusy)return;dpBusy=true;
+ try{if(editing)return toast('Finish editing points first.');
+  try{fxSync()}catch(e){}
+  const taken=new Set(objs.map(o=>o.name).filter(Boolean)),top=objs.indexOf(list[list.length-1]);
+  const cls=await Promise.all(list.map(o=>new Promise(r=>o.clone(r,PROPS))));
+  lock=true;const nw=[];
+  cls.forEach((k,i)=>{const o=list[i];
+   ['fx','look','shapePts','shapeCr','cmyk'].forEach(p=>{if(o[p]!=null&&typeof o[p]==='object')k[p]=JSON.parse(JSON.stringify(o[p]))});
+   k.lockedLayer=false;k._lkA=false;k.set({lockMovementX:false,lockMovementY:false,lockRotation:false,lockScalingX:false,lockScalingY:false,lockSkewingX:false,lockSkewingY:false,hasControls:true,hoverCursor:null});
+   if(o.type==='curves')k.set({lockMovementX:true,lockMovementY:true,hasControls:false});
+   else k.set({left:k.left+20,top:k.top+20});
+   k.name=dpName(o.name||o.type,taken);k.dirty=true;k.setCoords();c.insertAt(k,top+1+i);nw.push(k)});
+  lock=false;c.discardActiveObject();
+  const ok=nw.filter(k=>k.type!=='curves');
+  if(ok.length===1)c.setActiveObject(ok[0]);else if(ok.length>1)c.setActiveObject(new fabric.ActiveSelection(ok,{canvas:c}));
+  c.requestRenderAll();push();toast(nw.length>1?'Duplicated '+nw.length+' layers.':'Duplicated "'+nw[0].name+'".')}
+ catch(e){lock=false;console.error(e);toast('Could not duplicate: '+(e&&e.message||e))}
+ finally{dpBusy=false}}
+add.dup=()=>dupLayers();
+{const l4=layers;layers=function(){l4();const objs=c.getObjects().slice().reverse();
+ [...$('#layers').children].forEach((row,i)=>{const o=objs[i];if(!o)return;const dl=row.querySelector('button[aria-label="Delete layer"]');
+  const b=mk6('button','','⧉');b.title='Duplicate layer (Ctrl+D)';b.setAttribute('aria-label','Duplicate layer');b.onclick=ev=>{ev.stopPropagation();dupLayers([o])};
+  row.insertBefore(b,dl||null)})}}
+{const b=$('#lyDup');if(b)b.onclick=()=>dupLayers()}
 
 /* ===== v0.2.1: nudge pad for touch screens (arrow buttons that move the selected layer, like Canva) ===== */
 const NG=(()=>{const K='mte-nudge',STEPS=[1,5,10,25];let S={on:false,step:5,x:null,y:null,hint:0};

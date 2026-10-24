@@ -1,7 +1,12 @@
-# MTE Productive Studio — handoff summary (v0.2.1)
+# MTE Productive Studio — handoff summary (v0.2.2)
 
 Files: `index.html`, `sw.js`, `manifest.webmanifest`, `icon.svg` (PWA, single-file app, fabric.js 5.3.1 canvas).
 Rule for releases: bump `VERSION` in index.html AND `V` in sw.js together (e.g. `mte-studio-v0.0.2`).
+
+## v0.2.2 changes (fixes; syntax-checked and name-collision-checked only, the sandbox has no CDN so fabric could not load: please test each item in the real app)
+- **Layer lock was dead (root cause)**: `lkSet` was declared twice. The v0.0.10 Filters code (`lkSet(L,fin)`) is declared later in the file, and hoisting made it replace the v0.2.0 layer-lock `lkSet(list,v)`. Every lock click (row button, Lock / Unlock, Ctrl+/) therefore ran the filter function instead (it even wrote a blank `look` on the selected layers). The layer-lock function is now `lyLockSet`; Filters keep `lkSet`. A scan of all top-level function and const names found no other duplicates.
+- **FX / looks / masks clipped text**: the effect canvas (`fxPaint`) was only the text box plus a 4 px margin, so script fonts (swashes, tall caps, descenders) outside the box were cut off. Text layers now get a margin of one font size (scaled) on every side, the cap is raised to 1200 px, and text is drawn without fabric's own object cache while it is rendered into that canvas (the cache is box-sized too). Cache key now includes font family and size. Very large text that would exceed 30 MP falls back to plain rendering (no clipping, but no effects).
+- **Duplicate layers** (`dupLayers`): new ⧉ button on every layer row, a ⧉ Duplicate button in the layers action row, Ctrl+D and Arrange > Duplicate all use it. Copies go directly above the original, offset 20 px, named `name copy`, `name copy 2`, ... Works on several selected layers (order kept, copies selected afterwards), one undo step. Copies keep FX, masks, filters, blend, opacity, rounded shapes; `fx`, `look`, `shapePts`, `shapeCr` are deep-copied so editing the copy never changes the original. A copy of a locked layer comes out unlocked. Curves adjustment layers can be duplicated (copy stays unselectable like the original). Smart-object copies share the same `smartId`.
 
 ## v0.2.1 changes (nudge pad for touch screens; logic tested in headless Chromium with a stubbed canvas, please test in the real app)
 - **Nudge pad** (`NG` block, markup after `#fab`): on touch screens (`pointer:coarse`) and in the phone layout (`max-width:800px`), a round ✥ button next to the Panel button opens a floating pad with up / down / left / right arrows. It is `display:none` everywhere else, so the PC layout is unchanged (pixel-compared at 1100, 1366 and 1920 px wide).
